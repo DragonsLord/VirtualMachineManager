@@ -13,9 +13,13 @@ namespace Simulation.Models
 
         public Resources Resources { get; private set; }
 
-        public Resources UsedResources { get; private set; }
+        public Resources UsedResources {
+            get => PrognosedUsedResources[0];
+            private set => PrognosedUsedResources[0] = value;
+        }
 
-        public Resources[] PredictedUsedResources { get; } = new Resources[GlobalConstants.PROGNOSE_DEPTH];
+        // 0 index contains real (not predicted) data
+        public Resources[] PrognosedUsedResources { get; } = new Resources[GlobalConstants.PROGNOSE_DEPTH + 1];
 
         public bool TurnedOn { get; private set; }
 
@@ -38,7 +42,6 @@ namespace Simulation.Models
             vm.HostServerId = 0;
 
             vm.OnResourceRequirmentChange -= Vm_OnResourceRequirmentChange;
-            vm.OnPredictedResourceRequirmentChange -= Vm_OnPredictedResourceRequirmentChange;
 
             UsedResources -= vm.Resources;
 
@@ -47,23 +50,23 @@ namespace Simulation.Models
 
         public void RunVM(VM vm)
         {
-            // TODO: add resource constrains
             RunningVMs.Add(vm);
             vm.HostServerId = Id;
 
+            for (int depth = 0; depth <= GlobalConstants.PROGNOSE_DEPTH; depth++)
+            {
+                PrognosedUsedResources[depth] += vm.PrognosedResources[depth];
+            }
+
             vm.OnResourceRequirmentChange += Vm_OnResourceRequirmentChange;
-            vm.OnPredictedResourceRequirmentChange += Vm_OnPredictedResourceRequirmentChange;
         }
 
-        public bool CanRunVM(VM vm, Func<Server, Resources> selector)
+        public bool CanRunVM(VM vm, int depth)
         {
-            // TODO: deside if selector for VM is needed
-            return Resources - selector(this) > vm.Resources;
+            return Resources - PrognosedUsedResources[depth] > vm.PrognosedResources[depth];
         }
-
-        private void Vm_OnResourceRequirmentChange(Resources diff) => UsedResources += diff;
-
-        private void Vm_OnPredictedResourceRequirmentChange(int depth, Resources diff) => PredictedUsedResources[depth] += diff;
+        
+        private void Vm_OnResourceRequirmentChange(int depth, Resources diff) => PrognosedUsedResources[depth] += diff;
 
         public static Server FromDataBaseModel(DAL.Entities.PhysicalMachine pm)
         {

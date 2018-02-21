@@ -23,7 +23,7 @@ namespace Simulation
         private MigrationModule migrationModule = new MigrationModule();
         private AsigningModule asigningModule = new AsigningModule();
 
-        private DataUnit _dataContext = new DataUnit();
+        private DataUnit dataContext = new DataUnit();
 
         public VMCollection VMs { get; private set; } = new VMCollection();
         public ServerCollection Servers { get; private set; }
@@ -44,7 +44,7 @@ namespace Simulation
 
         private void Prepare()
         {
-            Servers = new ServerCollection(_dataContext.PhysicalMachineRepository);
+            Servers = new ServerCollection(dataContext.PhysicalMachineRepository);
         }
 
         public void Run()
@@ -54,7 +54,7 @@ namespace Simulation
             Prepare();
 
             #region Main Cycle
-            foreach(var timeEvent in _dataContext.TimeEventRepository.EnumerateAll())       // ???
+            foreach(var timeEvent in dataContext.TimeEventRepository.EnumerateAll())       // ???
             {
                 var loggerSectionName = $"Step {timeEvent.Id}";
                 Logger.StartProcessSection(loggerSectionName);
@@ -117,7 +117,8 @@ namespace Simulation
                                     .Select(VM.FromDataBaseModel));*/
             return timeEvent.VMEvents
                                     .Where(vme => vme.IsNew)
-                                    .Select(VM.FromDataBaseModel).ToList();
+                                    .Select(VM.FromDataBaseModel)
+                                    .ToList();
         }
 
         private void HandleUpdateRequirments(SimualtionTimeEvent timeEvent)

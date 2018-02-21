@@ -31,7 +31,7 @@ namespace Simulation.Modules.Asigning
                 unAsigned = true;
                 foreach (var server in workingServers)
                 {
-                    if (server.CanRunVM(vm, s => s.UsedResources))
+                    if (server.CanRunVM(vm, 0))
                     {
                         server.RunVM(vm);
                         unAsigned = false;
@@ -42,7 +42,7 @@ namespace Simulation.Modules.Asigning
                 {
                     foreach (var server in disabledServers)
                     {
-                        if (server.CanRunVM(vm, s => s.UsedResources))
+                        if (server.CanRunVM(vm, 0))
                         {
                             TurnOnServer(server);
                             server.RunVM(vm);

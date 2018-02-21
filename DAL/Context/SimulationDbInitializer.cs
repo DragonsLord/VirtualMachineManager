@@ -2,9 +2,6 @@
 using System.Collections.Generic;
 using System.Data.Entity;
 using DAL.Entities;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Utilities;
 using System.IO;
 using System.Globalization;
@@ -12,7 +9,7 @@ using EntityFramework.BulkInsert.Extensions;
 
 namespace DAL.Context
 {
-    public class SimulationDbInitializer: DropCreateDatabaseAlways<SimulationContext>
+    public class SimulationDbInitializer: DropCreateDatabaseIfModelChanges<SimulationContext>
     {
         private readonly string inputDataFolder = "InputData";
         private readonly string VMTracesFolder = "Traces";

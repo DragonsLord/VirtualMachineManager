@@ -31,9 +31,9 @@ namespace Simulation.Modules.Prognosing
 
         private void Predict(VM vm)
         {
-            for (int i = 0; i < GlobalConstants.PROGNOSE_DEPTH; i++)
+            for (int i = 1; i <= GlobalConstants.PROGNOSE_DEPTH; i++)
             {
-                vm.UpdatePredictedRequirments(i, PredictStep(vm, i));
+                vm.UpdatePrognosedRequirments(i, PredictStep(vm, i));
             }
         }
 

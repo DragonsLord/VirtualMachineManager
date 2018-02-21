@@ -11,14 +11,17 @@ namespace Simulation.Models
     {
         public int Id { get; set; }
 
-        public Resources Resources { get; private set; }
+        public Resources Resources {
+            get => PrognosedResources[0];
+            private set => PrognosedResources[0] = value;
+        }
 
-        public Resources[] PredictedResources { get; } = new Resources[GlobalConstants.PROGNOSE_DEPTH];
+        // 0 index contains real (not predicted) data
+        public Resources[] PrognosedResources { get; } = new Resources[GlobalConstants.PROGNOSE_DEPTH + 1];
 
         public int HostServerId { get; set; } = 0;
 
-        public event Action<Resources> OnResourceRequirmentChange;
-        public event Action<int, Resources> OnPredictedResourceRequirmentChange;
+        public event Action<int, Resources> OnResourceRequirmentChange;
 
         public void UpdateRequirments(DAL.Entities.VMEvent vme)
         {
@@ -30,16 +33,14 @@ namespace Simulation.Models
                 Network = vme.Network
             };
 
-            OnResourceRequirmentChange(newResources - Resources);
-
-            Resources = newResources;
+            UpdatePrognosedRequirments(0, newResources);
         }
 
-        public void UpdatePredictedRequirments(int depth, Resources res)
+        public void UpdatePrognosedRequirments(int depth, Resources res)
         {
-            OnPredictedResourceRequirmentChange(depth, res - Resources);
+            OnResourceRequirmentChange(depth, res - Resources);
 
-            PredictedResources[depth] = res;
+            PrognosedResources[depth] = res;
         }
 
         // TODO: [debug] remove
