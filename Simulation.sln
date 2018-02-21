@@ -1,0 +1,37 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27130.2020
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Simulation", "Simulation\Simulation.csproj", "{AE060219-1CD6-4DAF-869D-4D766D312F51}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DAL", "DAL\DAL.csproj", "{0F9AB444-0ECE-4956-9BF7-7B8114C38A98}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Utilities", "Utilities\Utilities.shproj", "{F327A5A0-95BD-4521-8EAF-6CBA7D9CF3E0}"
+EndProject
+Global
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		Utilities\Utilities.projitems*{0f9ab444-0ece-4956-9bf7-7b8114c38a98}*SharedItemsImports = 4
+		Utilities\Utilities.projitems*{f327a5a0-95bd-4521-8eaf-6cba7d9cf3e0}*SharedItemsImports = 13
+	EndGlobalSection
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{AE060219-1CD6-4DAF-869D-4D766D312F51}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AE060219-1CD6-4DAF-869D-4D766D312F51}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AE060219-1CD6-4DAF-869D-4D766D312F51}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AE060219-1CD6-4DAF-869D-4D766D312F51}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0F9AB444-0ECE-4956-9BF7-7B8114C38A98}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0F9AB444-0ECE-4956-9BF7-7B8114C38A98}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0F9AB444-0ECE-4956-9BF7-7B8114C38A98}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0F9AB444-0ECE-4956-9BF7-7B8114C38A98}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {3803FDBE-AC63-4EFF-85FA-A29C36CF8B5D}
+	EndGlobalSection
+EndGlobal
