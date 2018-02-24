@@ -1,4 +1,5 @@
 ﻿using Simulation.Models;
+using Simulation.Modules.Migration.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,7 +17,7 @@ namespace Simulation.Modules.Migration
 
             public Server Source { get; }
 
-            public Server Recipient { get; }
+            public Server Reciever { get; }
 
             public int Time { get; }
 
@@ -24,7 +25,7 @@ namespace Simulation.Modules.Migration
             {
                 Target = targetVM;
                 Source = from;
-                Recipient = to;
+                Reciever = to;
             }
         }
 
@@ -36,13 +37,23 @@ namespace Simulation.Modules.Migration
             return this;
         }
 
+        public void Add(MigrationNode node, Server target)
+        {
+            _planData.AddRange(
+                node.Changes
+                    .Select((change) => new PlanItem(
+                                                change.Target,
+                                                target,
+                                                change.Reciever )));
+        }
+
         public string GetFullInfo()
         {
             var sb = new StringBuilder("VM\tFrom\tTo\tEstimated time\n");
 
             foreach (var item in _planData)
             {
-                sb.AppendLine($"{item.Target.Id}\t{item.Source.Id}\t{item.Recipient.Id}\t{item.Time}");
+                sb.AppendLine($"{item.Target.Id}\t{item.Source.Id}\t{item.Reciever.Id}\t{item.Time}");
             }
 
             return sb.ToString();

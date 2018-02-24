@@ -11,14 +11,14 @@ namespace Simulation.Modules.Diagnostic
     {
         public IEnumerable<Server> Targets { get; }
 
-        public IEnumerable<Server> Recipients { get; }
+        public IEnumerable<Server> Recievers { get; }
 
-        public int Depth { get; set; }
+        public byte Depth { get; set; }
 
-        public DiagnosticResult(IEnumerable<Server> targets, IEnumerable<Server> recipients, int depth)
+        public DiagnosticResult(IEnumerable<Server> targets, IEnumerable<Server> recievers, byte depth)
         {
             Targets = targets;
-            Recipients = recipients;
+            Recievers = recievers;
             Depth = depth;
         }
 

@@ -65,10 +65,7 @@ namespace Simulation.Modules.Asigning
         {
             // TODO: [heuristic] improve
             var res = vm.Resources;
-            return
-                (CPU_WEIGHT * res.CPU + IOPS_WEIGHT * res.IOPS +
-                 MEMMORY_WEIGHT * res.Memmory + NETWORK_WEIGHT * res.Network)
-                / (CPU_WEIGHT + IOPS_WEIGHT + MEMMORY_WEIGHT + NETWORK_WEIGHT);
+            return res.EvaluateVolume();
         }
     }
 }

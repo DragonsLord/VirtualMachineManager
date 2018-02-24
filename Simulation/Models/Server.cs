@@ -19,7 +19,7 @@ namespace Simulation.Models
         }
 
         // 0 index contains real (not predicted) data
-        public Resources[] PrognosedUsedResources { get; } = new Resources[GlobalConstants.PROGNOSE_DEPTH + 1];
+        public Resources[] PrognosedUsedResources { get; private set; } = new Resources[GlobalConstants.PROGNOSE_DEPTH + 1];
 
         public bool TurnedOn { get; private set; }
 
@@ -64,6 +64,19 @@ namespace Simulation.Models
         public bool CanRunVM(VM vm, int depth)
         {
             return Resources - PrognosedUsedResources[depth] > vm.PrognosedResources[depth];
+        }
+
+        public Server ShalowCopy()
+        {
+            // TODO: check if work properly
+            return new Server()
+            {
+                Id = this.Id,
+                Resources = this.Resources,
+                TurnedOn = this.TurnedOn,
+                PrognosedUsedResources = this.PrognosedUsedResources.ToArray(),
+                RunningVMs = this.RunningVMs.ToList()
+            };
         }
         
         private void Vm_OnResourceRequirmentChange(int depth, Resources diff) => PrognosedUsedResources[depth] += diff;

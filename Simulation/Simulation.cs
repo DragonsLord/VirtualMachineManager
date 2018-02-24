@@ -76,7 +76,7 @@ namespace Simulation
                 var overloadedMachines = diagnosticModule.DetectOverloadedMachines(Servers);
 
                 // migrate from overloaded servers
-                var migrationPlan = migrationModule.MigrateFromOverloaded(overloadedMachines.Targets);
+                var migrationPlan = migrationModule.MigrateFromOverloaded(overloadedMachines);
 
                 // assign new VMs
                 asigningModule.Asign(newVMs, Servers); // TODO: move turnOn handling inside module?
@@ -89,7 +89,7 @@ namespace Simulation
                 var releaseMigrationPlan = migrationModule.ReleaseLowloadedMachines(lowloadedMachines.Targets);
 
                 // save migration plan
-                migrationPlan.Merge(releaseMigrationPlan).SaveToFile(); // TODO: add filepath as argument
+                
 
                 Logger.EndSection(loggerSectionName, "finished");
             }

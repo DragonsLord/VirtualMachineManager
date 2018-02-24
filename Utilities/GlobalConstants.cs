@@ -14,9 +14,26 @@ namespace Utilities
 
         public const int TIME_STEP_VALUE = 300;
 
+        #region Evaluation parameters
         public const byte CPU_WEIGHT = 1;
         public const byte MEMMORY_WEIGHT = 1;
         public const byte NETWORK_WEIGHT = 1;
         public const byte IOPS_WEIGHT = 1;
+
+        // TODO: may be unique for every server
+        // percentage
+        public const float CPU_THREADHOLD = 0.8f;
+        public const float MEMMORY_THREADHOLD = 0.8f;
+        public const float NETWORK_THREADHOLD = 0.8f;
+        public const float IOPS_THREADHOLD = 0.8f;
+        #endregion
+
+        #region Migration Parameters
+        public const byte MIN_CHILD_NODES_PER_VM = 4;
+        public const byte VM_PER_SERVER = 4;
+        public const byte BEAM_LENTH = 4;
+
+        public const byte TURN_ON_SHTRAF = 20;
+        #endregion
     }
 }

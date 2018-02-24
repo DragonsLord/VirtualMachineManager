@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Simulation.Modules.Diagnostic;
+using System;
+using static Utilities.GlobalConstants;
 
 namespace Simulation.Models
 {
@@ -15,6 +13,11 @@ namespace Simulation.Models
         public float CPU { get; set; }
 
         public float Network { get; set; }
+
+        public float EvaluateVolume()
+        {
+            return Evaluator.Evaluate(this);
+        }
 
         public static Resources operator -(Resources r1, Resources r2)
         {
