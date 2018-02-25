@@ -44,8 +44,6 @@ namespace Simulation.Models
             vm.OnResourceRequirmentChange -= Vm_OnResourceRequirmentChange;
 
             UsedResources -= vm.Resources;
-
-            //TODO: resolve PredictedResources (maybe in PrognoseModule ?)
         }
 
         public void RunVM(VM vm)

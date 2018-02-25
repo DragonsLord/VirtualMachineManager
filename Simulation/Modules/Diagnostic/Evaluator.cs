@@ -15,17 +15,17 @@ namespace Simulation.Modules.Diagnostic
 
         public static bool IsOverloaded(Server server, byte depth)
         {
-            return server.TurnedOn && IsOverloaded(server.UsedResources, server, depth);
+            return server.TurnedOn && IsOverloaded(server.PrognosedUsedResources[depth], server);
         }
 
-        public static bool IsOverloaded(Resources required, Server server, byte depth)
+        public static bool IsOverloaded(Resources required, Server server)
         {
-            var aviable = server.PrognosedUsedResources[depth];
+            var aviable = server.Resources - required;
             // TODO: add server managing requirments and check prognosed value
-            return required.CPU > aviable.CPU * CPU_THREADHOLD
-                || required.Memmory > aviable.Memmory * MEMMORY_THREADHOLD
-                || required.Network > aviable.Network * NETWORK_THREADHOLD
-                || required.IOPS > aviable.IOPS * IOPS_THREADHOLD;
+            return aviable.CPU / server.Resources.CPU < CPU_THREADHOLD
+                || aviable.Memmory / server.Resources.Memmory < MEMMORY_THREADHOLD
+                || aviable.Network / server.Resources.Network < NETWORK_THREADHOLD
+                || aviable.IOPS / server.Resources.IOPS < IOPS_THREADHOLD;
         }
     }
 }

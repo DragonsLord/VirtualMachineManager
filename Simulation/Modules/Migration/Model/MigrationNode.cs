@@ -110,7 +110,7 @@ namespace Simulation.Modules.Migration.Model
             {
                 result = !Evaluator.IsOverloaded(
                     server.PrognosedUsedResources[i] + GetRecieverResourcesChange(server, i),
-                    server, i);
+                    server);
                 if (!result)
                     return result;
             }
@@ -126,7 +126,7 @@ namespace Simulation.Modules.Migration.Model
             {
                 IsValid = !Evaluator.IsOverloaded(
                     _root.TargetServer.PrognosedUsedResources[i] - target.PrognosedResources[i],
-                    _root.TargetServer, i);
+                    _root.TargetServer);
                 if (!IsValid)
                     break;
             }
@@ -144,7 +144,7 @@ namespace Simulation.Modules.Migration.Model
             {
                 IsValid = !Evaluator.IsOverloaded(
                     _root.TargetServer.PrognosedUsedResources[i] - GetTargetServerResourcesChange(i),
-                    _root.TargetServer, i);
+                    _root.TargetServer);
                 if (!IsValid)
                     break;
             }

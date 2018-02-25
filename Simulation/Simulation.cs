@@ -91,7 +91,7 @@ namespace Simulation
                 // save migration plan
                 if (!migrationPlan.IsEmpty)
                 {
-                    Logger.LogAction(migrationPlan.GetShortInfo()); // always contains migrations
+                    Logger.LogAction(migrationPlan.GetShortInfo()); // migration dont applies
                 }
 
                 Logger.EndSection(loggerSectionName, "finished");

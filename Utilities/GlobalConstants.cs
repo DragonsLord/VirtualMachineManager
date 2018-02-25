@@ -21,11 +21,11 @@ namespace Utilities
         public const byte IOPS_WEIGHT = 1;
 
         // TODO: may be unique for every server
-        // percentage
-        public const float CPU_THREADHOLD = 0.9f;
-        public const float MEMMORY_THREADHOLD = 0.9f;
-        public const float NETWORK_THREADHOLD = 0.9f;
-        public const float IOPS_THREADHOLD = 0.9f;
+        // percentage of aviable recources
+        public const float CPU_THREADHOLD = 0.1f;
+        public const float MEMMORY_THREADHOLD = 0.1f;
+        public const float NETWORK_THREADHOLD = 0.1f;
+        public const float IOPS_THREADHOLD = 0.1f;
         #endregion
 
         #region Diagnostic parametrs
