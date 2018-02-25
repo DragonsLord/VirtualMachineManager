@@ -70,7 +70,7 @@ namespace Simulation
                 #endregion
 
                 // prognosing
-                prognoseModule.Run(VMs);
+                // prognoseModule.Run(VMs);
 
                 // run diagnostic (detect overloaded)
                 var overloadedMachines = diagnosticModule.DetectOverloadedMachines(Servers);
@@ -79,17 +79,20 @@ namespace Simulation
                 var migrationPlan = migrationModule.MigrateFromOverloaded(overloadedMachines);
 
                 // assign new VMs
-                asigningModule.Asign(newVMs, Servers); // TODO: move turnOn handling inside module?
+                asigningModule.Asign(newVMs, Servers);
                 VMs.AddRange(newVMs);
 
                 // run diagnostic (detect low loaded)
-                var lowloadedMachines = diagnosticModule.DetectLowloadedMachines(Servers);
+                // var lowloadedMachines = diagnosticModule.DetectLowloadedMachines(Servers);
 
                 // free low loaded servers
-                var releaseMigrationPlan = migrationModule.ReleaseLowloadedMachines(lowloadedMachines.Targets);
+                // var releaseMigrationPlan = migrationModule.ReleaseLowloadedMachines(lowloadedMachines.Targets);
 
                 // save migration plan
-                
+                if (!migrationPlan.IsEmpty)
+                {
+                    Logger.LogAction(migrationPlan.GetShortInfo()); // always contains migrations
+                }
 
                 Logger.EndSection(loggerSectionName, "finished");
             }

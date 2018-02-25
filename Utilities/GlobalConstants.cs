@@ -22,10 +22,17 @@ namespace Utilities
 
         // TODO: may be unique for every server
         // percentage
-        public const float CPU_THREADHOLD = 0.8f;
-        public const float MEMMORY_THREADHOLD = 0.8f;
-        public const float NETWORK_THREADHOLD = 0.8f;
-        public const float IOPS_THREADHOLD = 0.8f;
+        public const float CPU_THREADHOLD = 0.9f;
+        public const float MEMMORY_THREADHOLD = 0.9f;
+        public const float NETWORK_THREADHOLD = 0.9f;
+        public const float IOPS_THREADHOLD = 0.9f;
+        #endregion
+
+        #region Diagnostic parametrs
+        public const float CPU_RECIEVER_THREADHOLD = 0.8f;
+        public const float MEMMORY_RECIEVER_THREADHOLD = 0.8f;
+        public const float NETWORK_RECIEVER_THREADHOLD = 0.8f;
+        public const float IOPS_RECIEVER_THREADHOLD = 0.8f;
         #endregion
 
         #region Migration Parameters

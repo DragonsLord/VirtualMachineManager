@@ -64,6 +64,8 @@ namespace Simulation.Modules.Migration
             return $"Migration Plan contains {_planData.Count} migrations";
         }
 
+        public bool IsEmpty => _planData.Count == 0;
+
         private static readonly Lazy<MigrationPlan> _empty = new Lazy<MigrationPlan>();
         public static MigrationPlan Empty => _empty.Value;
     }

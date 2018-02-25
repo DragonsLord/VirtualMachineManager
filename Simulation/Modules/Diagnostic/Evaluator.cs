@@ -15,7 +15,7 @@ namespace Simulation.Modules.Diagnostic
 
         public static bool IsOverloaded(Server server, byte depth)
         {
-            return IsOverloaded(server.UsedResources, server, depth);
+            return server.TurnedOn && IsOverloaded(server.UsedResources, server, depth);
         }
 
         public static bool IsOverloaded(Resources required, Server server, byte depth)

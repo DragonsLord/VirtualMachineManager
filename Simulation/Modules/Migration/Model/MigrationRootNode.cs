@@ -32,14 +32,14 @@ namespace Simulation.Modules.Migration.Model
         {
             var nodes = Recievers
                 .Where(server => server.CanRunVM(vm, Depth))
-                .OrderByDescending(server => server.Resources - server.PrognosedUsedResources[Depth])
+                .OrderByDescending(server => (server.Resources - server.PrognosedUsedResources[Depth]).EvaluateVolume())
                 .Select(server => new MigrationNode(this, vm, server)).ToList();
             var remainigCount = GlobalConstants.MIN_CHILD_NODES_PER_VM - nodes.Count;
             if (remainigCount > 0)
             {
                 var toTurnOn = Reservation
                     .Where(server => server.CanRunVM(vm, Depth))
-                    .OrderByDescending(server => server.Resources - server.PrognosedUsedResources[Depth])
+                    .OrderByDescending(server => (server.Resources - server.PrognosedUsedResources[Depth]).EvaluateVolume())
                     .Take(remainigCount)
                     .Select(server => new MigrationNode(this, vm, server, true));
 
@@ -58,6 +58,7 @@ namespace Simulation.Modules.Migration.Model
         {
             TargetServer = targetServer;
             Recievers = recievers;
+            Reservation = reservation;
             Depth = depth;
         }
     }

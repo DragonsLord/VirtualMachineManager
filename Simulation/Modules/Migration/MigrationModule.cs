@@ -20,6 +20,9 @@ namespace Simulation.Modules.Migration
             var migrationPlan = new MigrationPlan();
             var copies = input.Recievers
                 .Select(server => server.ShalowCopy())
+                .OrderBy(s => s.Resources.EvaluateVolume())
+                .ThenBy(s => s.RunningVMs.Count)
+                .ThenBy(s => s.PrognosedUsedResources[0].EvaluateVolume() / s.RunningVMs.Count)
                 .ToList();
             // TODO: check if expressions recalculate each time
             var recievers = copies.Where(server => server.TurnedOn);

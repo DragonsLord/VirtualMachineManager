@@ -78,16 +78,16 @@ namespace Simulation.Modules.Migration.Model
         {
             var nodes = _root.Recievers
                 .Where(server => CanServerRunVM(server, vm)) // !
-                .OrderByDescending(server => 
-                    server.Resources - server.PrognosedUsedResources[_root.Depth] - GetRecieverResourcesChange(server, _root.Depth))
+                .OrderByDescending(server => Evaluator.Evaluate(
+                    server.Resources - server.PrognosedUsedResources[_root.Depth] - GetRecieverResourcesChange(server, _root.Depth)))
                 .Select(server => new MigrationNode(this, vm, server)).ToList();
             var remainigCount = GlobalConstants.MIN_CHILD_NODES_PER_VM - nodes.Count;
             if (remainigCount > 0)
             {
                 var toTurnOn = _root.Reservation
                     .Where(server => CanServerRunVM(server, vm))
-                    .OrderByDescending(server =>
-                        server.Resources - server.PrognosedUsedResources[_root.Depth] - GetRecieverResourcesChange(server, _root.Depth))
+                    .OrderByDescending(server => Evaluator.Evaluate(
+                        server.Resources - server.PrognosedUsedResources[_root.Depth] - GetRecieverResourcesChange(server, _root.Depth)))
                     .Take(remainigCount)
                     .Select(server => new MigrationNode(this, vm, server, true));
 
