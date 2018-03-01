@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Simulation.Modules.Diagnostic;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -61,7 +62,8 @@ namespace Simulation.Models
 
         public bool CanRunVM(VM vm, int depth)
         {
-            return Resources - PrognosedUsedResources[depth] > vm.PrognosedResources[depth];
+            var required = PrognosedUsedResources[depth] + vm.Resources;
+            return !Evaluator.IsOverloaded(required, this);
         }
 
         public Server ShalowCopy()

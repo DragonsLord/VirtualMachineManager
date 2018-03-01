@@ -38,7 +38,7 @@ namespace Simulation.Models
 
         public void UpdatePrognosedRequirments(int depth, Resources res)
         {
-            OnResourceRequirmentChange(depth, res - Resources);
+            OnResourceRequirmentChange?.Invoke(depth, res - Resources);
 
             PrognosedResources[depth] = res;
         }

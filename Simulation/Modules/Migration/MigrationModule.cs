@@ -32,6 +32,8 @@ namespace Simulation.Modules.Migration
                 var resultNode = _searchEngine.Run(
                     new MigrationRootNode(server, recievers.ToList(), reserve.ToList(), input.Depth)
                     ) as MigrationNode;
+                if (resultNode == null)
+                    break;
                 migrationPlan.Add(resultNode, server);
                 foreach (var change in resultNode.Changes)
                 {

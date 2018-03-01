@@ -39,7 +39,7 @@ namespace Simulation
             AppDomain.CurrentDomain.SetData("DataDirectory", appDataDir);
             #endregion
 
-            Logger.RegisterOutputChannels(Console.WriteLine);
+            Logger.RegisterOutputChannels(Console.WriteLine, (s) => System.Diagnostics.Debug.WriteLine(s));
         }
 
         private void Prepare()
@@ -93,7 +93,7 @@ namespace Simulation
                 {
                     Logger.LogAction(migrationPlan.GetShortInfo()); // migration dont applies
                 }
-
+                Console.WriteLine(VMs.Select(vm => vm.Resources.CPU).Sum());
                 Logger.EndSection(loggerSectionName, "finished");
             }
             #endregion

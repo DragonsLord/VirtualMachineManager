@@ -37,11 +37,11 @@ namespace Simulation.Modules.Diagnostic
         private bool ValidateThreadhold(Server s, byte depth)
         {
             var freeRes = s.Resources - s.PrognosedUsedResources[depth];
-            return s.TurnedOn || (
+            return !Evaluator.IsOverloaded(s, depth) && (!s.TurnedOn || (
                 freeRes.CPU > GlobalConstants.CPU_RECIEVER_THREADHOLD * s.Resources.CPU &&
                 freeRes.Memmory > GlobalConstants.MEMMORY_RECIEVER_THREADHOLD * s.Resources.Memmory &&
                 freeRes.IOPS > GlobalConstants.IOPS_RECIEVER_THREADHOLD * s.Resources.IOPS &&
-                freeRes.Network > GlobalConstants.NETWORK_RECIEVER_THREADHOLD * s.Resources.Network);
+                freeRes.Network > GlobalConstants.NETWORK_RECIEVER_THREADHOLD * s.Resources.Network));
         }
     }
 }

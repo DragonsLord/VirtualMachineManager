@@ -127,7 +127,7 @@ namespace DAL.Context
             {
                 context.PhysicalMachines.Add(new PhysicalMachine()
                 {
-                    CPU = 100000 + (float)rnd.NextDouble() * 1000000,
+                    CPU = 10000 + (float)rnd.NextDouble() * 100000,
                     Memmory = 2 * 1024 * 1024 + (float)rnd.NextDouble() * 6 * 1024 * 1024,   // 4 Gigs cap
                     IOPS = 10000 + (float)rnd.NextDouble() * 20000,
                     Network = 2000 + (float)rnd.NextDouble() * 10000
