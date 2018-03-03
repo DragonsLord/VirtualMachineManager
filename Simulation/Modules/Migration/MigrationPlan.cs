@@ -1,6 +1,7 @@
 ﻿using Simulation.Models;
 using Simulation.Modules.Migration.Model;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,10 +9,10 @@ using System.Threading.Tasks;
 
 namespace Simulation.Modules.Migration
 {
-    public class MigrationPlan
+    public class MigrationPlan: IEnumerable<MigrationPlan.PlanItem>
     {
         // structure: VMId | MachineIds | Requirments (time and etc)
-        class PlanItem
+        public class PlanItem
         {
             public VM Target { get; }
 
@@ -62,6 +63,16 @@ namespace Simulation.Modules.Migration
         public string GetShortInfo()
         {
             return $"Migration Plan contains {_planData.Count} migrations";
+        }
+
+        public IEnumerator<PlanItem> GetEnumerator()
+        {
+            return ((IEnumerable<PlanItem>)_planData).GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return ((IEnumerable<PlanItem>)_planData).GetEnumerator();
         }
 
         public bool IsEmpty => _planData.Count == 0;

@@ -18,6 +18,7 @@ namespace Simulation
 {
     public class Simulation
     {
+        private string _logFileName;
         private PrognoseModule prognoseModule = new PrognoseModule();
         private DiagnosticModule diagnosticModule = new DiagnosticModule();
         private MigrationModule migrationModule = new MigrationModule();
@@ -39,67 +40,76 @@ namespace Simulation
             AppDomain.CurrentDomain.SetData("DataDirectory", appDataDir);
             #endregion
 
-            Logger.RegisterOutputChannels(Console.WriteLine, (s) => System.Diagnostics.Debug.WriteLine(s));
+            Logger.RegisterOutputChannels(Console.Write, (s) => System.Diagnostics.Debug.Write(s));
         }
 
         private void Prepare()
         {
             Servers = new ServerCollection(dataContext.PhysicalMachineRepository);
+            _logFileName = $"Logs\\Simualtion log - {DateTime.Now.ToString("yyyy-MM-dd hh mm ss")}.txt";
         }
-
+        
         public void Run()
         {
-            Logger.StartProcessSection("Simulation runnig");
 
             Prepare();
-
-            #region Main Cycle
-            foreach(var timeEvent in dataContext.TimeEventRepository.EnumerateAll())       // ???
+            using (var streamWriter = new StreamWriter(File.Create(_logFileName)))
             {
-                var loggerSectionName = $"Step {timeEvent.Id}";
-                Logger.StartProcessSection(loggerSectionName);
-
-                #region Updating resources requirments
-                Logger.StartProcessSection("Updating resources requirments");
-
-                HandleRemovedVMs(timeEvent);
-                HandleUpdateRequirments(timeEvent);
-                var newVMs = GetNewVMs(timeEvent);
-
-                Logger.EndSection("Updating resources requirments");
+                Logger.RegisterOutputChannels(streamWriter.Write);
+                Logger.StartProcess("Simulation runnig");
+                #region Main Cycle
+                foreach (var timeEvent in dataContext.TimeEventRepository.EnumerateAll())
+                {
+                    ProccessEvent(timeEvent);
+                }
                 #endregion
 
-                // prognosing
-                // prognoseModule.Run(VMs);
-
-                // run diagnostic (detect overloaded)
-                var overloadedMachines = diagnosticModule.DetectOverloadedMachines(Servers);
-
-                // migrate from overloaded servers
-                var migrationPlan = migrationModule.MigrateFromOverloaded(overloadedMachines);
-
-                // assign new VMs
-                asigningModule.Asign(newVMs, Servers);
-                VMs.AddRange(newVMs);
-
-                // run diagnostic (detect low loaded)
-                // var lowloadedMachines = diagnosticModule.DetectLowloadedMachines(Servers);
-
-                // free low loaded servers
-                // var releaseMigrationPlan = migrationModule.ReleaseLowloadedMachines(lowloadedMachines.Targets);
-
-                // save migration plan
-                if (!migrationPlan.IsEmpty)
-                {
-                    Logger.LogAction(migrationPlan.GetShortInfo()); // migration dont applies
-                }
-                Console.WriteLine(VMs.Select(vm => vm.Resources.CPU).Sum());
-                Logger.EndSection(loggerSectionName, "finished");
+                Logger.EndProccess("Simulation", "ended");
             }
+            Console.ReadKey();
+        }
+
+        private void ProccessEvent(SimualtionTimeEvent timeEvent)
+        {
+            var loggerSectionName = $"Step {timeEvent.Id}";
+            Logger.StartProcess(loggerSectionName);
+
+            #region Updating resources requirments
+            Logger.StartAction("Updating resources requirments");
+
+            HandleRemovedVMs(timeEvent);
+            HandleUpdateRequirments(timeEvent);
+            var newVMs = GetNewVMs(timeEvent);
+
+            Logger.EndAction();
             #endregion
 
-            Logger.EndSection("Simulation", "ended");
-            Console.ReadKey();
+            // prognosing
+            // prognoseModule.Run(VMs);
+
+            // run diagnostic (detect overloaded)
+            var overloadedMachines = diagnosticModule.DetectOverloadedMachines(Servers);
+
+            // migrate from overloaded servers
+            var migrationPlan = migrationModule.MigrateFromOverloaded(overloadedMachines); // too many migrations
+
+            // assign new VMs
+            asigningModule.Asign(newVMs, Servers);
+            VMs.AddRange(newVMs);
+
+            // run diagnostic (detect low loaded)
+            // var lowloadedMachines = diagnosticModule.DetectLowloadedMachines(Servers);
+
+            // free low loaded servers
+            // var releaseMigrationPlan = migrationModule.ReleaseLowloadedMachines(lowloadedMachines.Targets);
+
+            // save migration plan
+            if (!migrationPlan.IsEmpty)
+            {
+                Logger.LogMessage(migrationPlan.GetShortInfo()); // migration dont applies
+            }
+            // Console.WriteLine(VMs.Select(vm => vm.Resources.CPU).Sum());
+            Logger.EndProccess(loggerSectionName, "finished");
         }
 
         private void HandleRemovedVMs(SimualtionTimeEvent timeEvent)
@@ -107,8 +117,11 @@ namespace Simulation
             foreach (var removedVM in timeEvent.RemovedVM)
             {
                 var vm = VMs.Get(removedVM.VMId);
-                var server = Servers.Get(vm.HostServerId);
-                server.RemoveVM(vm);
+                if (vm.HostServerId > 0)
+                {
+                    var server = Servers.Get(vm.HostServerId);
+                    server.RemoveVM(vm);
+                }
                 VMs.Remove(vm);
             }
         }

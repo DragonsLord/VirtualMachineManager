@@ -32,7 +32,7 @@ namespace Simulation.Models
                 return;
             }
 
-            Logger.LogAction($"Server {Id} is turning on");
+            Logger.LogMessage($"Server {Id} is turning on");
 
             TurnedOn = true;
         }

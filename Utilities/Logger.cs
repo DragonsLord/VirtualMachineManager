@@ -6,6 +6,7 @@ namespace Utilities
 {
     public static class Logger
     {
+        private static string _lastAction;
         private static string _indent = "";
         private static event Action<string> output;
 
@@ -32,23 +33,36 @@ namespace Utilities
             }
         }
 
-        public static void StartProcessSection(string sectionName)
+        public static void StartProcess(string sectionName)
         {
             timeStack.Push(DateTime.Now);
-            output($"{_indent}{sectionName}...");
+            output($"{_indent}{sectionName}\n");
             IncreaseIndent();
         }
 
-        public static void LogAction(string message)
+        public static void LogMessage(string message)
         {
-            output($"{_indent}{message}");
+            output($"{_indent}{message}\n");
         }
 
-        public static void EndSection(string sectionName, string result = "done")
+        public static void StartAction(string name)
+        {
+            _lastAction = name;
+            timeStack.Push(DateTime.Now);
+            output($"{_indent}{name}...");
+        }
+
+        public static void EndAction()
+        {
+            var time = DateTime.Now - timeStack.Pop();
+            output($"{time.Milliseconds}ms\n");
+        }
+
+        public static void EndProccess(string sectionName, string result = "done")
         {
             var time = DateTime.Now - timeStack.Pop();
             DecreaseIndent();
-            output($"{_indent}{sectionName} - {result} |{time.Milliseconds}ms|");
+            output($"{_indent}{sectionName} - {result} |{time.Milliseconds}ms|\n");
         }
         #endregion
     }

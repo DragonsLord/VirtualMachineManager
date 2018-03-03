@@ -13,7 +13,7 @@ namespace Simulation.Modules.Prognosing
     {
         public void Run(VMCollection vms)
         {
-            Logger.StartProcessSection("Prognosing resources usage");
+            Logger.StartProcess("Prognosing resources usage");
             foreach (var vm in vms)
             {
                 PushResourcesToStatistics(vm);
@@ -21,7 +21,7 @@ namespace Simulation.Modules.Prognosing
                 Predict(vm);
                 //Logger.LogAction($"VM {vm.Id} - done");
             }
-            Logger.EndSection("Prognosing resources usage");
+            Logger.EndProccess("Prognosing resources usage");
         }
 
         private void PushResourcesToStatistics(VM vm)

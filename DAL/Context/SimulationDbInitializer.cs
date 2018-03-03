@@ -28,7 +28,7 @@ namespace DAL.Context
             var tracesDir = new DirectoryInfo(Path.Combine(inputDataFolder, VMTracesFolder));
             int vmId = 0;
 
-            Logger.StartProcessSection("Reading traces");
+            Logger.StartProcess("Reading traces");
 
             foreach(var trace in tracesDir.GetFiles())
             {
@@ -38,10 +38,10 @@ namespace DAL.Context
 
                 context.BulkInsert(vmTrace);
 
-                Logger.LogAction($"VM {vmId} - done");
+                Logger.LogMessage($"VM {vmId} - done");
             }
 
-            Logger.EndSection("Reading treaces", "done");
+            Logger.EndProccess("Reading treaces", "done");
         }
 
         private IEnumerable<VMEvent> ReadTrace(FileInfo trace, int vmId)
@@ -121,7 +121,7 @@ namespace DAL.Context
 
         private void MapPhysicalMachines(SimulationContext context)
         {
-            Logger.StartProcessSection("Reading PM capacities");
+            Logger.StartProcess("Reading PM capacities");
             var rnd = new Random(int.MaxValue / 2);
             for (int i = 0; i < GlobalConstants.PM_CAPACITY; i++)
             {
@@ -132,17 +132,17 @@ namespace DAL.Context
                     IOPS = 10000 + (float)rnd.NextDouble() * 20000,
                     Network = 2000 + (float)rnd.NextDouble() * 10000
                 });
-                Logger.LogAction($"PM {i + 1} - done");
+                Logger.LogMessage($"PM {i + 1} - done");
             }
-            Logger.EndSection("Reading PM capacities");
+            Logger.EndProccess("Reading PM capacities");
         }
 
         protected override void Seed(SimulationContext context)
         {
-            Logger.StartProcessSection("Mapping Traces Data to DataBase Model");
+            Logger.StartProcess("Mapping Traces Data to DataBase Model");
 
             CreateTimeEvents(context);
-            Logger.LogAction("TimeEvents created");
+            Logger.LogMessage("TimeEvents created");
 
             MapFromVMTraces(context);
 
@@ -152,7 +152,7 @@ namespace DAL.Context
 
             base.Seed(context);
 
-            Logger.EndSection("Mapping Traces Data to DataBase Model");
+            Logger.EndProccess("Mapping Traces Data to DataBase Model");
         }
     }
 }

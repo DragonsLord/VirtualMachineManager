@@ -24,7 +24,7 @@ namespace Simulation.Modules.Asigning
 
         private void FirstFitDecreasing(IEnumerable<VM> vms)
         {
-            Logger.StartProcessSection("Assigning VMs");
+            Logger.StartProcess("Assigning VMs");
             bool unAsigned = false;
             foreach (var vm in vms.OrderByDescending(GetVMResourceVolume))
             {
@@ -51,7 +51,7 @@ namespace Simulation.Modules.Asigning
                     }
                 }
             }
-            Logger.EndSection("Assigning VMs");
+            Logger.EndProccess("Assigning VMs");
         }
 
         private void TurnOnServer(Server server)
