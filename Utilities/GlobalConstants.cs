@@ -41,6 +41,9 @@ namespace Utilities
         public const byte BEAM_LENTH = 4;
 
         public const byte TURN_ON_SHTRAF = 20;
+
+        public const float NETWORK_ON_MIGRATION = 0.1f;
+        public const float CPU_ON_MIGRATION = 100f;
         #endregion
     }
 }

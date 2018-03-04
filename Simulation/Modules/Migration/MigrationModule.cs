@@ -1,4 +1,5 @@
 ﻿using Simulation.Models;
+using Simulation.Models.Collections;
 using Simulation.Modules.Diagnostic;
 using Simulation.Modules.Migration.Algorythm;
 using Simulation.Modules.Migration.Model;
@@ -47,6 +48,21 @@ namespace Simulation.Modules.Migration
         {
             // TODO: implement (try use same code but with different Evaluation functions)
             return MigrationPlan.Empty;
+        }
+
+        public List<MigrationTask> ApplayMigrations(MigrationPlan migrationPlan, ServerCollection servers)
+        {
+            var migrationTasks = new List<MigrationTask>(migrationPlan.Count);
+
+            foreach (var migration in migrationPlan)
+            {
+                migrationTasks.Add(new MigrationTask(
+                        migration.Target,
+                        servers.Get(migration.SourceId),
+                        servers.Get(migration.RecieverId)));
+            }
+
+            return migrationTasks;
         }
     }
 }

@@ -11,26 +11,27 @@ namespace Simulation.Modules.Migration
 {
     public class MigrationPlan: IEnumerable<MigrationPlan.PlanItem>
     {
-        // structure: VMId | MachineIds | Requirments (time and etc)
         public class PlanItem
         {
             public VM Target { get; }
 
-            public Server Source { get; }
+            public int SourceId { get; }
 
-            public Server Reciever { get; }
+            public int RecieverId { get; }
 
             public int Time { get; }
 
             public PlanItem(VM targetVM, Server from, Server to)
             {
                 Target = targetVM;
-                Source = from;
-                Reciever = to;
+                SourceId = from.Id;
+                RecieverId = to.Id;
             }
         }
 
         private List<PlanItem> _planData = new List<PlanItem>();
+
+        public int Count => _planData.Count;
 
         public MigrationPlan Merge(MigrationPlan other)
         {
@@ -54,7 +55,7 @@ namespace Simulation.Modules.Migration
 
             foreach (var item in _planData)
             {
-                sb.AppendLine($"{item.Target.Id}\t{item.Source.Id}\t{item.Reciever.Id}\t{item.Time}");
+                sb.AppendLine($"{item.Target.Id}\t{item.SourceId}\t{item.RecieverId}\t{item.Time}");
             }
 
             return sb.ToString();

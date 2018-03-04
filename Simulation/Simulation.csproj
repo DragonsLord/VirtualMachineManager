@@ -62,6 +62,7 @@
     <Compile Include="Modules\Migration\MigrationPlan.cs" />
     <Compile Include="Modules\Migration\Model\MigrationNode.cs" />
     <Compile Include="Modules\Migration\Model\MigrationRootNode.cs" />
+    <Compile Include="Modules\Migration\Model\MigrationTask.cs" />
     <Compile Include="Modules\Prognosing\PrognoseModule.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Simulation.cs" />

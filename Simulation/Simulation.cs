@@ -29,6 +29,8 @@ namespace Simulation
         public VMCollection VMs { get; private set; } = new VMCollection();
         public ServerCollection Servers { get; private set; }
 
+        public event Action<Simulation> OnNextStep;
+
         static Simulation()
         {
             #region register App Variables
@@ -58,8 +60,9 @@ namespace Simulation
                 Logger.RegisterOutputChannels(streamWriter.Write);
                 Logger.StartProcess("Simulation runnig");
                 #region Main Cycle
-                foreach (var timeEvent in dataContext.TimeEventRepository.EnumerateAll())
+                foreach (var timeEvent in dataContext.TimeEventRepository.EnumerateAll().Take(1000))
                 {
+                    OnNextStep?.Invoke(this);
                     ProccessEvent(timeEvent);
                 }
                 #endregion
@@ -107,6 +110,11 @@ namespace Simulation
             if (!migrationPlan.IsEmpty)
             {
                 Logger.LogMessage(migrationPlan.GetShortInfo()); // migration dont applies
+                foreach (var migrationTask in migrationModule.ApplayMigrations(migrationPlan, Servers))
+                {
+                    OnNextStep += migrationTask.OnNextTimeEvent;
+                }
+                Logger.LogMessage(migrationPlan.GetFullInfo());
             }
             // Console.WriteLine(VMs.Select(vm => vm.Resources.CPU).Sum());
             Logger.EndProccess(loggerSectionName, "finished");
@@ -143,5 +151,9 @@ namespace Simulation
         }
 
         private IEnumerable<Server> GetRunningServers() => Servers.Where(server => server.TurnedOn);
+
+        private void LogCurrentServerState()
+        {
+        }
     }
 }
