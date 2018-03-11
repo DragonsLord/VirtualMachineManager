@@ -21,6 +21,8 @@ namespace Simulation.Models
 
         public int HostServerId { get; set; } = 0;
 
+        public bool IsMigrating { get; set; } = false;
+
         public event Action<int, Resources> OnResourceRequirmentChange;
 
         public void UpdateRequirments(DAL.Entities.VMEvent vme)
@@ -28,7 +30,7 @@ namespace Simulation.Models
             var newResources = new Resources
             {
                 IOPS = vme.IOPS,
-                Memmory = vme.Memmory,
+                Memmory = vme.Memory,
                 CPU = vme.CPU,
                 Network = vme.Network
             };
@@ -55,7 +57,7 @@ namespace Simulation.Models
                 Resources = new Resources
                 {
                     IOPS = vme.IOPS,
-                    Memmory = vme.Memmory,
+                    Memmory = vme.Memory,
                     CPU = vme.CPU,
                     Network = vme.Network
                 }

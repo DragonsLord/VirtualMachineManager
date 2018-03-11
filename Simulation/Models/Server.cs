@@ -44,7 +44,10 @@ namespace Simulation.Models
 
             vm.OnResourceRequirmentChange -= Vm_OnResourceRequirmentChange;
 
-            UsedResources -= vm.Resources;
+            for (int i = 0; i <= GlobalConstants.PROGNOSE_DEPTH; i++)
+            {
+                PrognosedUsedResources[i] -= vm.PrognosedResources[i];
+            }
         }
 
         public void RunVM(VM vm)
@@ -89,7 +92,7 @@ namespace Simulation.Models
                 Resources = new Resources
                 {
                     IOPS = pm.IOPS,
-                    Memmory = pm.Memmory,
+                    Memmory = pm.Memory,
                     CPU = pm.CPU,
                     Network = pm.Network
                 }

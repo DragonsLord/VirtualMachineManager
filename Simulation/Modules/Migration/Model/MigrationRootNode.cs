@@ -23,6 +23,7 @@ namespace Simulation.Modules.Migration.Model
         public IEnumerable<IStateNode> GetChilds()
         {
             return TargetServer.RunningVMs
+                .Where(vm => !vm.IsMigrating)
                 .OrderByDescending((vm) => vm.Resources.EvaluateVolume())
                 .Take(GlobalConstants.VM_PER_SERVER)
                 .SelectMany((vm) => CreateChildNodes(vm));
@@ -46,10 +47,6 @@ namespace Simulation.Modules.Migration.Model
                 nodes.AddRange(toTurnOn);
 
                 remainigCount -= toTurnOn.Count();
-            }
-            if (remainigCount > 0)
-            {
-                // TODO: consider swaps... or not?
             }
             return nodes;
         }

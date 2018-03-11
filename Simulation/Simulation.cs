@@ -42,7 +42,7 @@ namespace Simulation
             AppDomain.CurrentDomain.SetData("DataDirectory", appDataDir);
             #endregion
 
-            Logger.RegisterOutputChannels(Console.Write, (s) => System.Diagnostics.Debug.Write(s));
+            Logger.RegisterOutputChannels(Console.Write);
         }
 
         private void Prepare()
@@ -64,6 +64,7 @@ namespace Simulation
                 {
                     OnNextStep?.Invoke(this);
                     ProccessEvent(timeEvent);
+                    LogCurrentServerState();
                 }
                 #endregion
 
@@ -78,27 +79,36 @@ namespace Simulation
             Logger.StartProcess(loggerSectionName);
 
             #region Updating resources requirments
-            Logger.StartAction("Updating resources requirments");
+            Logger.StartProcess("Updating resources requirments");
 
             HandleRemovedVMs(timeEvent);
             HandleUpdateRequirments(timeEvent);
             var newVMs = GetNewVMs(timeEvent);
+            Logger.LogMessage($"New VMs: {newVMs.Count}");
 
-            Logger.EndAction();
+            Logger.EndProccess("Updating resources requirments");
             #endregion
+
+            MigrationPlan migrationPlan = MigrationPlan.Empty;
 
             // prognosing
             // prognoseModule.Run(VMs);
 
             // run diagnostic (detect overloaded)
-            var overloadedMachines = diagnosticModule.DetectOverloadedMachines(Servers);
+            var overloadedDiagnosticResult = diagnosticModule.DetectOverloadedMachines(Servers);
 
-            // migrate from overloaded servers
-            var migrationPlan = migrationModule.MigrateFromOverloaded(overloadedMachines); // too many migrations
+            if (overloadedDiagnosticResult.AreOverloadedMachines)
+            {
+                // migrate from overloaded servers
+                migrationPlan = migrationModule.MigrateFromOverloaded(overloadedDiagnosticResult);
+            }
 
-            // assign new VMs
-            asigningModule.Asign(newVMs, Servers);
-            VMs.AddRange(newVMs);
+            if (newVMs.Count > 0)
+            {
+                // assign new VMs
+                asigningModule.Asign(newVMs, Servers);
+                VMs.AddRange(newVMs);
+            }
 
             // run diagnostic (detect low loaded)
             // var lowloadedMachines = diagnosticModule.DetectLowloadedMachines(Servers);
@@ -109,7 +119,7 @@ namespace Simulation
             // save migration plan
             if (!migrationPlan.IsEmpty)
             {
-                Logger.LogMessage(migrationPlan.GetShortInfo()); // migration dont applies
+                Logger.LogMessage(migrationPlan.GetShortInfo());
                 foreach (var migrationTask in migrationModule.ApplayMigrations(migrationPlan, Servers))
                 {
                     OnNextStep += migrationTask.OnNextTimeEvent;
@@ -122,6 +132,7 @@ namespace Simulation
 
         private void HandleRemovedVMs(SimualtionTimeEvent timeEvent)
         {
+            Logger.LogMessage($"{timeEvent.RemovedVM.Count} VMs is finished");
             foreach (var removedVM in timeEvent.RemovedVM)
             {
                 var vm = VMs.Get(removedVM.VMId);
@@ -134,7 +145,7 @@ namespace Simulation
             }
         }
 
-        private IEnumerable<VM> GetNewVMs(SimualtionTimeEvent timeEvent)
+        private List<VM> GetNewVMs(SimualtionTimeEvent timeEvent)
         {
             /*VMs.AddRange(timeEvent.VMEvents
                                     .Where(vme => vme.IsNew)

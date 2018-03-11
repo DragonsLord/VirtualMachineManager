@@ -16,8 +16,14 @@ namespace Simulation.Modules.Asigning
 
         public void Asign(IEnumerable<VM> vms, IEnumerable<Server> servers)
         {
-            workingServers = servers.Where(s => s.TurnedOn).ToList();
-            disabledServers = servers.Where(s => !s.TurnedOn).ToList();
+            workingServers = servers
+                .Where(s => s.TurnedOn)
+                .OrderBy(s => s.Resources.EvaluateVolume()) // TODO: Is it worth it?
+                .ToList();
+            disabledServers = servers
+                .Where(s => !s.TurnedOn)
+                .OrderBy(s => s.Resources.EvaluateVolume())
+                .ToList();
 
             FirstFitDecreasing(vms);
         }

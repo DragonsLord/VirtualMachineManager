@@ -68,6 +68,7 @@ namespace Simulation.Modules.Migration.Model
         public IEnumerable<IStateNode> GetChilds()
         {
             return _root.TargetServer.RunningVMs
+                .Where(vm => !vm.IsMigrating)
                 .Where(vm => Changes.All(record => record.Target.Id != vm.Id))
                 .OrderByDescending((vm) => vm.Resources.EvaluateVolume())
                 .Take(GlobalConstants.VM_PER_SERVER)
@@ -122,7 +123,7 @@ namespace Simulation.Modules.Migration.Model
             _value = new Lazy<float>(CulculateValue);
             Changes = new MigrationRecord[1] { new MigrationRecord(target, reciever) };
             _root = root;
-            for (byte i = 0; i < _root.Depth; i++)
+            for (byte i = 0; i <= _root.Depth; i++)
             {
                 IsValid = !Evaluator.IsOverloaded(
                     _root.TargetServer.PrognosedUsedResources[i] - target.PrognosedResources[i],
@@ -140,7 +141,7 @@ namespace Simulation.Modules.Migration.Model
             Changes = parent.Changes.PushToEnd(new MigrationRecord(target, reciever));
             _root = parent._root;
             _turnOnCount = parent._turnOnCount;
-            for (byte i = 0; i < _root.Depth; i++)  // TODO: is cycle neccessary ?
+            for (byte i = 0; i <= _root.Depth; i++)  // TODO: is cycle neccessary ?
             {
                 IsValid = !Evaluator.IsOverloaded(
                     _root.TargetServer.PrognosedUsedResources[i] - GetTargetServerResourcesChange(i),

@@ -7,7 +7,7 @@ namespace Utilities
     public static class Logger
     {
         private static string _lastAction;
-        private static string _indent = "";
+        public static string Indent { get; private set; } = "";
         private static event Action<string> output;
 
         private static Stack<DateTime> timeStack = new Stack<DateTime>();
@@ -15,12 +15,12 @@ namespace Utilities
         #region private methods
         private static void IncreaseIndent()
         {
-            _indent += '\t';
+            Indent += '\t';
         }
 
         private static void DecreaseIndent()
         {
-            _indent = _indent.Substring(0, _indent.Length - 1);
+            Indent = Indent.Substring(0, Indent.Length - 1);
         }
         #endregion
 
@@ -36,20 +36,20 @@ namespace Utilities
         public static void StartProcess(string sectionName)
         {
             timeStack.Push(DateTime.Now);
-            output($"{_indent}{sectionName}\n");
+            output($"{Indent}{sectionName}\n");
             IncreaseIndent();
         }
 
         public static void LogMessage(string message)
         {
-            output($"{_indent}{message}\n");
+            output($"{Indent}{message}\n");
         }
 
         public static void StartAction(string name)
         {
             _lastAction = name;
             timeStack.Push(DateTime.Now);
-            output($"{_indent}{name}...");
+            output($"{Indent}{name}...");
         }
 
         public static void EndAction()
@@ -62,7 +62,7 @@ namespace Utilities
         {
             var time = DateTime.Now - timeStack.Pop();
             DecreaseIndent();
-            output($"{_indent}{sectionName} - {result} |{time.Milliseconds}ms|\n");
+            output($"{Indent}{sectionName} - {result} |{time.Milliseconds}ms|\n");
         }
         #endregion
     }

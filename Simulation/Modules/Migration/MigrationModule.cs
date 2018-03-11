@@ -25,7 +25,7 @@ namespace Simulation.Modules.Migration
                 .ThenBy(s => s.RunningVMs.Count)
                 .ThenBy(s => s.PrognosedUsedResources[0].EvaluateVolume() / s.RunningVMs.Count)
                 .ToList();
-            // TODO: check if expressions recalculate each time
+
             var recievers = copies.Where(server => server.TurnedOn);
             var reserve = copies.Where(server => !server.TurnedOn);
             foreach (var server in input.Targets)

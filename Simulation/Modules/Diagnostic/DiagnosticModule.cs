@@ -13,18 +13,21 @@ namespace Simulation.Modules.Diagnostic
     {
         public DiagnosticResult DetectOverloadedMachines(ServerCollection collection)
         {
+            Logger.StartAction("Diagnosting for overloaded servers");
             // TODO: add prognosed steps after prognose module implementation
             var overloaded = collection.Where(server => Evaluator.IsOverloaded(server, 0));
-            return new DiagnosticResult(
+            var result = new DiagnosticResult(
                 overloaded,
                 PrepareRecievers(collection, 0),
                 0 );
+            Logger.EndAction();
+            return result;
         }
 
         public DiagnosticResult DetectLowloadedMachines(ServerCollection collection)
         {
             // TODO: implement
-            return DiagnosticResult.Empty;
+            return null;
         }
 
         private IEnumerable<Server> PrepareRecievers(IEnumerable<Server> servers, byte depth)

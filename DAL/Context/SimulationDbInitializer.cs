@@ -77,7 +77,7 @@ namespace DAL.Context
                     {
                         TimeEventId = GetTimeEventId(time),
                         CPU = cpu,
-                        Memmory = memmory,
+                        Memory = memmory,
                         IOPS = iops,
                         Network = network,
                         VMId = vmId,
@@ -128,7 +128,7 @@ namespace DAL.Context
                 context.PhysicalMachines.Add(new PhysicalMachine()
                 {
                     CPU = 10000 + (float)rnd.NextDouble() * 100000,
-                    Memmory = 2 * 1024 * 1024 + (float)rnd.NextDouble() * 6 * 1024 * 1024,   // 4 Gigs cap
+                    Memory = 2 * 1024 * 1024 + (float)rnd.NextDouble() * 6 * 1024 * 1024,   // 4 Gigs cap
                     IOPS = 10000 + (float)rnd.NextDouble() * 20000,
                     Network = 2000 + (float)rnd.NextDouble() * 10000
                 });

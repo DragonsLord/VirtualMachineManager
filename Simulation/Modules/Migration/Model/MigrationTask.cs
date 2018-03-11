@@ -23,8 +23,9 @@ namespace Simulation.Modules.Migration.Model
             TargetVM = targerVM;
             Sender = sender;
             CalculateResources();
-            steps = (int)Math.Ceiling(TargetVM.Resources.Memmory / Resources.Network);
+            steps = Math.Max(1, (int)Math.Ceiling(TargetVM.Resources.Memmory / Resources.Network)); // for 0 memmory tasks
             InitMigrationOnServers();
+            System.Diagnostics.Debug.WriteLine($"migration task created: vm{TargetVM.Id} from {Sender.Id} to {Reciever.Id} for {steps}");
         }
 
         public void CalculateResources()
@@ -43,6 +44,7 @@ namespace Simulation.Modules.Migration.Model
 
         private void InitMigrationOnServers()
         {
+            TargetVM.IsMigrating = true;
             for (byte depth = 0; depth < GlobalConstants.PROGNOSE_DEPTH; depth++)
             {
                 Sender.PrognosedUsedResources[depth] += Resources;
@@ -56,11 +58,13 @@ namespace Simulation.Modules.Migration.Model
             {
                 EndMigration();
                 simulation.OnNextStep -= this.OnNextTimeEvent;
+                System.Diagnostics.Debug.WriteLine($"VM{TargetVM.Id} migrated to {Reciever.Id}");
             }
         }
 
         private void EndMigration()
         {
+            TargetVM.IsMigrating = false;
             for (byte depth = 0; depth < GlobalConstants.PROGNOSE_DEPTH; depth++)
             {
                 Sender.PrognosedUsedResources[depth] -= Resources;

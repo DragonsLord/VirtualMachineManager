@@ -7,7 +7,7 @@ namespace DAL.Entities
 
         public float IOPS { get; set; }
 
-        public float Memmory { get; set; }
+        public float Memory { get; set; }
 
         public float CPU { get; set; }
 

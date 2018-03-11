@@ -15,13 +15,13 @@ namespace Simulation.Modules.Diagnostic
 
         public byte Depth { get; set; }
 
+        public bool AreOverloadedMachines => Targets.Any();
+
         public DiagnosticResult(IEnumerable<Server> targets, IEnumerable<Server> recievers, byte depth)
         {
             Targets = targets;
             Recievers = recievers;
             Depth = depth;
         }
-
-        public static DiagnosticResult Empty => new DiagnosticResult(new Server[0], new Server[0], 0);      // TODO: think about it
     }
 }

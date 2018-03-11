@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Utilities;
 
 namespace Simulation.Modules.Migration
 {
@@ -51,11 +52,11 @@ namespace Simulation.Modules.Migration
 
         public string GetFullInfo()
         {
-            var sb = new StringBuilder("VM\tFrom\tTo\tEstimated time\n");
+            var sb = new StringBuilder("VM\tFrom\tTo\n");
 
             foreach (var item in _planData)
             {
-                sb.AppendLine($"{item.Target.Id}\t{item.SourceId}\t{item.RecieverId}\t{item.Time}");
+                sb.AppendLine($"{Logger.Indent}{item.Target.Id}\t{item.SourceId}\t{item.RecieverId}");
             }
 
             return sb.ToString();
