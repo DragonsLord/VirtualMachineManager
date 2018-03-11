@@ -31,7 +31,12 @@ namespace Simulation.Modules.Migration
             foreach (var server in input.Targets)
             {
                 var resultNode = _searchEngine.Run(
-                    new MigrationRootNode(server, recievers.ToList(), reserve.ToList(), input.Depth)
+                    new MigrationRootNode(
+                        server,
+                        recievers.ToList(),
+                        reserve.ToList(),
+                        input.Depth,
+                        OverloadedMigrationNode.FromRootNode)
                     ) as MigrationNode;
                 if (resultNode == null)
                     break;

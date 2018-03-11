@@ -26,7 +26,7 @@ namespace Simulation.Modules.Diagnostic
 
         public DiagnosticResult DetectLowloadedMachines(ServerCollection collection)
         {
-            // TODO: implement
+            // TODO: implement smart diagnostic
             return null;
         }
 

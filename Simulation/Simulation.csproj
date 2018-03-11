@@ -63,6 +63,8 @@
     <Compile Include="Modules\Migration\Model\MigrationNode.cs" />
     <Compile Include="Modules\Migration\Model\MigrationRootNode.cs" />
     <Compile Include="Modules\Migration\Model\MigrationTask.cs" />
+    <Compile Include="Modules\Migration\Model\LowloadedMigrationNode.cs" />
+    <Compile Include="Modules\Migration\Model\OverloadedMigrationNode.cs" />
     <Compile Include="Modules\Prognosing\PrognoseModule.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Simulation.cs" />

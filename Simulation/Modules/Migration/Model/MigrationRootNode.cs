@@ -11,6 +11,7 @@ namespace Simulation.Modules.Migration.Model
 {
     public class MigrationRootNode : IStateNode
     {
+        private Func<MigrationRootNode, VM, Server, bool, MigrationNode> CreateChildNode;
         public byte Depth { get; }
         public Server TargetServer { get; }
         public IEnumerable<Server> Recievers { get; }
@@ -34,7 +35,7 @@ namespace Simulation.Modules.Migration.Model
             var nodes = Recievers
                 .Where(server => server.CanRunVM(vm, Depth))
                 .OrderByDescending(server => (server.Resources - server.PrognosedUsedResources[Depth]).EvaluateVolume())
-                .Select(server => new MigrationNode(this, vm, server)).ToList();
+                .Select(server => CreateChildNode(this, vm, server, false)).ToList();
             var remainigCount = GlobalConstants.MIN_CHILD_NODES_PER_VM - nodes.Count;
             if (remainigCount > 0)
             {
@@ -42,7 +43,7 @@ namespace Simulation.Modules.Migration.Model
                     .Where(server => server.CanRunVM(vm, Depth))
                     .OrderByDescending(server => (server.Resources - server.PrognosedUsedResources[Depth]).EvaluateVolume())
                     .Take(remainigCount)
-                    .Select(server => new MigrationNode(this, vm, server, true));
+                    .Select(server => CreateChildNode(this, vm, server, true));
 
                 nodes.AddRange(toTurnOn);
 
@@ -51,12 +52,18 @@ namespace Simulation.Modules.Migration.Model
             return nodes;
         }
 
-        public MigrationRootNode(Server targetServer, IEnumerable<Server> recievers, IEnumerable<Server> reservation, byte depth)
+        public MigrationRootNode(
+            Server targetServer, 
+            IEnumerable<Server> recievers, 
+            IEnumerable<Server> reservation, 
+            byte depth,
+            Func<MigrationRootNode, VM, Server, bool, MigrationNode> nodeCreator)
         {
             TargetServer = targetServer;
             Recievers = recievers;
             Reservation = reservation;
             Depth = depth;
+            CreateChildNode = nodeCreator;
         }
     }
 }
