@@ -1,4 +1,5 @@
 ﻿using Simulation.Models;
+using System;
 using static Utilities.GlobalConstants;
 
 namespace Simulation.Modules.Diagnostic
@@ -26,6 +27,47 @@ namespace Simulation.Modules.Diagnostic
                 || aviable.Memmory / server.Resources.Memmory < MEMMORY_THREADHOLD
                 || aviable.Network / server.Resources.Network < NETWORK_THREADHOLD
                 || aviable.IOPS / server.Resources.IOPS < IOPS_THREADHOLD;
+        }
+
+        public static float EvaluateForOverloading(Server server, byte depth)
+        {
+            var usedResources = server.PrognosedUsedResources[depth];
+            var toFreeCap = new Resources()
+            {
+                CPU = server.Resources.CPU * CPU_LOW_LEVEL,
+                Memmory = server.Resources.Memmory * MEMMORY_LOW_LEVEL,
+                Network = server.Resources.Network * NETWORK_LOW_LEVEL,
+                IOPS = server.Resources.IOPS * IOPS_LOW_LEVEL
+            };
+            if (usedResources < toFreeCap)
+            {
+                return (toFreeCap - usedResources).EvaluateVolume();
+            } else
+            {
+                var desiredLevel = new Resources()
+                {
+                    CPU = server.Resources.CPU * CPU_DESIRED_LEVEL,
+                    Memmory = server.Resources.Memmory * MEMMORY_DESIRED_LEVEL,
+                    Network = server.Resources.Network * NETWORK_DESIRED_LEVEL,
+                    IOPS = server.Resources.IOPS * IOPS_DESIRED_LEVEL
+                };
+                // "-" is used to transform it to maximization task
+                return -Math.Abs((desiredLevel - usedResources).EvaluateVolume());
+            }
+        }
+
+        public static float EvaluateForReleasing(Server server, byte depth)
+        {
+            var usedResources = server.PrognosedUsedResources[depth];
+            var desiredLevel = new Resources()
+            {
+                CPU = server.Resources.CPU * CPU_DESIRED_LEVEL,
+                Memmory = server.Resources.Memmory * MEMMORY_DESIRED_LEVEL,
+                Network = server.Resources.Network * NETWORK_DESIRED_LEVEL,
+                IOPS = server.Resources.IOPS * IOPS_DESIRED_LEVEL
+            };
+            // "-" is used to transform it to maximization task
+            return -Math.Abs((desiredLevel - usedResources).EvaluateVolume());
         }
     }
 }

@@ -18,7 +18,7 @@ namespace Simulation.Modules.Migration.Interfaces
         public int Compare(IStateNode x, IStateNode y)
         {
             if (x == y) return 0;
-            var val = (int)((y.Value - x.Value) * 100);
+            var val = (int)((y.Value - x.Value) * 1000);
             if (val == 0) return 1;
             else return val;
         }

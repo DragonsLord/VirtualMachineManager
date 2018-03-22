@@ -23,7 +23,7 @@ namespace Simulation.Modules.Migration
                 .Select(server => server.ShalowCopy())
                 .OrderBy(s => s.Resources.EvaluateVolume())
                 .ThenBy(s => s.RunningVMs.Count)
-                .ThenBy(s => s.PrognosedUsedResources[0].EvaluateVolume() / s.RunningVMs.Count)
+                .ThenBy(s => s.PrognosedUsedResources[input.Depth].EvaluateVolume() / s.RunningVMs.Count)
                 .ToList();
 
             var recievers = copies.Where(server => server.TurnedOn);
@@ -36,6 +36,7 @@ namespace Simulation.Modules.Migration
                         recievers.ToList(),
                         reserve.ToList(),
                         input.Depth,
+                        GetInitialValue(recievers, input.Depth, Evaluator.EvaluateForOverloading),
                         OverloadedMigrationNode.FromRootNode)
                     ) as MigrationNode;
                 if (resultNode == null)
@@ -49,10 +50,38 @@ namespace Simulation.Modules.Migration
             return migrationPlan;
         }
 
-        public MigrationPlan ReleaseLowloadedMachines(IEnumerable<Server> lowloadedMachines)
+        public MigrationPlan ReleaseLowloadedMachines(DiagnosticResult input)
         {
-            // TODO: implement (try use same code but with different Evaluation functions)
-            return MigrationPlan.Empty;
+            var migrationPlan = new MigrationPlan();
+            var copies = input.Recievers
+                .Select(server => server.ShalowCopy())
+                .OrderBy(s => s.Resources.EvaluateVolume())
+                .ThenBy(s => s.RunningVMs.Count)
+                .ThenBy(s => s.PrognosedUsedResources[input.Depth].EvaluateVolume() / s.RunningVMs.Count)
+                .ToList();
+
+            var recievers = copies.Where(server => server.TurnedOn);
+            var reserve = copies.Where(server => !server.TurnedOn);
+            foreach (var server in input.Targets)
+            {
+                var resultNode = _searchEngine.Run(
+                    new MigrationRootNode(
+                        server,
+                        recievers.ToList(),
+                        reserve.ToList(),
+                        input.Depth,
+                        GetInitialValue(recievers, input.Depth, Evaluator.EvaluateForReleasing),
+                        LowloadedMigrationNode.FromRootNode)
+                    ) as MigrationNode;
+                if (resultNode == null)
+                    break;
+                migrationPlan.Add(resultNode, server);
+                foreach (var change in resultNode.Changes)
+                {
+                    copies.Find(s => s.Id == change.Reciever.Id).RunVM(change.Target);
+                }
+            }
+            return migrationPlan;
         }
 
         public List<MigrationTask> ApplayMigrations(MigrationPlan migrationPlan, ServerCollection servers)
@@ -68,6 +97,15 @@ namespace Simulation.Modules.Migration
             }
 
             return migrationTasks;
+        }
+
+        private float GetInitialValue(IEnumerable<Server> recievers, byte depth, Func<Server, byte, float> evaluator)
+        {
+            if (recievers.Any())
+            {
+                return recievers.Average((s) => evaluator(s, depth));
+            }
+            else return 0;
         }
     }
 }

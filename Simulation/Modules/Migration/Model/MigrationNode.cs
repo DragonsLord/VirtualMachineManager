@@ -31,8 +31,8 @@ namespace Simulation.Modules.Migration.Model
 
         public bool IsValid { get; private set; }
 
-        public float Value => _value.Value;
-        private Lazy<float> _value;
+        public float Value => _value;
+        private float _value;
 
         protected Resources GetTargetServerResourcesChange(byte depth)
         {
@@ -42,14 +42,14 @@ namespace Simulation.Modules.Migration.Model
             return r;
         }
 
-        protected Resources GetRecieverResourcesChange(Server server, byte depth)
+        public Resources GetRecieverResources(Server server, byte depth)
         {
             Resources r = new Resources();
             Changes
                 .Where((change) => change.Reciever.Id == server.Id)
                 .ForEach((changes) => r += changes.Target.PrognosedResources[depth]);
 
-            return r;
+            return r + server.PrognosedUsedResources[depth];
         }
 
         public IEnumerable<IStateNode> GetChilds()
@@ -67,7 +67,7 @@ namespace Simulation.Modules.Migration.Model
             var nodes = _root.Recievers
                 .Where(server => CanServerRunVM(server, vm)) // !
                 .OrderByDescending(server => Evaluator.Evaluate(
-                    server.Resources - server.PrognosedUsedResources[_root.Depth] - GetRecieverResourcesChange(server, _root.Depth)))
+                    server.Resources - GetRecieverResources(server, _root.Depth)))
                 .Select(server => CreateNode(this, vm, server)).ToList();
             var remainigCount = GlobalConstants.MIN_CHILD_NODES_PER_VM - nodes.Count;
             if (remainigCount > 0)
@@ -75,7 +75,7 @@ namespace Simulation.Modules.Migration.Model
                 var toTurnOn = _root.Reservation
                     .Where(server => CanServerRunVM(server, vm))
                     .OrderByDescending(server => Evaluator.Evaluate(
-                        server.Resources - server.PrognosedUsedResources[_root.Depth] - GetRecieverResourcesChange(server, _root.Depth)))
+                        server.Resources - GetRecieverResources(server, _root.Depth)))
                     .Take(remainigCount)
                     .Select(server => CreateNode(this, vm, server, true));
 
@@ -97,7 +97,7 @@ namespace Simulation.Modules.Migration.Model
             for (byte i = 0; i < _root.Depth; i++)
             {
                 result = !Evaluator.IsOverloaded(
-                    server.PrognosedUsedResources[i] + GetRecieverResourcesChange(server, i),
+                    GetRecieverResources(server, i),
                     server);
                 if (!result)
                     return result;
@@ -107,28 +107,28 @@ namespace Simulation.Modules.Migration.Model
 
         public MigrationNode(MigrationRootNode root, VM target, Server reciever, bool turnOnNew = false)
         {
-            _value = new Lazy<float>(CalculateValue);
             Changes = new MigrationRecord[1] { new MigrationRecord(target, reciever) };
             _root = root;
             IsValid = CalculateValidity();
             if (turnOnNew)
                 _turnOnCount = 1;
+            _value = CalculateValue(root, turnOnNew);
         }
 
         public MigrationNode(MigrationNode parent, VM target, Server reciever, bool turnOnNew = false)
         {
-            _value = new Lazy<float>(CalculateValue);
             Changes = parent.Changes.PushToEnd(new MigrationRecord(target, reciever));
             _root = parent._root;
             _turnOnCount = parent._turnOnCount;
             IsValid = CalculateValidity();
             if (turnOnNew)
                 _turnOnCount += 1;
+            _value = CalculateValue(parent, turnOnNew);
         }
 
         protected abstract bool CalculateValidity();
 
-        protected abstract float CalculateValue();
+        protected abstract float CalculateValue(IStateNode previous, bool newTurnOn);
 
         protected abstract IStateNode CreateNode(MigrationNode parent, VM target, Server reciever, bool turnOnNew = false);
     }

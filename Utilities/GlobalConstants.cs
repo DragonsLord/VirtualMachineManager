@@ -6,29 +6,61 @@ namespace Utilities
 {
     public static class GlobalConstants
     {
+        /// <summary>
+        /// Upper bound for simulation parametrs
+        /// Should be always equals or be grater then actual value
+        /// </summary>
         public const int TIME_STEPS_CAPACITY = 9000;
         public const int VM_CAPACITY = 3000;
         public const int PM_CAPACITY = 30;
 
+        /// <summary>
+        /// Indicate how mach steps will be prognosed
+        /// </summary>
         public const int PROGNOSE_DEPTH = 3;
 
         public const int TIME_STEP_VALUE = 300;
 
         #region Evaluation parameters
+        /// <summary>
+        /// Weight of every resource for comulative value
+        /// </summary>
         public const byte CPU_WEIGHT = 1;
         public const byte MEMMORY_WEIGHT = 1;
         public const byte NETWORK_WEIGHT = 1;
         public const byte IOPS_WEIGHT = 1;
 
-        // TODO: may be unique for every server
-        // percentage of aviable recources
+        /// <summary>
+        /// Percantage of free resource amount.
+        /// When free valume is lower then that value
+        /// server is considered to be overloaded
+        /// </summary>
         public const float CPU_THREADHOLD = 0.1f;
         public const float MEMMORY_THREADHOLD = 0.1f;
         public const float NETWORK_THREADHOLD = 0.1f;
         public const float IOPS_THREADHOLD = 0.1f;
+
+        /// <summary>
+        /// Percentage of used resources volume which consider most sutible
+        /// </summary>
+        public const float CPU_DESIRED_LEVEL = 0.65f;
+        public const float MEMMORY_DESIRED_LEVEL = 0.65f;
+        public const float NETWORK_DESIRED_LEVEL = 0.65f;
+        public const float IOPS_DESIRED_LEVEL = 0.65f;
+
+        /// <summary>
+        /// Percentage of used resources volume which consider to be freed for server shut down
+        /// </summary>
+        public const float CPU_LOW_LEVEL = 0.15f;
+        public const float MEMMORY_LOW_LEVEL = 0.15f;
+        public const float NETWORK_LOW_LEVEL = 0.15f;
+        public const float IOPS_LOW_LEVEL = 0.15f;
         #endregion
 
         #region Diagnostic parametrs
+        /// <summary>
+        /// Percantage of free space server should have to became reciever in migration process
+        /// </summary>
         public const float CPU_RECIEVER_THREADHOLD = 0.8f;
         public const float MEMMORY_RECIEVER_THREADHOLD = 0.8f;
         public const float NETWORK_RECIEVER_THREADHOLD = 0.8f;
@@ -40,9 +72,15 @@ namespace Utilities
         public const byte VM_PER_SERVER = 4;
         public const byte BEAM_LENTH = 4;
 
-        public const byte TURN_ON_SHTRAF = 20;
+        public const byte TURN_ON_PENALTY = 20;
 
+        /// <summary>
+        /// relative network vaule to use for migration task
+        /// </summary>
         public const float NETWORK_ON_MIGRATION = 0.1f;
+        /// <summary>
+        /// absolute CPU resource value to use for migration task
+        /// </summary>
         public const float CPU_ON_MIGRATION = 100f;
         #endregion
     }

@@ -35,6 +35,11 @@ namespace Utilities
             return arr;
         }
 
+        public static T LastItem<T>(this T[] array)
+        {
+            return array[array.Length - 1];
+        }
+
         /*public static T Max<T>(this IEnumerable<T> collection, Func<T, float> evaluator)
         {
             float max = float.NegativeInfinity;

@@ -17,7 +17,7 @@ namespace Simulation.Modules.Migration.Model
         public IEnumerable<Server> Recievers { get; }
         public IEnumerable<Server> Reservation { get; }
 
-        public float Value => 0;
+        public float Value { get; }
 
         public bool IsValid => false;
 
@@ -57,6 +57,7 @@ namespace Simulation.Modules.Migration.Model
             IEnumerable<Server> recievers, 
             IEnumerable<Server> reservation, 
             byte depth,
+            float initialValue,
             Func<MigrationRootNode, VM, Server, bool, MigrationNode> nodeCreator)
         {
             TargetServer = targetServer;
@@ -64,6 +65,7 @@ namespace Simulation.Modules.Migration.Model
             Reservation = reservation;
             Depth = depth;
             CreateChildNode = nodeCreator;
+            Value = initialValue;
         }
     }
 }

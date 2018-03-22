@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Simulation.Models;
 using Simulation.Modules.Diagnostic;
 using Simulation.Modules.Migration.Interfaces;
+using Utilities;
 
 namespace Simulation.Modules.Migration.Model
 {
@@ -16,8 +17,8 @@ namespace Simulation.Modules.Migration.Model
         {
         }
 
-        public LowloadedMigrationNode(MigrationNode root, VM target, Server reciever, bool turnOnNew = false)
-            : base(root, target, reciever, turnOnNew)
+        public LowloadedMigrationNode(MigrationNode parent, VM target, Server reciever, bool turnOnNew = false)
+            : base(parent, target, reciever, turnOnNew)
         {
         }
 
@@ -26,19 +27,28 @@ namespace Simulation.Modules.Migration.Model
             return Changes.Length == _root.TargetServer.RunningVMs.Count;
         }
 
-        protected override float CalculateValue()
+        protected override float CalculateValue(IStateNode previous, bool newTurnOn)
         {
             if (_turnOnCount > 0)
             {
-                return float.NegativeInfinity;  // our task is to turn of server not turn on
+                // TODO: Consider MinValue instead of Infinity
+                return float.NegativeInfinity;  // our task is to turn off server not turn on
             }
-            float val = 0f;
-            
+
+            float val = previous.Value;
+
             val += GetTargetServerResourcesChange(_root.Depth).EvaluateVolume();
 
-            // TODO: [high] add value of average resources usage on recievers !!!
+            var change = Changes.LastItem();
+            val += CalculateDiffForUpdatedMachineCase(change.Target.PrognosedResources[_root.Depth]);
 
             return val;
+        }
+
+        private float CalculateDiffForUpdatedMachineCase(Resources serverResourcesChange)
+        {
+            var totalServers = _root.Recievers.Count() + _turnOnCount;
+            return serverResourcesChange.EvaluateVolume() / totalServers;
         }
 
         protected override IStateNode CreateNode(MigrationNode parent, VM target, Server reciever, bool turnOnNew = false)
