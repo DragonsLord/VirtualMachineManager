@@ -4,6 +4,7 @@ using System.Text;
 
 namespace Utilities
 {
+    //TODO: add migration per server constraint
     public static class GlobalConstants
     {
         /// <summary>
@@ -61,10 +62,10 @@ namespace Utilities
         /// <summary>
         /// Percantage of free space server should have to became reciever in migration process
         /// </summary>
-        public const float CPU_RECIEVER_THREADHOLD = 0.8f;
-        public const float MEMMORY_RECIEVER_THREADHOLD = 0.8f;
-        public const float NETWORK_RECIEVER_THREADHOLD = 0.8f;
-        public const float IOPS_RECIEVER_THREADHOLD = 0.8f;
+        public const float CPU_RECIEVER_THREADHOLD = 0.6f;
+        public const float MEMMORY_RECIEVER_THREADHOLD = 0.6f;
+        public const float NETWORK_RECIEVER_THREADHOLD = 0.6f;
+        public const float IOPS_RECIEVER_THREADHOLD = 0.6f;
         #endregion
 
         #region Migration Parameters

@@ -24,6 +24,8 @@ namespace Simulation.Models
 
         public bool TurnedOn { get; private set; }
 
+        public bool InMigration { get; set; }   //TODO: to aviod migration plan repeating
+
         public List<VM> RunningVMs { get; private set; } = new List<VM>();
 
         public void TurnOn()
@@ -35,6 +37,11 @@ namespace Simulation.Models
             Logger.LogMessage($"Server {Id} is turning on");
 
             TurnedOn = true;
+        }
+
+        public void MarkToShutdown()
+        {
+            TurnedOn = false;
         }
 
         public void RemoveVM(VM vm)
@@ -80,6 +87,15 @@ namespace Simulation.Models
                 PrognosedUsedResources = this.PrognosedUsedResources.ToArray(),
                 RunningVMs = this.RunningVMs.ToList()
             };
+        }
+
+        public void TryShutdown(Simulation simulation)
+        {
+            if (TurnedOn && !RunningVMs.Any())
+            {
+                TurnedOn = false;
+                Logger.LogMessage($"Server {Id} is shutting down");
+            }
         }
         
         private void Vm_OnResourceRequirmentChange(int depth, Resources diff) => PrognosedUsedResources[depth] += diff;

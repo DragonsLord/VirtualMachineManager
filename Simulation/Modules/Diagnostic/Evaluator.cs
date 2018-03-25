@@ -69,5 +69,14 @@ namespace Simulation.Modules.Diagnostic
             // "-" is used to transform it to maximization task
             return -Math.Abs((desiredLevel - usedResources).EvaluateVolume());
         }
+
+        public static bool IsLowLoaded(Server server, byte depth)
+        {
+            var res = server.PrognosedUsedResources[depth];
+            return res.CPU <= server.Resources.CPU * CPU_LOW_LEVEL &&
+            res.Memmory <= server.Resources.Memmory * MEMMORY_LOW_LEVEL &&
+            res.Network <= server.Resources.Network * NETWORK_LOW_LEVEL &&
+            res.IOPS <= server.Resources.IOPS * IOPS_LOW_LEVEL;
+        }
     }
 }

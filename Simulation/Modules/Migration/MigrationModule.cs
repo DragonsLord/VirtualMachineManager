@@ -73,9 +73,10 @@ namespace Simulation.Modules.Migration
                         GetInitialValue(recievers, input.Depth, Evaluator.EvaluateForReleasing),
                         LowloadedMigrationNode.FromRootNode)
                     ) as MigrationNode;
-                if (resultNode == null)
+                if (resultNode == null || !resultNode.IsValid)  // apply migration only if all VM is going to migrate
                     break;
                 migrationPlan.Add(resultNode, server);
+                server.MarkToShutdown();
                 foreach (var change in resultNode.Changes)
                 {
                     copies.Find(s => s.Id == change.Reciever.Id).RunVM(change.Target);

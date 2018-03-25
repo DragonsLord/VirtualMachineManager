@@ -15,7 +15,7 @@ namespace Simulation.Modules.Diagnostic
 
         public byte Depth { get; set; }
 
-        public bool AreOverloadedMachines => Targets.Any();
+        public bool AreTargetMachines => Targets.Any();
 
         public DiagnosticResult(IEnumerable<Server> targets, IEnumerable<Server> recievers, byte depth)
         {
@@ -23,5 +23,7 @@ namespace Simulation.Modules.Diagnostic
             Recievers = recievers;
             Depth = depth;
         }
+
+        public static DiagnosticResult Empty => new DiagnosticResult(new Server[0], null, 0);
     }
 }

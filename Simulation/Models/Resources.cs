@@ -58,5 +58,23 @@ namespace Simulation.Models
                 r1.CPU > r2.CPU &&
                 r1.Network > r2.Network;
         }
+
+        public static bool operator <(Resources r1, int n)
+        {
+            return
+                r1.IOPS < n &&
+                r1.Memmory < n &&
+                r1.CPU < n &&
+                r1.Network < n;
+        }
+
+        public static bool operator >(Resources r1, int n)
+        {
+            return
+                r1.IOPS > n &&
+                r1.Memmory > n &&
+                r1.CPU > n &&
+                r1.Network > n;
+        }
     }
 }

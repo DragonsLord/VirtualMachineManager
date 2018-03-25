@@ -48,6 +48,7 @@ namespace Simulation
         private void Prepare()
         {
             Servers = new ServerCollection(dataContext.PhysicalMachineRepository);
+            Servers.ForEach((server) => this.OnNextStep += server.TryShutdown);
             _logFileName = $"Logs\\Simualtion log - {DateTime.Now.ToString("yyyy-MM-dd hh mm ss")}.txt";
         }
         
@@ -88,21 +89,22 @@ namespace Simulation
 
             Logger.EndProccess("Updating resources requirments");
             #endregion
-
-            MigrationPlan migrationPlan = MigrationPlan.Empty;
-
+            
             // prognosing
             // prognoseModule.Run(VMs);
 
             // run diagnostic (detect overloaded)
             var overloadedDiagnosticResult = diagnosticModule.DetectOverloadedMachines(Servers);
 
-            if (overloadedDiagnosticResult.AreOverloadedMachines)
+            if (overloadedDiagnosticResult.AreTargetMachines)
             {
                 // migrate from overloaded servers
-                migrationPlan = migrationModule.MigrateFromOverloaded(overloadedDiagnosticResult);
+                var migrationPlan = migrationModule.MigrateFromOverloaded(overloadedDiagnosticResult);
+                if (!migrationPlan.IsEmpty)
+                {
+                    ApplyMigrations(migrationPlan);
+                }
             }
-
             if (newVMs.Count > 0)
             {
                 // assign new VMs
@@ -111,21 +113,18 @@ namespace Simulation
             }
 
             // run diagnostic (detect low loaded)
-            // var lowloadedMachines = diagnosticModule.DetectLowloadedMachines(Servers);
+            var lowloadedDiagnosticPlan = diagnosticModule.DetectLowloadedMachines(Servers);
 
-            // free low loaded servers
-            // var releaseMigrationPlan = migrationModule.ReleaseLowloadedMachines(lowloadedMachines.Targets);
-
-            // save migration plan
-            if (!migrationPlan.IsEmpty)
+            if (lowloadedDiagnosticPlan.AreTargetMachines)
             {
-                Logger.LogMessage(migrationPlan.GetShortInfo());
-                foreach (var migrationTask in migrationModule.ApplayMigrations(migrationPlan, Servers))
+                // free low loaded servers
+                var releaseMigrationPlan = migrationModule.ReleaseLowloadedMachines(lowloadedDiagnosticPlan);
+                if (!releaseMigrationPlan.IsEmpty)
                 {
-                    OnNextStep += migrationTask.OnNextTimeEvent;
+                    ApplyMigrations(releaseMigrationPlan);
                 }
-                Logger.LogMessage(migrationPlan.GetFullInfo());
             }
+
             // Console.WriteLine(VMs.Select(vm => vm.Resources.CPU).Sum());
             Logger.EndProccess(loggerSectionName, "finished");
         }
@@ -162,6 +161,16 @@ namespace Simulation
         }
 
         private IEnumerable<Server> GetRunningServers() => Servers.Where(server => server.TurnedOn);
+
+        private void ApplyMigrations(MigrationPlan migrationPlan)
+        {
+            Logger.LogMessage(migrationPlan.GetShortInfo());
+            foreach (var migrationTask in migrationModule.ApplayMigrations(migrationPlan, Servers))
+            {
+                OnNextStep += migrationTask.OnNextTimeEvent;
+            }
+            Logger.LogMessage(migrationPlan.GetFullInfo());
+        }
 
         private void LogCurrentServerState()
         {
