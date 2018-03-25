@@ -32,6 +32,14 @@ namespace Utilities
         public const byte IOPS_WEIGHT = 1;
 
         /// <summary>
+        /// Used for value normalization
+        /// </summary>
+        public const float CPU_CAP = 63877f;
+        public const float MEMMORY_CAP = 393216f;
+        public const float NETWORK_CAP = 879123f;
+        public const float IOPS_CAP = 192406f;
+
+        /// <summary>
         /// Percantage of free resource amount.
         /// When free valume is lower then that value
         /// server is considered to be overloaded

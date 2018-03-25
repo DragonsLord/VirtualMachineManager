@@ -54,7 +54,6 @@ namespace Simulation
         
         public void Run()
         {
-
             Prepare();
             using (var streamWriter = new StreamWriter(File.Create(_logFileName)))
             {
@@ -174,6 +173,33 @@ namespace Simulation
 
         private void LogCurrentServerState()
         {
+        }
+
+        private void Temp()
+        {
+            float cpu = float.NegativeInfinity,
+                memmory = float.NegativeInfinity,
+                network = float.NegativeInfinity,
+                iops = float.NegativeInfinity;
+            var total = dataContext.TimeEventRepository.Count();
+            Console.WriteLine(total);
+            for (int i = 6495; i <= total; i++)
+            {
+                var timeEvent = dataContext.TimeEventRepository.Get(i);
+                foreach (var vm in timeEvent.VMEvents)
+                {
+                    if (vm.CPU > cpu) cpu = vm.CPU;
+                    if (vm.Memory > memmory) memmory = vm.Memory;
+                    if (vm.Network > network) network = vm.Network;
+                    if (vm.IOPS > iops) iops = vm.IOPS;
+                }
+            }
+
+            Console.Write($"cpu: {cpu}");
+            Console.Write($"memmory: {memmory}");
+            Console.Write($"network: {network}");
+            Console.Write($"iops: {iops}");
+            Console.ReadKey();
         }
     }
 }
