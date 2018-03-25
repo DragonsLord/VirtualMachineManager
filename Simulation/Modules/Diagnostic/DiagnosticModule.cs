@@ -16,7 +16,7 @@ namespace Simulation.Modules.Diagnostic
             byte depth = 0;
             Logger.StartAction("Diagnosting for overloaded servers");
             // TODO: add prognosed steps after prognose module implementation
-            var overloaded = collection.Where(server => Evaluator.IsOverloaded(server, 0));
+            var overloaded = collection.Where(server => !server.InMigration && Evaluator.IsOverloaded(server, 0));
             var result = new DiagnosticResult(
                 overloaded,
                 collection.Where(s => ValidateThreadhold(s, depth, true)),
@@ -29,7 +29,7 @@ namespace Simulation.Modules.Diagnostic
         {
             byte depth = 0;
             // TODO: record ordering herustic
-            var lowLoaded = collection.Where((server) => Evaluator.IsLowLoaded(server, depth))
+            var lowLoaded = collection.Where((server) => !server.InMigration && Evaluator.IsLowLoaded(server, depth))
                 .OrderByDescending((server) => server.PrognosedUsedResources[depth].EvaluateVolume())
                 .ThenBy((server) => server.RunningVMs.Count);
 
@@ -66,7 +66,7 @@ namespace Simulation.Modules.Diagnostic
         private bool ValidateThreadhold(Server s, byte depth, bool includeOffline)
         {
             var freeRes = s.Resources - s.PrognosedUsedResources[depth];
-            return !Evaluator.IsOverloaded(s, depth) && ((!s.TurnedOn && includeOffline) || (
+            return !s.InMigration && !Evaluator.IsOverloaded(s, depth) && ((!s.TurnedOn && includeOffline) || (
                 freeRes.CPU > GlobalConstants.CPU_RECIEVER_THREADHOLD * s.Resources.CPU &&
                 freeRes.Memmory > GlobalConstants.MEMMORY_RECIEVER_THREADHOLD * s.Resources.Memmory &&
                 freeRes.IOPS > GlobalConstants.IOPS_RECIEVER_THREADHOLD * s.Resources.IOPS &&

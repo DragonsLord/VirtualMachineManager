@@ -16,6 +16,7 @@ using Utilities;
 
 namespace Simulation
 {
+    //TODO: add detection of unhandled server overloading (cause system to freeze);
     public class Simulation
     {
         private string _logFileName;

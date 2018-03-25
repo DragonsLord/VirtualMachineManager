@@ -24,7 +24,7 @@ namespace Simulation.Models
 
         public bool TurnedOn { get; private set; }
 
-        public bool InMigration { get; set; }   //TODO: to aviod migration plan repeating
+        public bool InMigration { get; set; }
 
         public List<VM> RunningVMs { get; private set; } = new List<VM>();
 

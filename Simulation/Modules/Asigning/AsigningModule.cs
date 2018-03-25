@@ -69,7 +69,6 @@ namespace Simulation.Modules.Asigning
 
         private float GetVMResourceVolume(VM vm)
         {
-            // TODO: [heuristic] improve
             var res = vm.Resources;
             return res.EvaluateVolume();
         }
