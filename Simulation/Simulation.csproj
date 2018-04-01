@@ -35,8 +35,13 @@
     <Reference Include="EntityFramework.SqlServer">
       <HintPath>..\Libs\EntityFramework.SqlServer.dll</HintPath>
     </Reference>
+    <Reference Include="MathNet.Numerics, Version=4.4.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\MathNet.Numerics.4.4.0\lib\net461\MathNet.Numerics.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Numerics" />
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -65,12 +70,16 @@
     <Compile Include="Modules\Migration\Model\MigrationTask.cs" />
     <Compile Include="Modules\Migration\Model\LowloadedMigrationNode.cs" />
     <Compile Include="Modules\Migration\Model\OverloadedMigrationNode.cs" />
+    <Compile Include="Modules\Prognosing\Algorythm\RegressionEngine.cs" />
+    <Compile Include="Modules\Prognosing\Model\ResourceUsageStatistic.cs" />
+    <Compile Include="Modules\Prognosing\Model\StatisticalDataStream.cs" />
     <Compile Include="Modules\Prognosing\PrognoseModule.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Simulation.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DAL\DAL.csproj">

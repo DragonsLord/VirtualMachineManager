@@ -1,46 +1,62 @@
 ﻿using Simulation.Models;
 using Simulation.Models.Collections;
+using Simulation.Modules.Prognosing.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Utilities;
+using Simulation.Modules.Prognosing.Algorythm;
 
 namespace Simulation.Modules.Prognosing
 {
     public class PrognoseModule
     {
-        public void Run(VMCollection vms)
+        private Dictionary<int, ResourceUsageStatistic> _data;
+        private RegressionEngine _regressionEngine;
+
+        public PrognoseModule()
+        {
+            _data = new Dictionary<int, ResourceUsageStatistic>(GlobalConstants.PM_CAPACITY);
+            _regressionEngine = new RegressionEngine();
+        }
+
+        public void Run(ServerCollection servers)
         {
             Logger.StartProcess("Prognosing resources usage");
-            foreach (var vm in vms)
+            foreach (var server in servers)
             {
-                PushResourcesToStatistics(vm);
+                PushResourcesToStatistics(server);
 
-                Predict(vm);
-                //Logger.LogAction($"VM {vm.Id} - done");
+                Predict(server);
             }
             Logger.EndProccess("Prognosing resources usage");
         }
 
-        private void PushResourcesToStatistics(VM vm)
+        private void PushResourcesToStatistics(Server server)
         {
-            // TODO: implement (create helper queue class ?)
-        }
-
-        private void Predict(VM vm)
-        {
-            for (int i = 1; i <= GlobalConstants.PROGNOSE_DEPTH; i++)
+            if (!_data.ContainsKey(server.Id))
             {
-                vm.UpdatePrognosedRequirments(i, PredictStep(vm, i));
+                _data.Add(server.Id, new ResourceUsageStatistic(server));  
             }
+            _data[server.Id].PushResourcesToStatistics();
         }
 
-        private Resources PredictStep(VM vm, int step)
+        private void Predict(Server server)
         {
-            // TODO: implement
-            return new Resources();
+            var statistics = _data[server.Id];
+            if (statistics.Count < 2 * GlobalConstants.INDEPENDENT_VALUES_AMOUNT) // not enough data
+            {
+                return;
+            }
+
+            var res = statistics.GetPredictedResources(_regressionEngine, GlobalConstants.PROGNOSE_DEPTH);
+
+            for (int i = 0; i < GlobalConstants.PROGNOSE_DEPTH; i++)
+            {
+                server.UpdatePrognosedRequirments(i + 1, res[i]);
+            }
         }
     }
 }

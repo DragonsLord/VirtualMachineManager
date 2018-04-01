@@ -89,9 +89,9 @@ namespace Simulation
 
             Logger.EndProccess("Updating resources requirments");
             #endregion
-            
+
             // prognosing
-            // prognoseModule.Run(VMs);
+            prognoseModule.Run(Servers);
 
             // run diagnostic (detect overloaded)
             var overloadedDiagnosticResult = diagnosticModule.DetectOverloadedMachines(Servers);

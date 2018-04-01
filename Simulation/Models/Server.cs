@@ -97,7 +97,15 @@ namespace Simulation.Models
                 Logger.LogMessage($"Server {Id} is shutting down");
             }
         }
-        
+
+        // TODO: Remove Prognosed values from VM
+        public void UpdatePrognosedRequirments(int depth, Resources res)
+        {
+            if (depth <= 0 || depth > GlobalConstants.PROGNOSE_DEPTH)
+                throw new ArgumentException($"invalid depth: {depth}");
+            PrognosedUsedResources[depth] = res;
+        }
+
         private void Vm_OnResourceRequirmentChange(int depth, Resources diff) => PrognosedUsedResources[depth] += diff;
 
         public static Server FromDataBaseModel(DAL.Entities.PhysicalMachine pm)

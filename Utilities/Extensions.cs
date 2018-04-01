@@ -40,6 +40,15 @@ namespace Utilities
             return array[array.Length - 1];
         }
 
+        public static IEnumerable<T> And<T>(this IEnumerable<T> collection, T element)
+        {
+            foreach(var item in collection)
+            {
+                yield return item;
+            }
+            yield return element;
+        }
+
         /*public static T Max<T>(this IEnumerable<T> collection, Func<T, float> evaluator)
         {
             float max = float.NegativeInfinity;

@@ -92,5 +92,9 @@ namespace Utilities
         /// </summary>
         public const float CPU_ON_MIGRATION = 100f;
         #endregion
+
+        #region Prognosing Parameters
+        public const int INDEPENDENT_VALUES_AMOUNT = 20;
+        #endregion
     }
 }

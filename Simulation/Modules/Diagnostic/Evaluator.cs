@@ -79,5 +79,16 @@ namespace Simulation.Modules.Diagnostic
             res.Network <= server.Resources.Network * NETWORK_LOW_LEVEL &&
             res.IOPS <= server.Resources.IOPS * IOPS_LOW_LEVEL;
         }
+
+        public static Resources GetResourcesUtilization(Server server)
+        {
+            return new Resources
+            {
+                CPU = server.UsedResources.CPU / server.Resources.CPU,
+                Network = server.UsedResources.Network / server.Resources.Network,
+                Memmory = server.UsedResources.Memmory / server.Resources.Memmory,
+                IOPS = server.UsedResources.IOPS / server.Resources.IOPS,
+            };
+        }
     }
 }
