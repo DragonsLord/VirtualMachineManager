@@ -11,6 +11,7 @@ using Utilities;
 
 namespace Simulation.Modules.Prognosing.Algorythm
 {
+    // TODO: change model - value and length to avoid a lot of same values
     public class RegressionEngine
     {
         public float[] Run(StatisticalDataStream<float> valuesStream, int stepsAmount = GlobalConstants.PROGNOSE_DEPTH)
@@ -19,14 +20,12 @@ namespace Simulation.Modules.Prognosing.Algorythm
             var Vec = Vector<float>.Build;
             var Y = Vec.DenseOfEnumerable(valuesStream.Take(independentCount));
             var X = Matrix<float>.Build.DenseOfRows(
-                Enumerable.Range(1, GlobalConstants.INDEPENDENT_VALUES_AMOUNT)
-                .Select(offset => valuesStream.GetPartial(offset, GlobalConstants.INDEPENDENT_VALUES_AMOUNT)));
+                Enumerable.Range(1, valuesStream.Count - independentCount)
+                .Select(offset => valuesStream.GetPartial(offset, independentCount - 1).And(1)));
             try
             {
                 // https://numerics.mathdotnet.com/Regression.html
                 var K = MultipleRegression.NormalEquations(X, Y);
-
-                System.Diagnostics.Debug.WriteLine("Success");
 
                 var prediction = new float[stepsAmount];
 
@@ -38,7 +37,7 @@ namespace Simulation.Modules.Prognosing.Algorythm
                 }
                 return prediction;
             }
-            catch (ArgumentException)   // TODO: to much exceptions (maybe add 1 column to X ?)
+            catch (ArgumentException)
             {
                 return Y.Reverse().Take(stepsAmount).ToArray();
             }

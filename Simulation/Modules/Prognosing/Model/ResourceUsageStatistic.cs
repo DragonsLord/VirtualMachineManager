@@ -23,10 +23,10 @@ namespace Simulation.Modules.Prognosing.Model
         public ResourceUsageStatistic(Server server)
         {
             _targetServer = server;
-            _cpuValuesStream = new StatisticalDataStream<float>(GlobalConstants.INDEPENDENT_VALUES_AMOUNT);
-            _memoryValuesStream = new StatisticalDataStream<float>(GlobalConstants.INDEPENDENT_VALUES_AMOUNT);
-            _networkValuesStream = new StatisticalDataStream<float>(GlobalConstants.INDEPENDENT_VALUES_AMOUNT);
-            _iopsValuesStream = new StatisticalDataStream<float>(GlobalConstants.INDEPENDENT_VALUES_AMOUNT);
+            _cpuValuesStream = new StatisticalDataStream<float>(GlobalConstants.MAX_VALUES_AMOUNT);
+            _memoryValuesStream = new StatisticalDataStream<float>(GlobalConstants.MAX_VALUES_AMOUNT);
+            _networkValuesStream = new StatisticalDataStream<float>(GlobalConstants.MAX_VALUES_AMOUNT);
+            _iopsValuesStream = new StatisticalDataStream<float>(GlobalConstants.MAX_VALUES_AMOUNT);
         }
 
         public void PushResourcesToStatistics()

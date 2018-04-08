@@ -11,19 +11,13 @@ namespace Simulation.Models
     {
         public int Id { get; set; }
 
-        public Resources Resources {
-            get => PrognosedResources[0];
-            private set => PrognosedResources[0] = value;
-        }
-
-        // 0 index contains real (not predicted) data
-        public Resources[] PrognosedResources { get; } = new Resources[GlobalConstants.PROGNOSE_DEPTH + 1];
-
+        public Resources Resources { get; private set; }
+        
         public int HostServerId { get; set; } = 0;
 
         public bool IsMigrating { get; set; } = false;
 
-        public event Action<int, Resources> OnResourceRequirmentChange;
+        public event Action<Resources> OnResourceRequirmentChange;
 
         public void UpdateRequirments(DAL.Entities.VMEvent vme)
         {
@@ -34,20 +28,11 @@ namespace Simulation.Models
                 CPU = vme.CPU,
                 Network = vme.Network
             };
+            
+            OnResourceRequirmentChange?.Invoke(newResources - Resources);
 
-            UpdatePrognosedRequirments(0, newResources);
+            Resources = newResources;
         }
-
-        public void UpdatePrognosedRequirments(int depth, Resources res)
-        {
-            OnResourceRequirmentChange?.Invoke(depth, res - Resources);
-
-            PrognosedResources[depth] = res;
-        }
-
-        // TODO: [debug] remove
-        public static int Instances = 0;
-        private VM() { Instances++; }
 
         public static VM FromDataBaseModel(DAL.Entities.VMEvent vme)
         {

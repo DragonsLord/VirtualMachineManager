@@ -40,7 +40,7 @@ namespace Simulation.Modules.Migration.Model
             val += GetTargetServerResourcesChange(_root.Depth).EvaluateVolume();
 
             var change = Changes.LastItem();
-            val += CalculateDiffForUpdatedMachineCase(change.Target.PrognosedResources[_root.Depth]);
+            val += CalculateDiffForUpdatedMachineCase(change.Target.Resources);
 
             return val;
         }

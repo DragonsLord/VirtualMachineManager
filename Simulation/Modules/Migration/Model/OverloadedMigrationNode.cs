@@ -47,7 +47,7 @@ namespace Simulation.Modules.Migration.Model
                 val -= GlobalConstants.TURN_ON_PENALTY;
                 val += CalculateDiffForNewMachineCase(previous.Value, newServerResources);
             } else {
-                val += CalculateDiffForUpdatedMachineCase(change.Target.PrognosedResources[_root.Depth]);
+                val += CalculateDiffForUpdatedMachineCase(change.Target.Resources);
             }
 
             return val;

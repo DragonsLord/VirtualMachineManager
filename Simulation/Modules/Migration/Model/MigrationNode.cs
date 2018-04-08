@@ -37,7 +37,7 @@ namespace Simulation.Modules.Migration.Model
         protected Resources GetTargetServerResourcesChange(byte depth)
         {
             Resources r = new Resources();
-            Changes.ForEach((changes) => r += changes.Target.PrognosedResources[depth]);
+            Changes.ForEach((changes) => r += changes.Target.Resources);
 
             return r;
         }
@@ -47,7 +47,7 @@ namespace Simulation.Modules.Migration.Model
             Resources r = new Resources();
             Changes
                 .Where((change) => change.Reciever.Id == server.Id)
-                .ForEach((changes) => r += changes.Target.PrognosedResources[depth]);
+                .ForEach((changes) => r += changes.Target.Resources);
 
             return r + server.PrognosedUsedResources[depth];
         }

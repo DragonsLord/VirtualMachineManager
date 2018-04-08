@@ -51,10 +51,7 @@ namespace Simulation.Models
 
             vm.OnResourceRequirmentChange -= Vm_OnResourceRequirmentChange;
 
-            for (int i = 0; i <= GlobalConstants.PROGNOSE_DEPTH; i++)
-            {
-                PrognosedUsedResources[i] -= vm.PrognosedResources[i];
-            }
+            UsedResources -= vm.Resources;
         }
 
         public void RunVM(VM vm)
@@ -62,10 +59,7 @@ namespace Simulation.Models
             RunningVMs.Add(vm);
             vm.HostServerId = Id;
 
-            for (int depth = 0; depth <= GlobalConstants.PROGNOSE_DEPTH; depth++)
-            {
-                PrognosedUsedResources[depth] += vm.PrognosedResources[depth];
-            }
+            UsedResources += vm.Resources;
 
             vm.OnResourceRequirmentChange += Vm_OnResourceRequirmentChange;
         }
@@ -106,7 +100,7 @@ namespace Simulation.Models
             PrognosedUsedResources[depth] = res;
         }
 
-        private void Vm_OnResourceRequirmentChange(int depth, Resources diff) => PrognosedUsedResources[depth] += diff;
+        private void Vm_OnResourceRequirmentChange(Resources diff) => UsedResources += diff;
 
         public static Server FromDataBaseModel(DAL.Entities.PhysicalMachine pm)
         {

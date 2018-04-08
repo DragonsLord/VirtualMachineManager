@@ -95,6 +95,8 @@ namespace Utilities
 
         #region Prognosing Parameters
         public const int INDEPENDENT_VALUES_AMOUNT = 20;
+
+        public const int MAX_VALUES_AMOUNT = 100;
         #endregion
     }
 }

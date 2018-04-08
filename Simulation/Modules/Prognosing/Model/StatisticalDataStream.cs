@@ -9,38 +9,28 @@ namespace Simulation.Modules.Prognosing.Model
     {
         private T[] _valuesContainer;
 
-        private int _head = 0;
+        private int _head;
+        private int _tail;
 
-        public int Count { get; private set; }
+        public int Count { get; private set; } = 0;
 
-        private int GetTail()
+        public StatisticalDataStream(int amount = GlobalConstants.MAX_VALUES_AMOUNT)
         {
-            if (Count == 0)
-            {
-                return _head;
-            }
-            if (Count < _valuesContainer.Length)
-            {
-                return (_head + Count) % _valuesContainer.Length;
-            }
-            if (_head == 0)
-            {
-                return _valuesContainer.Length - 1;
-            }
-            return _head - 1;
-        }
-
-        public StatisticalDataStream(int amount = GlobalConstants.INDEPENDENT_VALUES_AMOUNT)
-        {
-            _valuesContainer = new T[amount * 2];
-            Count = 0;
+            amount = Math.Max(amount, GlobalConstants.INDEPENDENT_VALUES_AMOUNT * 2);
+            _valuesContainer = new T[amount];
             _head = amount - 1;
+            _tail = _head;
         }
 
+        // TODO: fix (consider add tail as property instead of calculationg it every time (it`s broken right now))
         public void Push(T value)
         {
-            var tail = GetTail();
-            _valuesContainer[tail] = value;
+            _valuesContainer[_tail] = value;
+            _head = _tail;
+            if (--_tail < 0)
+            {
+                _tail = _valuesContainer.Length - 1;
+            }
             Count = Math.Min(Count + 1, _valuesContainer.Length);
         }
 
