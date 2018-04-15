@@ -20,6 +20,7 @@ namespace Simulation
     public class Simulation
     {
         private string _logFileName;
+        private string _serverStatisticsFolder;
         private PrognoseModule prognoseModule = new PrognoseModule();
         private DiagnosticModule diagnosticModule = new DiagnosticModule();
         private MigrationModule migrationModule = new MigrationModule();
@@ -50,7 +51,14 @@ namespace Simulation
         {
             Servers = new ServerCollection(dataContext.PhysicalMachineRepository);
             Servers.ForEach((server) => this.OnNextStep += server.TryShutdown);
-            _logFileName = $"Logs\\Simualtion log - {DateTime.Now.ToString("yyyy-MM-dd hh mm ss")}.txt";
+            var identifier = DateTime.Now.ToString("yyyy-MM-dd hh mm ss");
+            _logFileName = $"Logs\\Simualtion log - {identifier}.txt";
+            new DirectoryInfo("Logs").CreateSubdirectory($"Servers - {identifier}");
+            _serverStatisticsFolder = $"Logs\\Servers - {identifier}";
+            foreach (var server in Servers)
+            {
+                File.Create(Path.Combine(_serverStatisticsFolder, $"{server.Id}.csv")).Close();
+            }
         }
         
         public void Run()
@@ -65,7 +73,7 @@ namespace Simulation
                 {
                     OnNextStep?.Invoke(this);
                     ProccessEvent(timeEvent);
-                    LogCurrentServerState();
+                    LogCurrentServerState(timeEvent.Id);
                 }
                 #endregion
 
@@ -146,9 +154,6 @@ namespace Simulation
 
         private List<VM> GetNewVMs(SimualtionTimeEvent timeEvent)
         {
-            /*VMs.AddRange(timeEvent.VMEvents
-                                    .Where(vme => vme.IsNew)
-                                    .Select(VM.FromDataBaseModel));*/
             return timeEvent.VMEvents
                                     .Where(vme => vme.IsNew)
                                     .Select(VM.FromDataBaseModel)
@@ -172,8 +177,34 @@ namespace Simulation
             Logger.LogMessage(migrationPlan.GetFullInfo());
         }
 
-        private void LogCurrentServerState()
+        // TODO: add migration logging
+        private void LogCurrentServerState(int step)
         {
+            var server = Servers.Get(1);
+            var res = server.PrognosedUsedResources;
+            using (var streamWriter = new StreamWriter(Path.Combine(_serverStatisticsFolder, "1.csv"), true))
+            {
+                StringBuilder line = new StringBuilder();
+                line.Append($"{step};");
+                line.Append($"{server.PrognosedUsedResources[0].CPU};");
+                line.Append($"{server.PrognosedUsedResources[1].CPU};");
+                line.Append($"{server.PrognosedUsedResources[2].CPU};");
+                line.Append($"{server.PrognosedUsedResources[3].CPU};");
+                line.Append($"{server.PrognosedUsedResources[0].Memmory};");
+                line.Append($"{server.PrognosedUsedResources[1].Memmory};");
+                line.Append($"{server.PrognosedUsedResources[2].Memmory};");
+                line.Append($"{server.PrognosedUsedResources[3].Memmory};");
+                line.Append($"{server.PrognosedUsedResources[0].Network};");
+                line.Append($"{server.PrognosedUsedResources[1].Network};");
+                line.Append($"{server.PrognosedUsedResources[2].Network};");
+                line.Append($"{server.PrognosedUsedResources[3].Network};");
+                line.Append($"{server.PrognosedUsedResources[0].IOPS};");
+                line.Append($"{server.PrognosedUsedResources[1].IOPS};");
+                line.Append($"{server.PrognosedUsedResources[2].IOPS};");
+                line.Append($"{server.PrognosedUsedResources[3].IOPS};");
+                line.Append($"{server.RunningVMs.Count};");
+                streamWriter.WriteLine(line.ToString());
+            }
         }
 
         private void Temp()
