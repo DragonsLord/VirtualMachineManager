@@ -40,13 +40,25 @@ namespace Utilities
             return array[array.Length - 1];
         }
 
-        public static IEnumerable<T> And<T>(this IEnumerable<T> collection, T element)
+        public static IEnumerable<T> WithElement<T>(this IEnumerable<T> collection, T element)
         {
             foreach(var item in collection)
             {
                 yield return item;
             }
             yield return element;
+        }
+
+        public static IEnumerable<T> AddBefore<T>(this IEnumerable<T> collection, T[] addition, int start, int count)
+        {
+            for(int i = start; i < count; i++)
+            {
+                yield return addition[i];
+            }
+            foreach (var item in collection)
+            {
+                yield return item;
+            }
         }
 
         /*public static T Max<T>(this IEnumerable<T> collection, Func<T, float> evaluator)

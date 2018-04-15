@@ -47,8 +47,8 @@ namespace Simulation.Modules.Migration.Model
             TargetVM.IsMigrating = true;
             for (byte depth = 0; depth < GlobalConstants.PROGNOSE_DEPTH; depth++)
             {
-                Sender.PrognosedUsedResources[depth] += Resources;
-                Reciever.PrognosedUsedResources[depth] += Resources;
+                Sender.UsedResources += Resources;
+                Reciever.UsedResources += Resources;
             }
         }
 
@@ -67,8 +67,8 @@ namespace Simulation.Modules.Migration.Model
             TargetVM.IsMigrating = false;
             for (byte depth = 0; depth < GlobalConstants.PROGNOSE_DEPTH; depth++)
             {
-                Sender.PrognosedUsedResources[depth] -= Resources;
-                Reciever.PrognosedUsedResources[depth] -= Resources;
+                Sender.UsedResources -= Resources;
+                Reciever.UsedResources -= Resources;
             }
 
             Sender.RemoveVM(TargetVM);

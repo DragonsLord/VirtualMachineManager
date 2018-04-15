@@ -19,7 +19,7 @@ namespace Simulation.Models.Collections
 
         public void Remove(VM vm) => _list.Remove(vm);
 
-        public VM Get(int vmId) => _list.FirstOrDefault(vm => vm.Id == vm.Id);
+        public VM Get(int vmId) => _list.FirstOrDefault(vm => vmId == vm.Id);
 
         public void Update(IEnumerable<VMEvent> vmEvents)
         {

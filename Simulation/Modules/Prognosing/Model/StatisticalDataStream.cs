@@ -22,7 +22,6 @@ namespace Simulation.Modules.Prognosing.Model
             _tail = _head;
         }
 
-        // TODO: fix (consider add tail as property instead of calculationg it every time (it`s broken right now))
         public void Push(T value)
         {
             _valuesContainer[_tail] = value;

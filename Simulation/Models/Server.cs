@@ -16,7 +16,7 @@ namespace Simulation.Models
 
         public Resources UsedResources {
             get => PrognosedUsedResources[0];
-            private set => PrognosedUsedResources[0] = value;
+            set => PrognosedUsedResources[0] = value;
         }
 
         // 0 index contains real (not predicted) data
@@ -26,6 +26,7 @@ namespace Simulation.Models
 
         public bool InMigration { get; set; }
 
+        // TODO: switch to custom collection with inner dictionary
         public List<VM> RunningVMs { get; private set; } = new List<VM>();
 
         public void TurnOn()
@@ -92,15 +93,17 @@ namespace Simulation.Models
             }
         }
 
-        // TODO: Remove Prognosed values from VM
         public void UpdatePrognosedRequirments(int depth, Resources res)
         {
             if (depth <= 0 || depth > GlobalConstants.PROGNOSE_DEPTH)
                 throw new ArgumentException($"invalid depth: {depth}");
             PrognosedUsedResources[depth] = res;
         }
-
-        private void Vm_OnResourceRequirmentChange(Resources diff) => UsedResources += diff;
+        
+        private void Vm_OnResourceRequirmentChange(Resources diff)
+        {
+            UsedResources += diff;
+        }
 
         public static Server FromDataBaseModel(DAL.Entities.PhysicalMachine pm)
         {

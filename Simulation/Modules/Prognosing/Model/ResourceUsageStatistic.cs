@@ -31,7 +31,7 @@ namespace Simulation.Modules.Prognosing.Model
 
         public void PushResourcesToStatistics()
         {
-            var util = Evaluator.GetResourcesUtilization(_targetServer);
+            var util = _targetServer.UsedResources;
             _cpuValuesStream.Push(util.CPU);
             _memoryValuesStream.Push(util.Memmory);
             _networkValuesStream.Push(util.Network);
@@ -53,10 +53,10 @@ namespace Simulation.Modules.Prognosing.Model
             {
                 resources[i] = new Resources
                 {
-                    CPU = cpu[i] * _targetServer.Resources.CPU,
-                    Memmory = memory[i] * _targetServer.Resources.Memmory,
-                    Network = network[i] * _targetServer.Resources.Network,
-                    IOPS = iops[i] * _targetServer.Resources.IOPS,
+                    CPU = cpu[i],// * _targetServer.Resources.CPU,
+                    Memmory = memory[i],// * _targetServer.Resources.Memmory,
+                    Network = network[i],// * _targetServer.Resources.Network,
+                    IOPS = iops[i],// * _targetServer.Resources.IOPS,
                 };
             }
 
