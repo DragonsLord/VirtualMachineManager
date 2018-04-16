@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Utilities
 {
-    //TODO: add migration per server constraint
+    //TODO: add migration per server constraint ?
     public static class GlobalConstants
     {
         /// <summary>

@@ -21,6 +21,8 @@ namespace Simulation
     {
         private string _logFileName;
         private string _serverStatisticsFolder;
+        private ExcelWrapper _excel = new ExcelWrapper();
+
         private PrognoseModule prognoseModule = new PrognoseModule();
         private DiagnosticModule diagnosticModule = new DiagnosticModule();
         private MigrationModule migrationModule = new MigrationModule();
@@ -53,23 +55,19 @@ namespace Simulation
             Servers.ForEach((server) => this.OnNextStep += server.TryShutdown);
             var identifier = DateTime.Now.ToString("yyyy-MM-dd hh mm ss");
             _logFileName = $"Logs\\Simualtion log - {identifier}.txt";
-            new DirectoryInfo("Logs").CreateSubdirectory($"Servers - {identifier}");
-            _serverStatisticsFolder = $"Logs\\Servers - {identifier}";
-            foreach (var server in Servers)
-            {
-                File.Create(Path.Combine(_serverStatisticsFolder, $"{server.Id}.csv")).Close();
-            }
+            _excel.Initialize(10);
         }
         
         public void Run()
         {
             Prepare();
+
             using (var streamWriter = new StreamWriter(File.Create(_logFileName)))
             {
                 Logger.RegisterOutputChannels(streamWriter.Write);
                 Logger.StartProcess("Simulation runnig");
                 #region Main Cycle
-                foreach (var timeEvent in dataContext.TimeEventRepository.EnumerateAll().Take(1000))
+                foreach (var timeEvent in dataContext.TimeEventRepository.EnumerateAll().Take(200))
                 {
                     OnNextStep?.Invoke(this);
                     ProccessEvent(timeEvent);
@@ -78,6 +76,9 @@ namespace Simulation
                 #endregion
 
                 Logger.EndProccess("Simulation", "ended");
+                _excel.DrawCharts();
+                _excel.Save();
+                _excel.Dispose();
             }
             Console.ReadKey();
         }
@@ -180,58 +181,10 @@ namespace Simulation
         // TODO: add migration logging
         private void LogCurrentServerState(int step)
         {
-            var server = Servers.Get(1);
-            var res = server.PrognosedUsedResources;
-            using (var streamWriter = new StreamWriter(Path.Combine(_serverStatisticsFolder, "1.csv"), true))
+            foreach (var server in Servers.Take(10))
             {
-                StringBuilder line = new StringBuilder();
-                line.Append($"{step};");
-                line.Append($"{server.PrognosedUsedResources[0].CPU};");
-                line.Append($"{server.PrognosedUsedResources[1].CPU};");
-                line.Append($"{server.PrognosedUsedResources[2].CPU};");
-                line.Append($"{server.PrognosedUsedResources[3].CPU};");
-                line.Append($"{server.PrognosedUsedResources[0].Memmory};");
-                line.Append($"{server.PrognosedUsedResources[1].Memmory};");
-                line.Append($"{server.PrognosedUsedResources[2].Memmory};");
-                line.Append($"{server.PrognosedUsedResources[3].Memmory};");
-                line.Append($"{server.PrognosedUsedResources[0].Network};");
-                line.Append($"{server.PrognosedUsedResources[1].Network};");
-                line.Append($"{server.PrognosedUsedResources[2].Network};");
-                line.Append($"{server.PrognosedUsedResources[3].Network};");
-                line.Append($"{server.PrognosedUsedResources[0].IOPS};");
-                line.Append($"{server.PrognosedUsedResources[1].IOPS};");
-                line.Append($"{server.PrognosedUsedResources[2].IOPS};");
-                line.Append($"{server.PrognosedUsedResources[3].IOPS};");
-                line.Append($"{server.RunningVMs.Count};");
-                streamWriter.WriteLine(line.ToString());
+                _excel.WriteServerStatistics(step, server);
             }
-        }
-
-        private void Temp()
-        {
-            float cpu = float.NegativeInfinity,
-                memmory = float.NegativeInfinity,
-                network = float.NegativeInfinity,
-                iops = float.NegativeInfinity;
-            var total = dataContext.TimeEventRepository.Count();
-            Console.WriteLine(total);
-            for (int i = 6495; i <= total; i++)
-            {
-                var timeEvent = dataContext.TimeEventRepository.Get(i);
-                foreach (var vm in timeEvent.VMEvents)
-                {
-                    if (vm.CPU > cpu) cpu = vm.CPU;
-                    if (vm.Memory > memmory) memmory = vm.Memory;
-                    if (vm.Network > network) network = vm.Network;
-                    if (vm.IOPS > iops) iops = vm.IOPS;
-                }
-            }
-
-            Console.Write($"cpu: {cpu}");
-            Console.Write($"memmory: {memmory}");
-            Console.Write($"network: {network}");
-            Console.Write($"iops: {iops}");
-            Console.ReadKey();
         }
     }
 }
