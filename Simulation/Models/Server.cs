@@ -67,8 +67,13 @@ namespace Simulation.Models
 
         public bool CanRunVM(VM vm, int depth)
         {
-            var required = PrognosedUsedResources[depth] + vm.Resources;
-            return !Evaluator.IsOverloaded(required, this);
+            for (int i = depth; i >=0; i--)
+            {
+                var required = PrognosedUsedResources[depth] + vm.Resources;
+                if (Evaluator.IsOverloaded(required, this))
+                    return false;
+            }
+            return true;
         }
 
         public Server ShalowCopy()

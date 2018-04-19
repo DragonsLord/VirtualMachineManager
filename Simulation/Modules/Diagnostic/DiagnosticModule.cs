@@ -14,14 +14,23 @@ namespace Simulation.Modules.Diagnostic
         public DiagnosticResult DetectOverloadedMachines(ServerCollection collection)
         {
             byte depth = 0;
-            Logger.StartAction("Diagnosting for overloaded servers");
-            // TODO: add prognosed steps after prognose module implementation
-            var overloaded = collection.Where(server => !server.InMigration && Evaluator.IsOverloaded(server, 0));
+            IEnumerable<Server> overloaded = Array.Empty<Server>();
+            Logger.StartProcess("Diagnosting for overloaded servers");
+            // TODO: maybe we should not break
+            for (depth = 0; depth <= GlobalConstants.PROGNOSE_DEPTH; depth++)
+            {
+                overloaded = collection.Where(server => !server.InMigration && Evaluator.IsOverloaded(server, 0));
+                if (overloaded.Any())
+                {
+                    Logger.LogMessage($"overloaded servers detected at prognose level {depth}");
+                    break;
+                }
+            }
             var result = new DiagnosticResult(
                 overloaded,
                 collection.Where(s => ValidateThreadhold(s, depth, true)),
                 depth);
-            Logger.EndAction();
+            Logger.EndProccess("Diagnostic");
             return result;
         }
 
@@ -66,7 +75,7 @@ namespace Simulation.Modules.Diagnostic
         private bool ValidateThreadhold(Server s, byte depth, bool includeOffline)
         {
             var freeRes = s.Resources - s.PrognosedUsedResources[depth];
-            return !s.InMigration && !Evaluator.IsOverloaded(s, depth) && ((!s.TurnedOn && includeOffline) || (
+            return !s.InMigration && Evaluator.IsNotOverloaded(s, depth) && ((!s.TurnedOn && includeOffline) || (
                 freeRes.CPU > GlobalConstants.CPU_RECIEVER_THREADHOLD * s.Resources.CPU &&
                 freeRes.Memmory > GlobalConstants.MEMMORY_RECIEVER_THREADHOLD * s.Resources.Memmory &&
                 freeRes.IOPS > GlobalConstants.IOPS_RECIEVER_THREADHOLD * s.Resources.IOPS &&

@@ -20,6 +20,16 @@ namespace Simulation.Modules.Diagnostic
             return server.TurnedOn && IsOverloaded(server.PrognosedUsedResources[depth], server);
         }
 
+        public static bool IsNotOverloaded(Server server, byte depth)
+        {
+            for (int i = 0; i <= depth; i++)
+            {
+                if (IsOverloaded(server, depth))
+                    return false;
+            }
+            return true;
+        }
+
         public static bool IsOverloaded(Resources required, Server server)
         {
             var aviable = server.Resources - required;
