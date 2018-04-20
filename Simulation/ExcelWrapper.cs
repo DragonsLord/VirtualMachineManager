@@ -48,13 +48,22 @@ namespace Simulation
                     ws.Cells[2, 3 * steps + 5 + j].Value = $"|+{j}|";
                 }
                 ws.Cells[1, 4 * steps + 6].Value = "VM Count";
-                ws.Cells[1, 4 * steps + 7].Value = "Migrations"; // TODO: fill it 
+                MergeAndSetValue(ws.Cells[1, 4 * steps + 7, 1, 4 * steps + 8], "Migrations"); // TODO: fill it
+                ws.Cells[2, 4 * steps + 7].Value = "Send"; 
+                ws.Cells[2, 4 * steps + 8].Value = "Recieve";
+
+                MergeAndSetValue(ws.Cells[1, 4 * steps + 10, 1, 4 * steps + 13], "Capacity");
+                ws.Cells[2, 4 * steps + 10].Value = "CPU";
+                ws.Cells[2, 4 * steps + 11].Value = "Memmory";
+                ws.Cells[2, 4 * steps + 12].Value = "Network";
+                ws.Cells[2, 4 * steps + 13].Value = "IOPS";
             }
         }
 
         public void WriteServerStatistics(int step, Server server)
         {
             var depth = GlobalConstants.PROGNOSE_DEPTH;
+            var capacityOffset = 4 * depth;
             var res = server.PrognosedUsedResources;
             var ws = _excelPackage.Workbook.Worksheets[server.Id];
             ws.Cells[2 + step, 1].Value = step;
@@ -66,6 +75,12 @@ namespace Simulation
                 ws.Cells[2 + step, 3 * depth + 5 + j].Value = res[j].IOPS;
             }
             ws.Cells[2 + step, 4 * depth + 6].Value = server.RunningVMs.Count;
+
+            ws.Cells[2 + step, capacityOffset + 10].Value = server.Resources.CPU;
+            ws.Cells[2 + step, capacityOffset + 11].Value = server.Resources.Memmory;
+            ws.Cells[2 + step, capacityOffset + 12].Value = server.Resources.Network;
+            ws.Cells[2 + step, capacityOffset + 13].Value = server.Resources.IOPS;
+
             _currentStep = step;
         }
 
@@ -108,6 +123,9 @@ namespace Simulation
                     .Add(GetValuesCellRange(sheet, 2 + columnOffset + i, -i), GetValuesCellRange(sheet, 1, i))
                     .Header = $"+{i}";
             }
+            chart.Series
+                .Add(GetValuesCellRange(sheet, 4 * GlobalConstants.PROGNOSE_DEPTH + 10, 0), GetValuesCellRange(sheet, 1, 0))
+                .Header = "capacity";
             return chart;
         }
 

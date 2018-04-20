@@ -67,7 +67,7 @@ namespace Simulation
                 Logger.RegisterOutputChannels(streamWriter.Write);
                 Logger.StartProcess("Simulation runnig");
                 #region Main Cycle
-                foreach (var timeEvent in dataContext.TimeEventRepository.EnumerateAll().Take(500))
+                foreach (var timeEvent in dataContext.TimeEventRepository.EnumerateAll().Take(200))
                 {
                     OnNextStep?.Invoke(this);
                     ProccessEvent(timeEvent);
