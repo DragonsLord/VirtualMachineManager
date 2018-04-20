@@ -50,6 +50,8 @@ namespace Simulation.Modules.Migration.Model
                 Sender.UsedResources += Resources;
                 Reciever.UsedResources += Resources;
             }
+            Sender.SendingCount++;
+            Reciever.RecievingCount++;
         }
 
         public void OnNextTimeEvent(Simulation simulation)
@@ -73,6 +75,8 @@ namespace Simulation.Modules.Migration.Model
 
             Sender.RemoveVM(TargetVM);
             Reciever.RunVM(TargetVM);
+            Sender.SendingCount--;
+            Reciever.RecievingCount--;
         }
     }
 }

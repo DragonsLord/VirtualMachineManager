@@ -75,6 +75,8 @@ namespace Simulation
                 ws.Cells[2 + step, 3 * depth + 5 + j].Value = res[j].IOPS;
             }
             ws.Cells[2 + step, 4 * depth + 6].Value = server.RunningVMs.Count;
+            ws.Cells[2 + step, 4 * depth + 7].Value = server.SendingCount;
+            ws.Cells[2 + step, 4 * depth + 8].Value = server.RecievingCount;
 
             ws.Cells[2 + step, capacityOffset + 10].Value = server.Resources.CPU;
             ws.Cells[2 + step, capacityOffset + 11].Value = server.Resources.Memmory;
@@ -104,6 +106,9 @@ namespace Simulation
                 chart = CreateOneSeriesChart(sheet, "VMs", 4 * depth + 6);
                 chart.SetSize(1000, 400);
                 chart.SetPosition(3200, 0);
+                chart = CreateMigrationsChart(sheet);
+                chart.SetSize(1000, 400);
+                chart.SetPosition(3600, 0);
             }
         }
 
@@ -134,6 +139,18 @@ namespace Simulation
             var chart = sheet.Drawings.AddChart(title, eChartType.Line) as ExcelLineChart;
             chart.Title.Text = title;
             chart.Series.Add(GetValuesCellRange(sheet, column), GetValuesCellRange(sheet, 1));
+            return chart;
+        }
+
+        private ExcelLineChart CreateMigrationsChart(ExcelWorksheet sheet)
+        {
+            var depth = GlobalConstants.PROGNOSE_DEPTH;
+            var chart = sheet.Drawings.AddChart("Migrations", eChartType.Line) as ExcelLineChart;
+            chart.Title.Text = "Migrations";
+            chart.Series.Add(GetValuesCellRange(sheet, 4 * depth + 7), GetValuesCellRange(sheet, 1))
+                .Header = "Sending";
+            chart.Series.Add(GetValuesCellRange(sheet, 4 * depth + 8), GetValuesCellRange(sheet, 1))
+                .Header = "Recieving";
             return chart;
         }
 

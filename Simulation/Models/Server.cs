@@ -29,6 +29,12 @@ namespace Simulation.Models
         // TODO: switch to custom collection with inner dictionary
         public List<VM> RunningVMs { get; private set; } = new List<VM>();
 
+        #region Statistics Properties
+        public int SendingCount { get; set; }
+
+        public int RecievingCount { get; set; }
+        #endregion
+
         public void TurnOn()
         {
             if (TurnedOn) {
