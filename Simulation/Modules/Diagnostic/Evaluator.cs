@@ -33,11 +33,21 @@ namespace Simulation.Modules.Diagnostic
         public static bool IsOverloaded(Resources required, Server server)
         {
             var aviable = server.Resources - required;
-            // TODO: add server managing requirments and check prognosed value
             return aviable.CPU / server.Resources.CPU < CPU_THREADHOLD
                 || aviable.Memmory / server.Resources.Memmory < MEMMORY_THREADHOLD
                 || aviable.Network / server.Resources.Network < NETWORK_THREADHOLD
                 || aviable.IOPS / server.Resources.IOPS < IOPS_THREADHOLD;
+        }
+
+        public static Resources GetThreadholdDiff(Server server, byte depth)
+        {
+            var aviable = server.Resources - server.PrognosedUsedResources[depth];
+            return new Resources() {
+                CPU = Math.Abs(aviable.CPU - server.Resources.CPU * CPU_THREADHOLD),
+                Memmory = Math.Abs(aviable.Memmory - server.Resources.Memmory * MEMMORY_THREADHOLD),
+                Network = Math.Abs(aviable.Network - server.Resources.Network * NETWORK_THREADHOLD),
+                IOPS = Math.Abs(aviable.IOPS - server.Resources.IOPS * IOPS_THREADHOLD)
+            };
         }
 
         public static float EvaluateForOverloading(Server server, byte depth)
@@ -98,6 +108,21 @@ namespace Simulation.Modules.Diagnostic
                 Network = server.UsedResources.Network / server.Resources.Network,
                 Memmory = server.UsedResources.Memmory / server.Resources.Memmory,
                 IOPS = server.UsedResources.IOPS / server.Resources.IOPS,
+            };
+        }
+
+        public static Resources GetMigrationResourceRequirments(Server reciever, Server sender)
+        {
+            float getFreeNetwork(Server server)
+            {
+                return server.Resources.Network - server.UsedResources.Network;
+            }
+            return new Resources
+            {
+                CPU = CPU_ON_MIGRATION,
+                Memmory = 0,
+                IOPS = 0,
+                Network = Math.Min(getFreeNetwork(reciever), getFreeNetwork(sender)) * NETWORK_ON_MIGRATION
             };
         }
     }

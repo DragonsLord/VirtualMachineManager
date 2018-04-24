@@ -37,7 +37,10 @@ namespace Simulation.Modules.Migration.Model
         protected Resources GetTargetServerResourcesChange(byte depth)
         {
             Resources r = new Resources();
-            Changes.ForEach((changes) => r += changes.Target.Resources);
+            Changes.ForEach((changes) => 
+                r += (changes.Target.Resources + 
+                Evaluator.GetMigrationResourceRequirments(changes.Reciever, _root.TargetServer))
+                );
 
             return r;
         }

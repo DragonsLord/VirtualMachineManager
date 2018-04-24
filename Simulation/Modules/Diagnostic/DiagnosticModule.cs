@@ -27,7 +27,7 @@ namespace Simulation.Modules.Diagnostic
                 }
             }
             var result = new DiagnosticResult(
-                overloaded,
+                overloaded.OrderByDescending(s => Evaluator.GetThreadholdDiff(s, depth).EvaluateVolume()),
                 collection.Where(s => ValidateThreadhold(s, depth, true)),
                 depth);
             Logger.EndProccess("Diagnostic");

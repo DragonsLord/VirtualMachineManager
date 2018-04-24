@@ -1,4 +1,5 @@
 ﻿using Simulation.Models;
+using Simulation.Modules.Diagnostic;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,16 +31,7 @@ namespace Simulation.Modules.Migration.Model
 
         public void CalculateResources()
         {
-            float getFreeNetwork(Server server){
-                return server.Resources.Network - server.UsedResources.Network;
-            }
-            Resources = new Resources
-            {
-                CPU = GlobalConstants.CPU_ON_MIGRATION,
-                Memmory = 0,
-                IOPS = 0,
-                Network = Math.Min(getFreeNetwork(Reciever), getFreeNetwork(Sender)) * GlobalConstants.NETWORK_ON_MIGRATION
-            };
+            Resources = Evaluator.GetMigrationResourceRequirments(Reciever, Sender);
         }
 
         private void InitMigrationOnServers()
