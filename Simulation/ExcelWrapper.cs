@@ -11,7 +11,6 @@ using Utilities;
 
 namespace Simulation
 {
-    // TODO: [high] add res capacity to charts 
     public class ExcelWrapper: IDisposable
     {
         private string _outputFilename;
@@ -48,7 +47,7 @@ namespace Simulation
                     ws.Cells[2, 3 * steps + 5 + j].Value = $"|+{j}|";
                 }
                 ws.Cells[1, 4 * steps + 6].Value = "VM Count";
-                MergeAndSetValue(ws.Cells[1, 4 * steps + 7, 1, 4 * steps + 8], "Migrations"); // TODO: fill it
+                MergeAndSetValue(ws.Cells[1, 4 * steps + 7, 1, 4 * steps + 8], "Migrations");
                 ws.Cells[2, 4 * steps + 7].Value = "Send"; 
                 ws.Cells[2, 4 * steps + 8].Value = "Recieve";
 

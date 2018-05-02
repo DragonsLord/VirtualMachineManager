@@ -11,6 +11,7 @@ using Utilities;
 
 namespace Simulation.Modules.Prognosing.Algorythm
 {
+    // TODO: check cases with turnd off servers
     public class RegressionEngine
     {
         public float[] Run(StatisticalDataStream<float> valuesStream, int stepsAmount = GlobalConstants.PROGNOSE_DEPTH)

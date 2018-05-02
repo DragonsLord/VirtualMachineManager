@@ -47,7 +47,8 @@ namespace Simulation.Modules.Diagnostic
                 return DiagnosticResult.Empty;
             }
 
-            var recievers = collection.Where((server) => !lowLoaded.Any((s) => s.Id == server.Id))
+            var recievers = collection
+                .Where((server) => server.TurnedOn && !lowLoaded.Any((s) => s.Id == server.Id))
                 .Where(s => ValidateThreadhold(s, depth, false));
 
             if (!recievers.Any())
@@ -66,9 +67,25 @@ namespace Simulation.Modules.Diagnostic
                 IOPS = totalFree.IOPS * GlobalConstants.IOPS_THREADHOLD
             };
 
+            var exclusions = new List<Server>(lowLoaded.Count());
+            foreach (var server in lowLoaded)
+            {
+                if ((totalFree -= server.PrognosedUsedResources[depth]) < 0)
+                {
+                    exclusions.Add(server);
+                    totalFree += new Resources()
+                    {
+                        CPU = server.Resources.CPU * (1 - GlobalConstants.CPU_THREADHOLD),
+                        Memmory = server.Resources.Memmory * (1 - GlobalConstants.MEMMORY_THREADHOLD),
+                        Network = server.Resources.Network * (1 - GlobalConstants.NETWORK_THREADHOLD),
+                        IOPS = server.Resources.IOPS * (1 - GlobalConstants.IOPS_THREADHOLD)
+                    };
+                }
+            }
+
             return new DiagnosticResult(
-                lowLoaded.Where((server) => (totalFree -= server.PrognosedUsedResources[depth]) > 0),
-                recievers,
+                lowLoaded.Where((server) => !exclusions.Any(s => s.Id == server.Id)),
+                recievers.Concat(exclusions),
                 depth);
         }
 

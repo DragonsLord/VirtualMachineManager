@@ -84,7 +84,6 @@ namespace Simulation.Models
 
         public Server ShalowCopy()
         {
-            // TODO: check if work properly
             return new Server()
             {
                 Id = this.Id,

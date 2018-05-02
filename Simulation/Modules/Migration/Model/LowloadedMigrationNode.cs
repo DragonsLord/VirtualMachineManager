@@ -22,6 +22,8 @@ namespace Simulation.Modules.Migration.Model
         {
         }
 
+        // TODO: runs very long time. Probably could not finished in some cases
+        // TODO: add additinal cases to exit, check childs count
         protected override bool CalculateValidity()
         {
             return Changes.Length == _root.TargetServer.RunningVMs.Count;

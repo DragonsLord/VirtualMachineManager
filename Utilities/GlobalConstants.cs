@@ -86,7 +86,7 @@ namespace Utilities
         /// <summary>
         /// relative network vaule to use for migration task
         /// </summary>
-        public const float NETWORK_ON_MIGRATION = 0.1f;
+        public const float NETWORK_ON_MIGRATION = 0.1f; // TODO: from total capacity, check diagnostic
         /// <summary>
         /// absolute CPU resource value to use for migration task
         /// </summary>
@@ -94,9 +94,17 @@ namespace Utilities
         #endregion
 
         #region Prognosing Parameters
-        public const int INDEPENDENT_VALUES_AMOUNT = 20;
+        public const int INDEPENDENT_VALUES_AMOUNT = 30;
 
-        public const int MAX_VALUES_AMOUNT = 100;
+        public const int MAX_VALUES_AMOUNT = 120;
+        #endregion
+
+        #region Asigning Parameters
+        /// <summary>
+        /// !!! NOT USED !!!
+        /// If vm to asign count is bigger then that param FirstFitDecreasing will be used instead of BestFitDecreasing
+        /// </summary>
+        public const int BEST_FIT_THREADHOLD = 0;
         #endregion
     }
 }
