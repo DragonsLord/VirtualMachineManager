@@ -21,7 +21,7 @@ namespace Simulation
     {
         private string _logFileName;
         private string _serverStatisticsFolder;
-        private ExcelWrapper _excel = new ExcelWrapper();
+        private ExcelWrapper _excel;
 
         private PrognoseModule prognoseModule = new PrognoseModule();
         private DiagnosticModule diagnosticModule = new DiagnosticModule();
@@ -55,7 +55,8 @@ namespace Simulation
             Servers.ForEach((server) => this.OnNextStep += server.TryShutdown);
             var identifier = DateTime.Now.ToString("yyyy-MM-dd hh mm ss");
             _logFileName = $"Logs\\Simualtion log - {identifier}.txt";
-            _excel.Initialize(10);
+            _excel = new ExcelWrapper($"Logs\\Servers statistics - {identifier}.xlsx");
+            _excel.Initialize(Servers.Count);
         }
         
         public void Run()
@@ -178,10 +179,9 @@ namespace Simulation
             Logger.LogMessage(migrationPlan.GetFullInfo());
         }
 
-        // TODO: add migration logging
         private void LogCurrentServerState(int step)
         {
-            foreach (var server in Servers.Take(10))
+            foreach (var server in Servers)
             {
                 _excel.WriteServerStatistics(step, server);
             }

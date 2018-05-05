@@ -24,8 +24,9 @@ namespace Simulation.Modules.Prognosing
 
         public void Run(ServerCollection servers)
         {
+            var turnedOnServers = servers.Where(server => server.TurnedOn);
             Logger.StartProcess("Prognosing resources usage");
-            foreach (var server in servers)
+            foreach (var server in turnedOnServers)
             {
                 PushResourcesToStatistics(server);
 

@@ -22,7 +22,6 @@ namespace Simulation
         {
             _excelPackage = new ExcelPackage();
             _outputFilename = outputFilename;
-            // TODO: _excelPackage.File = output;
         }
 
         public void Initialize(int serversCount)

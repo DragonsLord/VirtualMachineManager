@@ -76,5 +76,16 @@ namespace Simulation.Models
                 r1.CPU > n &&
                 r1.Network > n;
         }
+
+        public static implicit operator Resources(int num)
+        {
+            return new Resources()
+            {
+                CPU = num,
+                Memmory = num,
+                Network = num,
+                IOPS = num
+            };
+        }
     }
 }

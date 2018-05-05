@@ -38,7 +38,8 @@ namespace Simulation.Modules.Diagnostic
         {
             byte depth = 0;
             // TODO: record ordering herustic
-            var lowLoaded = collection.Where((server) => !server.InMigration && Evaluator.IsLowLoaded(server, depth))
+            var lowLoaded = collection.Where(server => server.TurnedOn)
+                .Where((server) => !server.InMigration && Evaluator.IsLowLoaded(server, depth))
                 .OrderByDescending((server) => server.PrognosedUsedResources[depth].EvaluateVolume())
                 .ThenBy((server) => server.RunningVMs.Count);
 

@@ -46,11 +46,6 @@ namespace Simulation.Models
             TurnedOn = true;
         }
 
-        public void MarkToShutdown()
-        {
-            TurnedOn = false;
-        }
-
         public void RemoveVM(VM vm)
         {
             RunningVMs.Remove(vm);
@@ -99,6 +94,10 @@ namespace Simulation.Models
             if (TurnedOn && !RunningVMs.Any())
             {
                 TurnedOn = false;
+                for (int i = 0; i < GlobalConstants.PROGNOSE_DEPTH; i++)
+                {
+                    PrognosedUsedResources[i + 1] = 0;
+                }
                 Logger.LogMessage($"Server {Id} is shutting down");
             }
         }

@@ -5,6 +5,7 @@ using System.Text;
 namespace Utilities
 {
     //TODO: add migration per server constraint ?
+    //TODO: add limitation for differance between prognosed and real values
     public static class GlobalConstants
     {
         /// <summary>
