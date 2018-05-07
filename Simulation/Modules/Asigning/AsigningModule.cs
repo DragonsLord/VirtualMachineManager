@@ -16,7 +16,6 @@ namespace Simulation.Modules.Asigning
 
         public void Asign(IEnumerable<VM> vms, IEnumerable<Server> servers)
         {
-            //TODO: add buffer zone resource
             workingServers = servers
                 .Where(s => s.TurnedOn)
                 .OrderBy(s => s.Resources.EvaluateVolume()) // TODO: Is it worth it?
@@ -81,6 +80,7 @@ namespace Simulation.Modules.Asigning
             foreach (var vm in vms.OrderByDescending(GetVMResourceVolume))
             {
                 unAsigned = true;
+                minVolume = float.PositiveInfinity;
                 foreach (var server in workingServers)
                 {
                     if (server.CanRunVM(vm, 0))
@@ -110,6 +110,9 @@ namespace Simulation.Modules.Asigning
                 {
                     currentServer.RunVM(vm);
                     currentServer = null;
+                } else
+                {
+                    Logger.LogMessage($"VM{vm.Id} was rejected");
                 }
             }
             Logger.EndProccess("Assigning VMs");

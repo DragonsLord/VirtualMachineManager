@@ -20,7 +20,6 @@ namespace Simulation
     public class Simulation
     {
         private string _logFileName;
-        private string _serverStatisticsFolder;
         private ExcelWrapper _excel;
 
         private PrognoseModule prognoseModule = new PrognoseModule();
@@ -183,6 +182,11 @@ namespace Simulation
         {
             foreach (var server in Servers)
             {
+                if (server.UsedResources.Network < -1)  // TODO: [bug] fix
+                {
+                    Console.WriteLine($"< 0: {server.Id} - {server.UsedResources.Network }");
+                    // Console.ReadKey();
+                }
                 _excel.WriteServerStatistics(step, server);
             }
         }

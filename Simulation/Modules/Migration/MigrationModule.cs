@@ -52,7 +52,7 @@ namespace Simulation.Modules.Migration
             return migrationPlan;
         }
 
-        public MigrationPlan ReleaseLowloadedMachines(DiagnosticResult input)
+        public MigrationPlan ReleaseLowloadedMachines(DiagnosticResult input) // TODO: Migration Res consider too late
         {
             var migrationPlan = new MigrationPlan();
             var copies = input.Recievers
@@ -69,7 +69,7 @@ namespace Simulation.Modules.Migration
                     new MigrationRootNode(
                         server,
                         recievers.ToList(),
-                        new List<Server>(), // empty reserve because we are decrease amount of working servers
+                        new List<Server>(), // empty reserve because we are decreasing amount of working servers
                         input.Depth,
                         GetInitialValue(recievers, input.Depth, Evaluator.EvaluateForReleasing),
                         LowloadedMigrationNode.FromRootNode)
@@ -79,7 +79,10 @@ namespace Simulation.Modules.Migration
                 migrationPlan.Add(resultNode, server);
                 foreach (var change in resultNode.Changes)
                 {
-                    copies.Find(s => s.Id == change.Reciever.Id).RunVM(change.Target);
+                    var reciever = copies.Find(s => s.Id == change.Reciever.Id);
+                    reciever.RunVM(change.Target);
+                    reciever.PrognosedUsedResources[0] += Evaluator.GetMigrationResourceRequirments(reciever, server);
+
                 }
             }
             return migrationPlan;

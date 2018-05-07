@@ -38,8 +38,9 @@ namespace Simulation.Modules.Migration.Model
         {
             Resources r = new Resources();
             Changes.ForEach((changes) => 
-                r += (changes.Target.Resources + 
-                Evaluator.GetMigrationResourceRequirments(changes.Reciever, _root.TargetServer))
+                r += (
+                    Evaluator.GetMigrationResourceRequirments(changes.Reciever, _root.TargetServer))
+                    - changes.Target.Resources
                 );
 
             return r;
@@ -50,7 +51,12 @@ namespace Simulation.Modules.Migration.Model
             Resources r = new Resources();
             Changes
                 .Where((change) => change.Reciever.Id == server.Id)
-                .ForEach((changes) => r += changes.Target.Resources);
+                .ForEach((changes) =>
+                    r += (
+                        changes.Target.Resources +
+                        Evaluator.GetMigrationResourceRequirments(changes.Reciever, _root.TargetServer)
+                    )
+                );
 
             return r + server.PrognosedUsedResources[depth];
         }
@@ -85,10 +91,6 @@ namespace Simulation.Modules.Migration.Model
                 nodes.AddRange(toTurnOn);
 
                 remainigCount -= toTurnOn.Count();
-            }
-            if (remainigCount > 0)
-            {
-                // TODO: consider swaps... or not?
             }
             return nodes;
         }

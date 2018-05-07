@@ -60,18 +60,20 @@ namespace Simulation.Modules.Diagnostic
             var totalFree = recievers.Select(s => s.Resources - s.PrognosedUsedResources[depth])
                 .Aggregate((r1, r2) => r1 + r2);
 
+            int vmsToMigrateCount = lowLoaded.Select(server => server.RunningVMs.Count).Sum();
+            
             totalFree -= new Resources()
             {
-                CPU = totalFree.CPU * GlobalConstants.CPU_THREADHOLD,
+                CPU = totalFree.CPU * GlobalConstants.CPU_THREADHOLD + GlobalConstants.CPU_ON_MIGRATION * vmsToMigrateCount,
                 Memmory = totalFree.Memmory * GlobalConstants.MEMMORY_THREADHOLD,
-                Network = totalFree.Network * GlobalConstants.NETWORK_THREADHOLD,
+                Network = totalFree.Network * GlobalConstants.NETWORK_THREADHOLD + GlobalConstants.MIN_NETWORK_ON_MIGRATION * vmsToMigrateCount,
                 IOPS = totalFree.IOPS * GlobalConstants.IOPS_THREADHOLD
             };
 
             var exclusions = new List<Server>(lowLoaded.Count());
             foreach (var server in lowLoaded)
             {
-                if ((totalFree -= server.PrognosedUsedResources[depth]) < 0)
+                if ((totalFree -= server.PrognosedUsedResources[depth]) < 0)  // TODO: Add migration res req
                 {
                     exclusions.Add(server);
                     totalFree += new Resources()

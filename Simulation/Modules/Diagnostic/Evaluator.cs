@@ -33,6 +33,8 @@ namespace Simulation.Modules.Diagnostic
         public static bool IsOverloaded(Resources required, Server server)
         {
             var aviable = server.Resources - required;
+            if (aviable < 0)
+                return true;
             return aviable.CPU / server.Resources.CPU < CPU_THREADHOLD
                 || aviable.Memmory / server.Resources.Memmory < MEMMORY_THREADHOLD
                 || aviable.Network / server.Resources.Network < NETWORK_THREADHOLD
@@ -113,16 +115,20 @@ namespace Simulation.Modules.Diagnostic
 
         public static Resources GetMigrationResourceRequirments(Server reciever, Server sender)
         {
-            float getFreeNetwork(Server server)
+            float getServerNetworkReq(Server server)
             {
-                return server.Resources.Network - server.UsedResources.Network;
+                return Math.Max(MIN_NETWORK_ON_MIGRATION, server.Resources.Network * NETWORK_ON_MIGRATION);
+                    //Math.Min(
+                    //    Math.Max(MIN_NETWORK_ON_MIGRATION, server.Resources.Network * NETWORK_ON_MIGRATION),
+                    //    server.Resources.Network - server.UsedResources.Network // TODO: move this check to diagnostic
+                    //);
             }
             return new Resources
             {
                 CPU = CPU_ON_MIGRATION,
                 Memmory = 0,
                 IOPS = 0,
-                Network = Math.Min(getFreeNetwork(reciever), getFreeNetwork(sender)) * NETWORK_ON_MIGRATION
+                Network = Math.Min(getServerNetworkReq(reciever), getServerNetworkReq(sender))
             };
         }
     }

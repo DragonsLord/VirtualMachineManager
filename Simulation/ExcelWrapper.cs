@@ -86,22 +86,21 @@ namespace Simulation
 
         public void DrawCharts()
         {
-            int depth = GlobalConstants.PROGNOSE_DEPTH;
             foreach (var sheet in _excelPackage.Workbook.Worksheets)
             {
                 var chart = CreatePredictionChart(sheet, "CPU", 0);
                 chart.SetSize(1000, 800);
                 chart.SetPosition(0, 0);
-                chart = CreatePredictionChart(sheet, "Memory", depth + 1);
+                chart = CreatePredictionChart(sheet, "Memory", 1);
                 chart.SetSize(1000, 800);
                 chart.SetPosition(800, 0);
-                chart = CreatePredictionChart(sheet, "Network", 2 * depth + 2);
+                chart = CreatePredictionChart(sheet, "Network", 2);
                 chart.SetSize(1000, 800);
                 chart.SetPosition(1600, 0);
-                chart = CreatePredictionChart(sheet, "IOPS", 3 * depth + 3);
+                chart = CreatePredictionChart(sheet, "IOPS", 3);
                 chart.SetSize(1000, 800);
                 chart.SetPosition(2400, 0);
-                chart = CreateOneSeriesChart(sheet, "VMs", 4 * depth + 6);
+                chart = CreateOneSeriesChart(sheet, "VMs", 4 * GlobalConstants.PROGNOSE_DEPTH + 6);
                 chart.SetSize(1000, 400);
                 chart.SetPosition(3200, 0);
                 chart = CreateMigrationsChart(sheet);
@@ -118,16 +117,17 @@ namespace Simulation
 
         private ExcelLineChart CreatePredictionChart(ExcelWorksheet sheet, string title, int columnOffset)
         {
+            int depth = GlobalConstants.PROGNOSE_DEPTH;
             var chart = sheet.Drawings.AddChart(title, eChartType.Line) as ExcelLineChart;
             chart.Title.Text = title;
             for (int i = 0; i <= GlobalConstants.PROGNOSE_DEPTH; i++)
             {
                 chart.Series
-                    .Add(GetValuesCellRange(sheet, 2 + columnOffset + i, -i), GetValuesCellRange(sheet, 1, i))
+                    .Add(GetValuesCellRange(sheet, 2 + columnOffset*(depth + 1) + i, -i), GetValuesCellRange(sheet, 1, i))
                     .Header = $"+{i}";
             }
             chart.Series
-                .Add(GetValuesCellRange(sheet, 4 * GlobalConstants.PROGNOSE_DEPTH + 10, 0), GetValuesCellRange(sheet, 1, 0))
+                .Add(GetValuesCellRange(sheet, 4 * depth + 10 + columnOffset, 0), GetValuesCellRange(sheet, 1, 0))
                 .Header = "capacity";
             return chart;
         }

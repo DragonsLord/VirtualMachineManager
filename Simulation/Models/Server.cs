@@ -58,6 +58,8 @@ namespace Simulation.Models
 
         public void RunVM(VM vm)
         {
+            if (!TurnedOn)
+                TurnOn();
             RunningVMs.Add(vm);
             vm.HostServerId = Id;
 

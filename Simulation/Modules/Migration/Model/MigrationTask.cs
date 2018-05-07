@@ -37,11 +37,9 @@ namespace Simulation.Modules.Migration.Model
         private void InitMigrationOnServers()
         {
             TargetVM.IsMigrating = true;
-            for (byte depth = 0; depth < GlobalConstants.PROGNOSE_DEPTH; depth++)
-            {
-                Sender.UsedResources += Resources;
-                Reciever.UsedResources += Resources;
-            }
+            Sender.UsedResources += Resources;
+            Reciever.UsedResources += Resources;
+
             Sender.SendingCount++;
             Reciever.RecievingCount++;
         }
@@ -59,11 +57,9 @@ namespace Simulation.Modules.Migration.Model
         private void EndMigration()
         {
             TargetVM.IsMigrating = false;
-            for (byte depth = 0; depth < GlobalConstants.PROGNOSE_DEPTH; depth++)
-            {
-                Sender.UsedResources -= Resources;
-                Reciever.UsedResources -= Resources;
-            }
+
+            Sender.UsedResources -= Resources;
+            Reciever.UsedResources -= Resources;
 
             Sender.RemoveVM(TargetVM);
             Reciever.RunVM(TargetVM);

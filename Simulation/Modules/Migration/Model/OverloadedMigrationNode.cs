@@ -27,7 +27,7 @@ namespace Simulation.Modules.Migration.Model
             for (byte i = 0; i <= _root.Depth; i++)  // TODO: is cycle neccessary ?
             {
                 if (Evaluator.IsOverloaded(
-                    _root.TargetServer.PrognosedUsedResources[i] - GetTargetServerResourcesChange(i),
+                    _root.TargetServer.PrognosedUsedResources[i] + GetTargetServerResourcesChange(i),
                     _root.TargetServer))
                     return false;
             }

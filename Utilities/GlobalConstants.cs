@@ -21,6 +21,9 @@ namespace Utilities
         /// </summary>
         public const int PROGNOSE_DEPTH = 3;
 
+        /// <summary>
+        /// simulation step value in ms
+        /// </summary>
         public const int TIME_STEP_VALUE = 300;
 
         #region Evaluation parameters
@@ -87,7 +90,13 @@ namespace Utilities
         /// <summary>
         /// relative network vaule to use for migration task
         /// </summary>
-        public const float NETWORK_ON_MIGRATION = 0.1f; // TODO: from total capacity, check diagnostic
+        public const float NETWORK_ON_MIGRATION = 0.2f; // TODO: from total capacity, check diagnostic
+
+        /// <summary>
+        /// minimal network amount for migration
+        /// </summary>
+        public const float MIN_NETWORK_ON_MIGRATION = 5000; // TODO: Add Max Network Cap
+
         /// <summary>
         /// absolute CPU resource value to use for migration task
         /// </summary>
@@ -98,6 +107,11 @@ namespace Utilities
         public const int INDEPENDENT_VALUES_AMOUNT = 30;
 
         public const int MAX_VALUES_AMOUNT = 120;
+
+        /// <summary>
+        /// max difference between prognosed and real val
+        /// </summary>
+        public const int MAX_DEVIATION = 30000;
         #endregion
 
         #region Asigning Parameters

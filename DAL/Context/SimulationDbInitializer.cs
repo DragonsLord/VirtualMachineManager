@@ -13,6 +13,7 @@ namespace DAL.Context
     {
         private readonly string inputDataFolder = "InputData";
         private readonly string VMTracesFolder = "Traces";
+        private readonly string serversFile = "servers.csv";
         private readonly string timeRangeFile = "TimeRange.txt";
         private long startTime = 0;
         private long timeStep = 100;
@@ -121,20 +122,35 @@ namespace DAL.Context
 
         private void MapPhysicalMachines(SimulationContext context)
         {
-            Logger.StartProcess("Reading PM capacities");
-            var rnd = new Random(int.MaxValue / 2);
-            for (int i = 0; i < GlobalConstants.PM_CAPACITY; i++)
+            Logger.StartAction("Reading PM capacities");
+            using (StreamReader reader = new StreamReader(Path.Combine(inputDataFolder, serversFile)))
             {
-                context.PhysicalMachines.Add(new PhysicalMachine()
+                reader.ReadLine();  // skip headers
+
+                while (!reader.EndOfStream)
                 {
-                    CPU = 10000 + (float)rnd.NextDouble() * 100000,
-                    Memory = 2 * 1024 * 1024 + (float)rnd.NextDouble() * 6 * 1024 * 1024,   // 4 Gigs cap
-                    IOPS = 10000 + (float)rnd.NextDouble() * 20000,
-                    Network = 2000 + (float)rnd.NextDouble() * 10000
-                });
-                Logger.LogMessage($"PM {i + 1} - done");
+                    string[] line = reader.ReadLine().Split(new String[] { ";\t" }, StringSplitOptions.RemoveEmptyEntries);
+
+                    var amount = int.Parse(line[2]);
+                    var cpuFrequency = float.Parse(line[3], CultureInfo.InvariantCulture); // Mhz
+                    var cpuCores = int.Parse(line[5], CultureInfo.InvariantCulture);
+                    var memmory = float.Parse(line[6], CultureInfo.InvariantCulture); // GB
+                    var iops = float.Parse(line[7], CultureInfo.InvariantCulture);  //Mb/s
+                    var network = float.Parse(line[8], CultureInfo.InvariantCulture);   // Gbit/s
+
+                    for (int i = 0; i < amount; i++)
+                    {
+                        context.PhysicalMachines.Add(new PhysicalMachine()
+                        {
+                            CPU = cpuFrequency * cpuCores,
+                            Memory = memmory * 1024 * 1024, // kb
+                            IOPS = iops * 1024,  // kb/s
+                            Network = network * 1024 * 1024 // kbit/s
+                        });
+                    }
+                }
             }
-            Logger.EndProccess("Reading PM capacities");
+            Logger.EndAction();
         }
 
         protected override void Seed(SimulationContext context)

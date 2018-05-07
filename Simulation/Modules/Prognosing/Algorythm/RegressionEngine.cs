@@ -11,7 +11,6 @@ using Utilities;
 
 namespace Simulation.Modules.Prognosing.Algorythm
 {
-    // TODO: check cases with turnd off servers
     public class RegressionEngine
     {
         public float[] Run(StatisticalDataStream<float> valuesStream, int stepsAmount = GlobalConstants.PROGNOSE_DEPTH)
@@ -28,11 +27,16 @@ namespace Simulation.Modules.Prognosing.Algorythm
                 var K = MultipleRegression.NormalEquations(X, Y);
 
                 var prediction = new float[stepsAmount];
-
+                var realVal = Y.First();
                 for (int i = 0; i < stepsAmount; i++)
                 {
                     Y = Vec.DenseOfEnumerable(valuesStream.Take(independentCount - i).AddBefore(prediction, 0, i));
-                    prediction[i] = K.DotProduct(Y);
+                    var p = K.DotProduct(Y);
+                    if (Math.Abs(realVal - p) > GlobalConstants.MAX_DEVIATION)
+                    {
+                        prediction[i] = realVal;
+                    }
+                    else prediction[i] = p;
                 }
 
                 return prediction;

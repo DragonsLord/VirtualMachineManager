@@ -62,9 +62,9 @@ namespace Simulation.Models
         public static bool operator <(Resources r1, int n)
         {
             return
-                r1.IOPS < n &&
-                r1.Memmory < n &&
-                r1.CPU < n &&
+                r1.IOPS < n ||
+                r1.Memmory < n ||
+                r1.CPU < n ||
                 r1.Network < n;
         }
 
