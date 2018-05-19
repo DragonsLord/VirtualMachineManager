@@ -45,10 +45,10 @@ namespace Simulation.Modules.Diagnostic
         {
             var aviable = server.Resources - server.PrognosedUsedResources[depth];
             return new Resources() {
-                CPU = Math.Abs(aviable.CPU - server.Resources.CPU * CPU_THREADHOLD),
-                Memmory = Math.Abs(aviable.Memmory - server.Resources.Memmory * MEMMORY_THREADHOLD),
-                Network = Math.Abs(aviable.Network - server.Resources.Network * NETWORK_THREADHOLD),
-                IOPS = Math.Abs(aviable.IOPS - server.Resources.IOPS * IOPS_THREADHOLD)
+                CPU = Math.Abs(server.Resources.CPU * CPU_THREADHOLD - aviable.CPU),
+                Memmory = Math.Abs(server.Resources.Memmory * MEMMORY_THREADHOLD - aviable.Memmory),
+                Network = Math.Abs(server.Resources.Network * NETWORK_THREADHOLD - aviable.Network),
+                IOPS = Math.Abs(server.Resources.IOPS * IOPS_THREADHOLD - aviable.IOPS)
             };
         }
 

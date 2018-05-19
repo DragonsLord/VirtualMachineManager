@@ -78,10 +78,10 @@ namespace Simulation.Modules.Diagnostic
                     exclusions.Add(server);
                     totalFree += new Resources()
                     {
-                        CPU = server.Resources.CPU * (1 - GlobalConstants.CPU_THREADHOLD),
-                        Memmory = server.Resources.Memmory * (1 - GlobalConstants.MEMMORY_THREADHOLD),
-                        Network = server.Resources.Network * (1 - GlobalConstants.NETWORK_THREADHOLD),
-                        IOPS = server.Resources.IOPS * (1 - GlobalConstants.IOPS_THREADHOLD)
+                        CPU = server.Resources.CPU * (1 - GlobalConstants.CPU_THREADHOLD) - server.PrognosedUsedResources[depth].CPU,
+                        Memmory = server.Resources.Memmory * (1 - GlobalConstants.MEMMORY_THREADHOLD) - server.PrognosedUsedResources[depth].Memmory,
+                        Network = server.Resources.Network * (1 - GlobalConstants.NETWORK_THREADHOLD) - server.PrognosedUsedResources[depth].Network,
+                        IOPS = server.Resources.IOPS * (1 - GlobalConstants.IOPS_THREADHOLD) - server.PrognosedUsedResources[depth].IOPS
                     };
                 }
             }

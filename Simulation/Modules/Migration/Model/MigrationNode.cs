@@ -46,7 +46,7 @@ namespace Simulation.Modules.Migration.Model
             return r;
         }
 
-        public Resources GetRecieverResources(Server server, byte depth)
+        public Resources GetRecieverUsedResources(Server server, byte depth)
         {
             Resources r = new Resources();
             Changes
@@ -76,7 +76,7 @@ namespace Simulation.Modules.Migration.Model
             var nodes = _root.Recievers
                 .Where(server => CanServerRunVM(server, vm)) // !
                 .OrderByDescending(server => Evaluator.Evaluate(
-                    server.Resources - GetRecieverResources(server, _root.Depth)))
+                    server.Resources - GetRecieverUsedResources(server, _root.Depth)))
                 .Select(server => CreateNode(this, vm, server)).ToList();
             var remainigCount = GlobalConstants.MIN_CHILD_NODES_PER_VM - nodes.Count;
             if (remainigCount > 0)
@@ -84,7 +84,7 @@ namespace Simulation.Modules.Migration.Model
                 var toTurnOn = _root.Reservation
                     .Where(server => CanServerRunVM(server, vm))
                     .OrderByDescending(server => Evaluator.Evaluate(
-                        server.Resources - GetRecieverResources(server, _root.Depth)))
+                        server.Resources - GetRecieverUsedResources(server, _root.Depth)))
                     .Take(remainigCount)
                     .Select(server => CreateNode(this, vm, server, true));
 
@@ -102,7 +102,7 @@ namespace Simulation.Modules.Migration.Model
             for (byte i = 0; i < _root.Depth; i++)
             {
                 result = !Evaluator.IsOverloaded(
-                    GetRecieverResources(server, i),
+                    GetRecieverUsedResources(server, i),
                     server);
                 if (!result)
                     return result;

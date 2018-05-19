@@ -41,7 +41,7 @@ namespace Simulation.Modules.Migration.Model
             val += GetTargetServerResourcesChange(_root.Depth).EvaluateVolume();
 
             var change = Changes.LastItem();
-            var newServerResources = GetRecieverResources(change.Reciever, _root.Depth);
+            var newServerResources = GetRecieverUsedResources(change.Reciever, _root.Depth);
 
             if (newTurnOn) {
                 val -= GlobalConstants.TURN_ON_PENALTY;
