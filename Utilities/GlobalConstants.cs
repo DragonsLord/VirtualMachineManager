@@ -90,12 +90,17 @@ namespace Utilities
         /// <summary>
         /// relative network vaule to use for migration task
         /// </summary>
-        public const float NETWORK_ON_MIGRATION = 0.2f; // TODO: from total capacity, check diagnostic
+        public const float NETWORK_ON_MIGRATION = 0.2f;
 
         /// <summary>
-        /// minimal network amount for migration
+        /// minimal network capacity for migration
         /// </summary>
-        public const float MIN_NETWORK_ON_MIGRATION = 5000; // TODO: Add Max Network Cap
+        public const float MIN_NETWORK_ON_MIGRATION = 100000;
+
+        /// <summary>
+        /// minimal network capacity for migration
+        /// </summary>
+        public const float MAX_NETWORK_ON_MIGRATION = 1000000;  // you should be very carefull. Very big value can broke network loading on migrations
 
         /// <summary>
         /// absolute CPU resource value to use for migration task

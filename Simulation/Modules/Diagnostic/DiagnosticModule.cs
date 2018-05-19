@@ -66,7 +66,7 @@ namespace Simulation.Modules.Diagnostic
             {
                 CPU = totalFree.CPU * GlobalConstants.CPU_THREADHOLD + GlobalConstants.CPU_ON_MIGRATION * vmsToMigrateCount,
                 Memmory = totalFree.Memmory * GlobalConstants.MEMMORY_THREADHOLD,
-                Network = totalFree.Network * GlobalConstants.NETWORK_THREADHOLD + GlobalConstants.MIN_NETWORK_ON_MIGRATION * vmsToMigrateCount,
+                Network = totalFree.Network * GlobalConstants.NETWORK_THREADHOLD + GlobalConstants.MAX_NETWORK_ON_MIGRATION * vmsToMigrateCount,
                 IOPS = totalFree.IOPS * GlobalConstants.IOPS_THREADHOLD
             };
 

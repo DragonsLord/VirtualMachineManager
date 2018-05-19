@@ -117,11 +117,10 @@ namespace Simulation.Modules.Diagnostic
         {
             float getServerNetworkReq(Server server)
             {
-                return Math.Max(MIN_NETWORK_ON_MIGRATION, server.Resources.Network * NETWORK_ON_MIGRATION);
-                    //Math.Min(
-                    //    Math.Max(MIN_NETWORK_ON_MIGRATION, server.Resources.Network * NETWORK_ON_MIGRATION),
-                    //    server.Resources.Network - server.UsedResources.Network // TODO: move this check to diagnostic
-                    //);
+                return Math.Min(
+                    Math.Max(MIN_NETWORK_ON_MIGRATION, server.Resources.Network * NETWORK_ON_MIGRATION),
+                    MAX_NETWORK_ON_MIGRATION
+                );
             }
             return new Resources
             {
