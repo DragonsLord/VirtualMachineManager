@@ -110,7 +110,7 @@ namespace Simulation.Modules.Asigning
                 {
                     currentServer.RunVM(vm);
                     currentServer = null;
-                } else
+                } else if (vm.HostServerId == 0)
                 {
                     Logger.LogMessage($"VM{vm.Id} was rejected");
                 }

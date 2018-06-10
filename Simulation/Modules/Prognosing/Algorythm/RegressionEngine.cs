@@ -13,7 +13,7 @@ namespace Simulation.Modules.Prognosing.Algorythm
 {
     public class RegressionEngine
     {
-        public float[] Run(StatisticalDataStream<float> valuesStream, int stepsAmount = GlobalConstants.PROGNOSE_DEPTH)
+        public float[] Run(StatisticalDataStream<float> valuesStream, int stepsAmount)
         {
             var independentCount = GlobalConstants.INDEPENDENT_VALUES_AMOUNT;
             var Vec = Vector<float>.Build;

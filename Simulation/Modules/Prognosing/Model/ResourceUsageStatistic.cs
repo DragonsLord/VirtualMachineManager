@@ -40,7 +40,7 @@ namespace Simulation.Modules.Prognosing.Model
             Count++;
         }
 
-        public Resources[] GetPredictedResources(RegressionEngine regression, int steps = GlobalConstants.PROGNOSE_DEPTH)
+        public Resources[] GetPredictedResources(RegressionEngine regression, int steps)
         {
             var cpu = regression.Run(_cpuValuesStream, steps);
             var memory = regression.Run(_memoryValuesStream, steps);

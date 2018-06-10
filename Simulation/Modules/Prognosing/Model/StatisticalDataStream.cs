@@ -14,7 +14,7 @@ namespace Simulation.Modules.Prognosing.Model
 
         public int Count { get; private set; } = 0;
 
-        public StatisticalDataStream(int amount = GlobalConstants.MAX_VALUES_AMOUNT)
+        public StatisticalDataStream(int amount)
         {
             amount = Math.Max(amount, GlobalConstants.INDEPENDENT_VALUES_AMOUNT * 2);
             _valuesContainer = new T[amount];
@@ -33,7 +33,7 @@ namespace Simulation.Modules.Prognosing.Model
             Count = Math.Min(Count + 1, _valuesContainer.Length);
         }
 
-        public IEnumerable<T> GetPartial(int offset, int amount = GlobalConstants.INDEPENDENT_VALUES_AMOUNT)
+        public IEnumerable<T> GetPartial(int offset, int amount)
         {
             for (int i = 0; i < amount; i++)
             {

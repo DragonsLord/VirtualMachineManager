@@ -10,8 +10,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Utilities;
 
 namespace Simulation
@@ -46,6 +44,7 @@ namespace Simulation
             #endregion
 
             Logger.RegisterOutputChannels(Console.Write);
+            GlobalConstants.LoadFromFile("Settings.ini");
         }
 
         private void Prepare()
@@ -67,7 +66,7 @@ namespace Simulation
                 Logger.RegisterOutputChannels(streamWriter.Write);
                 Logger.StartProcess("Simulation runnig");
                 #region Main Cycle
-                foreach (var timeEvent in dataContext.TimeEventRepository.EnumerateAll().Take(200))
+                foreach (var timeEvent in dataContext.TimeEventRepository.EnumerateAll().Take(500))
                 {
                     OnNextStep?.Invoke(this);
                     ProccessEvent(timeEvent);
@@ -98,7 +97,7 @@ namespace Simulation
 
             Logger.EndProccess("Updating resources requirments");
             #endregion
-
+            
             // prognosing
             prognoseModule.Run(Servers);
 
@@ -120,7 +119,7 @@ namespace Simulation
                 asigningModule.Asign(newVMs, Servers);
                 VMs.AddRange(newVMs);
             }
-
+            
             // run diagnostic (detect low loaded)
             var lowloadedDiagnosticPlan = diagnosticModule.DetectLowloadedMachines(Servers);
 
@@ -133,7 +132,7 @@ namespace Simulation
                     ApplyMigrations(releaseMigrationPlan);
                 }
             }
-
+            
             // Console.WriteLine(VMs.Select(vm => vm.Resources.CPU).Sum());
             Logger.EndProccess(loggerSectionName, "finished");
         }
@@ -182,11 +181,6 @@ namespace Simulation
         {
             foreach (var server in Servers)
             {
-                if (server.UsedResources.Network < -1)  // TODO: [bug] fix
-                {
-                    Console.WriteLine($"< 0: {server.Id} - {server.UsedResources.Network }");
-                    // Console.ReadKey();
-                }
                 _excel.WriteServerStatistics(step, server);
             }
         }
