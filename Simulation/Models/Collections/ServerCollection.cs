@@ -27,6 +27,15 @@ namespace Simulation.Models.Collections
             }
         }
 
+        /// <summary>
+        /// For test purposes
+        /// </summary>
+        /// <param name="servers"></param>
+        public ServerCollection(IEnumerable<Server> servers)
+        {
+            _array = servers.ToArray();
+        }
+
         #region Interface inplementation
         public IEnumerator<Server> GetEnumerator()
         {

@@ -36,33 +36,33 @@ namespace Utilities
         public static void StartProcess(string sectionName)
         {
             timeStack.Push(DateTime.Now);
-            output($"{Indent}{sectionName}\n");
+            output?.Invoke($"{Indent}{sectionName}\n");
             IncreaseIndent();
         }
 
         public static void LogMessage(string message)
         {
-            output($"{Indent}{message}\n");
+            output?.Invoke($"{Indent}{message}\n");
         }
 
         public static void StartAction(string name)
         {
             _lastAction = name;
             timeStack.Push(DateTime.Now);
-            output($"{Indent}{name}...");
+            output?.Invoke($"{Indent}{name}...");
         }
 
         public static void EndAction()
         {
             var time = DateTime.Now - timeStack.Pop();
-            output($"{time.Milliseconds}ms\n");
+            output?.Invoke($"{time.Milliseconds}ms\n");
         }
 
         public static void EndProccess(string sectionName, string result = "done")
         {
             var time = DateTime.Now - timeStack.Pop();
             DecreaseIndent();
-            output($"{Indent}{sectionName} - {result} |{time.Milliseconds}ms|\n");
+            output?.Invoke($"{Indent}{sectionName} - {result} |{time.Milliseconds}ms|\n");
         }
         #endregion
     }

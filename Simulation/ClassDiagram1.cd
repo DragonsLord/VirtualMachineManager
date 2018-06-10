@@ -1,0 +1,564 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="Simulation.ExcelWrapper" BaseTypeListCollapsed="true">
+    <Position X="7.25" Y="5" Width="1.75" />
+    <Members>
+      <Field Name="_currentStep" Hidden="true" />
+      <Field Name="_outputFilename" Hidden="true" />
+      <Method Name="CreateMigrationsChart" Hidden="true" />
+      <Method Name="CreateOneSeriesChart" Hidden="true" />
+      <Method Name="CreatePredictionChart" Hidden="true" />
+      <Method Name="Dispose" Hidden="true" />
+      <Method Name="ExcelWrapper" Hidden="true" />
+      <Method Name="GetValuesCellRange" Hidden="true" />
+      <Method Name="MergeAndSetValue" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>AAAAKIAAACAAAQBQABgAAQAAAAACAAAAAQAAAAAAAAE=</HashCode>
+      <FileName>ExcelWrapper.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Simulation.Simulation">
+    <Position X="8.75" Y="0.5" Width="2.5" />
+    <Members>
+      <Field Name="_logFileName" Hidden="true" />
+      <Method Name="ApplyMigrations" Hidden="true" />
+      <Method Name="Simulation" Hidden="true" />
+    </Members>
+    <AssociationLine Name="migrationModule" Type="Simulation.Modules.Migration.MigrationModule">
+      <MemberNameLabel ManuallyPlaced="true" ManuallySized="true">
+        <Position X="0.181" Y="-0" Height="0.182" Width="1.26" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <AssociationLine Name="asigningModule" Type="Simulation.Modules.Asigning.AsigningModule" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="8.75" Y="1.414" />
+        <Point X="7.5" Y="1.414" />
+        <Point X="7.5" Y="2.25" />
+      </Path>
+      <MemberNameLabel ManuallyPlaced="true" ManuallySized="true">
+        <Position X="-1.179" Y="0.625" Height="0.182" Width="1.274" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <AssociationLine Name="diagnosticModule" Type="Simulation.Modules.Diagnostic.DiagnosticModule" ManuallyRouted="true" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="8.875" Y="3.401" />
+        <Point X="8.875" Y="4.438" />
+        <Point X="6.562" Y="4.438" />
+        <Point X="6.562" Y="5" />
+      </Path>
+      <MemberNameLabel ManuallyPlaced="true" ManuallySized="true">
+        <Position X="-1.496" Y="0.253" Height="0.182" Width="1.361" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <AssociationLine Name="prognoseModule" Type="Simulation.Modules.Prognosing.PrognoseModule" ManuallyRouted="true" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="11.25" Y="2.75" />
+        <Point X="12.423" Y="2.75" />
+        <Point X="12.423" Y="3.75" />
+        <Point X="12.75" Y="3.75" />
+      </Path>
+      <MemberNameLabel ManuallyPlaced="true" ManuallySized="true">
+        <Position X="0.048" Y="0.725" Height="0.182" Width="1.268" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <AssociationLine Name="Servers" Type="Simulation.Models.Collections.ServerCollection" ManuallyRouted="true" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="10.75" Y="3.401" />
+        <Point X="10.75" Y="3.776" />
+        <Point X="11.625" Y="3.776" />
+        <Point X="11.625" Y="4.25" />
+      </Path>
+      <MemberNameLabel ManuallyPlaced="true">
+        <Position X="0.311" Y="0.539" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <AssociationLine Name="VMs" Type="Simulation.Models.Collections.VMCollection" ManuallyRouted="true" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="9.938" Y="3.401" />
+        <Point X="9.938" Y="4.076" />
+        <Point X="9.938" Y="4.076" />
+        <Point X="9.938" Y="4.25" />
+      </Path>
+      <MemberNameLabel ManuallyPlaced="true" ManuallySized="true">
+        <Position X="-0.295" Y="0.567" Height="0.182" Width="0.579" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <AssociationLine Name="dataContext" Type="DAL.DataUnit">
+      <MemberNameLabel ManuallyPlaced="true">
+        <Position X="0.234" Y="0.052" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <AssociationLine Name="_excel" Type="Simulation.ExcelWrapper" ManuallyRouted="true" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="9.125" Y="3.401" />
+        <Point X="9.125" Y="4.695" />
+        <Point X="8.312" Y="4.695" />
+        <Point X="8.312" Y="5" />
+      </Path>
+      <MemberNameLabel ManuallyPlaced="true">
+        <Position X="-0.672" Y="0.046" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <TypeIdentifier>
+      <HashCode>AIAAQBAgACAAQAEAAAAkGAAAAAAAAAIIABAAEIAACgI=</HashCode>
+      <FileName>Simulation.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="migrationModule" />
+      <Field Name="asigningModule" />
+      <Field Name="diagnosticModule" />
+      <Field Name="prognoseModule" />
+      <Field Name="dataContext" />
+      <Field Name="_excel" />
+      <Property Name="Servers" />
+      <Property Name="VMs" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="Simulation.Models.Collections.ServerCollection" BaseTypeListCollapsed="true">
+    <Position X="11" Y="4.25" Width="1.5" />
+    <Members>
+      <Method Name="GetEnumerator" Hidden="true" />
+      <Method Name="IEnumerable.GetEnumerator" Hidden="true" />
+      <Method Name="ServerCollection" Hidden="true" />
+    </Members>
+    <AssociationLine Name="_array" Type="Simulation.Models.Server" FixedToPoint="true">
+      <Path>
+        <Point X="12.188" Y="5.805" />
+        <Point X="12.188" Y="6.25" />
+      </Path>
+      <MemberNameLabel ManuallyPlaced="true" ManuallySized="true">
+        <Position X="0.083" Y="0.158" Height="0.182" Width="0.703" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAABBAAAAAAAQAAAAAAAAEAAAAAAIAAAA=</HashCode>
+      <FileName>Models\Collections\ServerCollection.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsCollectionAssociation>
+      <Field Name="_array" />
+    </ShowAsCollectionAssociation>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Simulation.Models.Collections.VMCollection" BaseTypeListCollapsed="true">
+    <Position X="9.25" Y="4.25" Width="1.5" />
+    <Members>
+      <Method Name="GetEnumerator" Hidden="true" />
+      <Method Name="IEnumerable.GetEnumerator" Hidden="true" />
+    </Members>
+    <AssociationLine Name="_list" Type="Simulation.Models.VM" FixedFromPoint="true">
+      <Path>
+        <Point X="10.125" Y="6.123" />
+        <Point X="10.125" Y="6.5" />
+      </Path>
+      <MemberNameLabel ManuallyPlaced="true" ManuallySized="true">
+        <Position X="0.103" Y="0.081" Height="0.182" Width="0.579" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <TypeIdentifier>
+      <HashCode>AAYAAAAAAAAAABBAAAAABAAAAAAAAAAEQAAAAAAEAAA=</HashCode>
+      <FileName>Models\Collections\VMCollection.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsCollectionAssociation>
+      <Field Name="_list" />
+    </ShowAsCollectionAssociation>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Simulation.Models.Server">
+    <Position X="10.75" Y="6.25" Width="2" />
+    <Members>
+      <Method Name="FromDataBaseModel" Hidden="true" />
+      <Method Name="ShalowCopy" Hidden="true" />
+      <Method Name="UpdatePrognosedRequirments" Hidden="true" />
+      <Method Name="Vm_OnResourceRequirmentChange" Hidden="true" />
+    </Members>
+    <AssociationLine Name="Resources" Type="Simulation.Models.Resources">
+      <MemberNameLabel ManuallyPlaced="true" ManuallySized="true">
+        <Position X="0.718" Y="0.089" Height="0.182" Width="0.992" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <TypeIdentifier>
+      <HashCode>AAASIBBAIAAABEAAgACEAAABAAAAAgAAQgggAAAAAAA=</HashCode>
+      <FileName>Models\Server.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="Resources" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="Simulation.Models.VM">
+    <Position X="9.25" Y="6.5" Width="1.25" />
+    <Members>
+      <Method Name="FromDataBaseModel" Hidden="true" />
+      <Event Name="OnResourceRequirmentChange" Hidden="true" />
+      <Method Name="UpdateRequirments" Hidden="true" />
+    </Members>
+    <AssociationLine Name="Resources" Type="Simulation.Models.Resources">
+      <MemberNameLabel ManuallyPlaced="true">
+        <Position X="0.182" Y="0.118" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <TypeIdentifier>
+      <HashCode>ACACIAAQIAAAAAAAAABAAAAAAAAAAAAAAAIAAAAAAAA=</HashCode>
+      <FileName>Models\VM.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="Resources" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="Simulation.Modules.Asigning.AsigningModule">
+    <Position X="6.75" Y="2.25" Width="1.75" />
+    <Members>
+      <Method Name="FirstFitDecreasing" Hidden="true" />
+      <Method Name="GetVMResourceVolume" Hidden="true" />
+      <Method Name="TurnOnServer" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>AAAAACAAgQCAAAAAAAAAAAAAAAACAAAAAAAgAAAgAAA=</HashCode>
+      <FileName>Modules\Asigning\AsigningModule.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Simulation.Modules.Diagnostic.DiagnosticModule">
+    <Position X="4.75" Y="5" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAACAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Modules\Diagnostic\DiagnosticModule.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Simulation.Modules.Diagnostic.DiagnosticResult">
+    <Position X="5.25" Y="7.25" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAABAAAAAAAAAIAAAAAAIAAAEAgAAAAAAAAAAA=</HashCode>
+      <FileName>Modules\Diagnostic\DiagnosticResult.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Simulation.Modules.Diagnostic.Evaluator">
+    <Position X="2.75" Y="7" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAACAAAAACAAAAABIIiAAAAAEAAAAAAAAAQAAAAA=</HashCode>
+      <FileName>Modules\Diagnostic\Evaluator.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Simulation.Modules.Migration.Algorythm.BeamSearchAlgorythm">
+    <Position X="2.25" Y="0.5" Width="1.5" />
+    <Members>
+      <Field Name="_beam_lenth" Hidden="true" />
+      <Field Name="_layer" Hidden="true" />
+      <Method Name="BeamSearchAlgorythm" Hidden="true" />
+      <Property Name="Comparer" Hidden="true" />
+    </Members>
+    <NestedTypes>
+      <Class Name="Simulation.Modules.Migration.Algorythm.BeamSearchAlgorythm.Beam" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Modules\Migration\Algorythm\BeamSearchAlgorythm.cs</NewMemberFileName>
+        </TypeIdentifier>
+        <Lollipop Position="0.2" />
+      </Class>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>AAAAAEAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAEAAAAQI=</HashCode>
+      <FileName>Modules\Migration\Algorythm\BeamSearchAlgorythm.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Simulation.Modules.Migration.MigrationModule">
+    <Position X="5" Y="0.5" Width="2.25" />
+    <Members>
+      <Method Name="GetInitialValue" Hidden="true" />
+    </Members>
+    <AssociationLine Name="_searchEngine" Type="Simulation.Modules.Migration.Algorythm.BeamSearchAlgorythm">
+      <MemberNameLabel ManuallyPlaced="true" ManuallySized="true">
+        <Position X="-0.01" Y="0.055" Height="0.182" Width="1.164" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <TypeIdentifier>
+      <HashCode>ACAAAAAQAAAAAAAAAAAAAgAAAAgAAAAAAAAAgAAAAAA=</HashCode>
+      <FileName>Modules\Migration\MigrationModule.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="_searchEngine" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="Simulation.Modules.Migration.MigrationPlan" BaseTypeListCollapsed="true">
+    <Position X="0.5" Y="9.25" Width="2" />
+    <Members>
+      <Field Name="_empty" Hidden="true" />
+      <Field Name="_planData" Hidden="true" />
+      <Method Name="GetEnumerator" Hidden="true" />
+      <Method Name="IEnumerable.GetEnumerator" Hidden="true" />
+      <Method Name="Merge" Hidden="true" />
+    </Members>
+    <NestedTypes>
+      <Class Name="Simulation.Modules.Migration.MigrationPlan.PlanItem" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Modules\Migration\MigrationPlan.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Class>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>AIJAAAAAAAAAABAAAAIAAAQAAAAAAQQEICAAAAAAAAA=</HashCode>
+      <FileName>Modules\Migration\MigrationPlan.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Simulation.Modules.Migration.Model.LowloadedMigrationNode">
+    <Position X="2.5" Y="5" Width="2" />
+    <Members>
+      <Method Name="CalculateDiffForUpdatedMachineCase" Hidden="true" />
+      <Method Name="LowloadedMigrationNode" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>ABAAAAAQAAAAAAAAAAEAAAAAAAAAAIAAAAAAAAAAgAA=</HashCode>
+      <FileName>Modules\Migration\Model\LowloadedMigrationNode.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Simulation.Modules.Migration.Model.MigrationNode">
+    <Position X="0.5" Y="2.75" Width="1.5" />
+    <Members>
+      <Field Name="_turnOnCount" Hidden="true" />
+      <Field Name="_value" Hidden="true" />
+      <Method Name="CanServerRunVM" Hidden="true" />
+      <Method Name="CreateChildNodes" Hidden="true" />
+      <Method Name="MigrationNode" Hidden="true" />
+    </Members>
+    <NestedTypes>
+      <Class Name="Simulation.Modules.Migration.Model.MigrationNode.MigrationRecord" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Modules\Migration\Model\MigrationNode.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Class>
+    </NestedTypes>
+    <AssociationLine Name="_root" Type="Simulation.Modules.Migration.Model.MigrationRootNode" FixedToPoint="true">
+      <Path>
+        <Point X="1.562" Y="5.911" />
+        <Point X="1.562" Y="6.25" />
+      </Path>
+      <MemberNameLabel ManuallyPlaced="true" ManuallySized="true">
+        <Position X="-0.664" Y="0.081" Height="0.182" Width="0.608" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <TypeIdentifier>
+      <HashCode>IBAAAAAQAAAYCAgAACsAAAAACAAAAAAAAAAgAAAAAAA=</HashCode>
+      <FileName>Modules\Migration\Model\MigrationNode.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="_root" />
+    </ShowAsAssociation>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Simulation.Modules.Migration.Model.MigrationRootNode" BaseTypeListCollapsed="true">
+    <Position X="0.5" Y="6.25" Width="1.75" />
+    <Members>
+      <Field Name="CreateChildNode" Hidden="true" />
+      <Method Name="CreateChildNodes" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAABAAACAAAEAsAQAAAAAAAAAAgAAAgAAAAAAA=</HashCode>
+      <FileName>Modules\Migration\Model\MigrationRootNode.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.1" />
+  </Class>
+  <Class Name="Simulation.Modules.Migration.Model.MigrationTask">
+    <Position X="4.5" Y="2.25" Width="1.75" />
+    <Members>
+      <Method Name="EndMigration" Hidden="true" />
+      <Method Name="InitMigrationOnServers" Hidden="true" />
+      <Field Name="steps" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>AAABAABABQAAAAAABAAAAAAgAAAAAAAAAAQAABAIAAA=</HashCode>
+      <FileName>Modules\Migration\Model\MigrationTask.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Simulation.Modules.Migration.Model.OverloadedMigrationNode">
+    <Position X="2.5" Y="2.5" Width="1.75" />
+    <Members>
+      <Method Name="OverloadedMigrationNode" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>ABAAAAAQAAAAAAAAAAEAAAAAAAAAAIBAAAAAAAAAgAA=</HashCode>
+      <FileName>Modules\Migration\Model\OverloadedMigrationNode.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Simulation.Modules.Prognosing.Algorythm.RegressionEngine">
+    <Position X="16.25" Y="2.75" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAI=</HashCode>
+      <FileName>Modules\Prognosing\Algorythm\RegressionEngine.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Simulation.Modules.Prognosing.Model.ResourceUsageStatistic">
+    <Position X="13" Y="4.5" Width="2" />
+    <AssociationLine Name="_cpuValuesStream" Type="Simulation.Modules.Prognosing.Model.StatisticalDataStream&lt;T&gt;" FixedFromPoint="true">
+      <Path>
+        <Point X="15" Y="5.562" />
+        <Point X="16.25" Y="5.562" />
+      </Path>
+      <MemberNameLabel ManuallyPlaced="true" ManuallySized="true">
+        <Position X="0.111" Y="0.077" Height="0.182" Width="1.305" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <AssociationLine Name="_iopsValuesStream" Type="Simulation.Modules.Prognosing.Model.StatisticalDataStream&lt;T&gt;" FixedFromPoint="true">
+      <Path>
+        <Point X="15" Y="6" />
+        <Point X="16.25" Y="6" />
+      </Path>
+      <MemberNameLabel ManuallyPlaced="true" ManuallySized="true">
+        <Position X="0.139" Y="0.085" Height="0.182" Width="1.356" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <AssociationLine Name="_memoryValuesStream" Type="Simulation.Modules.Prognosing.Model.StatisticalDataStream&lt;T&gt;" FixedFromPoint="true">
+      <Path>
+        <Point X="15" Y="6.5" />
+        <Point X="16.25" Y="6.5" />
+      </Path>
+      <MemberNameLabel ManuallyPlaced="true" ManuallySized="true">
+        <Position X="-0.035" Y="0.042" Height="0.182" Width="1.607" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <AssociationLine Name="_networkValuesStream" Type="Simulation.Modules.Prognosing.Model.StatisticalDataStream&lt;T&gt;">
+      <MemberNameLabel ManuallyPlaced="true" ManuallySized="true">
+        <Position X="-0.028" Y="0.085" Height="0.182" Width="1.596" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <TypeIdentifier>
+      <HashCode>AAAAAABEAAABIAAAAAAAAAQAIAAAAAAAIAAAAAABAAA=</HashCode>
+      <FileName>Modules\Prognosing\Model\ResourceUsageStatistic.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="_cpuValuesStream" />
+      <Field Name="_iopsValuesStream" />
+      <Field Name="_memoryValuesStream" />
+      <Field Name="_networkValuesStream" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="Simulation.Modules.Prognosing.Model.StatisticalDataStream&lt;T&gt;" BaseTypeListCollapsed="true">
+    <Position X="16.25" Y="4.25" Width="2" />
+    <Members>
+      <Method Name="GetEnumerator" Hidden="true" />
+      <Method Name="IEnumerable.GetEnumerator" Hidden="true" />
+      <Method Name="StatisticalDataStream" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAABAAQABAAAAAgAAQAAAAAAAAEAAAAAAABCAA=</HashCode>
+      <FileName>Modules\Prognosing\Model\StatisticalDataStream.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Simulation.Modules.Prognosing.PrognoseModule">
+    <Position X="12.75" Y="2.75" Width="2.25" />
+    <Members>
+      <Method Name="PrognoseModule" Hidden="true" />
+    </Members>
+    <AssociationLine Name="_regressionEngine" Type="Simulation.Modules.Prognosing.Algorythm.RegressionEngine" FixedFromPoint="true">
+      <Path>
+        <Point X="15" Y="3.5" />
+        <Point X="16.25" Y="3.5" />
+      </Path>
+      <MemberNameLabel ManuallyPlaced="true" ManuallySized="true">
+        <Position X="0.052" Y="0.06" Height="0.182" Width="1.409" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <AssociationLine Name="_data" Type="Simulation.Modules.Prognosing.Model.ResourceUsageStatistic">
+      <MemberNameLabel ManuallyPlaced="true" ManuallySized="true">
+        <Position X="0.114" Y="0.02" Height="0.182" Width="0.608" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAABAAAAAAAAAAAAAAAICAAAAAAAAAAAAAAAAo=</HashCode>
+      <FileName>Modules\Prognosing\PrognoseModule.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="_regressionEngine" />
+    </ShowAsAssociation>
+    <ShowAsCollectionAssociation>
+      <Field Name="_data" />
+    </ShowAsCollectionAssociation>
+  </Class>
+  <Class Name="DAL.DataUnit" Collapsed="true">
+    <Position X="12.75" Y="0.5" Width="2.25" />
+    <Members>
+      <Method Name="DataUnit" Hidden="true" />
+    </Members>
+    <AssociationLine Name="PhysicalMachineRepository" Type="DAL.Repositories.PhysicalMachineRepository" ManuallyRouted="true" FixedToPoint="true">
+      <Path>
+        <Point X="14.312" Y="1.062" />
+        <Point X="14.312" Y="1.26" />
+        <Point X="14.312" Y="1.26" />
+        <Point X="14.312" Y="1.5" />
+      </Path>
+      <MemberNameLabel ManuallyPlaced="true">
+        <Position X="-0.899" Y="0.146" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <AssociationLine Name="TimeEventRepository" Type="DAL.Repositories.TimeEventRepository" ManuallyRouted="true" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="14.875" Y="0.5" />
+        <Point X="14.875" Y="0.355" />
+        <Point X="16.812" Y="0.355" />
+        <Point X="16.812" Y="1" />
+      </Path>
+      <MemberNameLabel ManuallyPlaced="true">
+        <Position X="0.076" Y="0.321" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <AssociationLine Name="VMEventRepository" Type="DAL.Repositories.VMEventRepository" FixedToPoint="true">
+      <Path>
+        <Point X="13.25" Y="1.062" />
+        <Point X="13.25" Y="1.5" />
+      </Path>
+      <MemberNameLabel ManuallyPlaced="true" ManuallySized="true">
+        <Position X="0.082" Y="0.187" Height="0.182" Width="1.391" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <TypeIdentifier />
+    <ShowAsAssociation>
+      <Property Name="PhysicalMachineRepository" />
+      <Property Name="TimeEventRepository" />
+      <Property Name="VMEventRepository" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="DAL.Repositories.PhysicalMachineRepository">
+    <Position X="13.75" Y="1.5" Width="2" />
+    <Members>
+      <Method Name="PhysicalMachineRepository" Hidden="true" />
+    </Members>
+    <TypeIdentifier />
+  </Class>
+  <Class Name="DAL.Repositories.TimeEventRepository">
+    <Position X="16" Y="1" Width="2" />
+    <Members>
+      <Method Name="TimeEventRepository" Hidden="true" />
+    </Members>
+    <TypeIdentifier />
+  </Class>
+  <Class Name="DAL.Repositories.VMEventRepository">
+    <Position X="11.75" Y="1.5" Width="1.75" />
+    <Members>
+      <Method Name="VMEventRepository" Hidden="true" />
+    </Members>
+    <TypeIdentifier />
+  </Class>
+  <Struct Name="Simulation.Models.Resources">
+    <Position X="7.25" Y="7.75" Width="1.5" />
+    <Members>
+      <Method Name="EvaluateVolume" Hidden="true" />
+      <Method Name="implicit operator Resources" Hidden="true" />
+      <Method Name="operator -" Hidden="true" />
+      <Method Name="operator +" Hidden="true" />
+      <Method Name="operator &lt;" Hidden="true" />
+      <Method Name="operator &gt;" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAwAGAAgCQAgAAAAAAAAAAAAQQAAA=</HashCode>
+      <FileName>Models\Resources.cs</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Interface Name="Simulation.Modules.Migration.Interfaces.IStateNode">
+    <Position X="0.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAoAAAAAAAAAAAAAAAAgAAAAAAA=</HashCode>
+      <FileName>Modules\Migration\Algorythm\IStateNode.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

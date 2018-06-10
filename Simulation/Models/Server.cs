@@ -12,7 +12,7 @@ namespace Simulation.Models
     {
         public int Id { get; set; }
 
-        public Resources Resources { get; private set; }
+        public Resources Resources { get; set; }
 
         public Resources UsedResources {
             get => PrognosedUsedResources[0];
@@ -22,12 +22,12 @@ namespace Simulation.Models
         // 0 index contains real (not predicted) data
         public Resources[] PrognosedUsedResources { get; private set; } = new Resources[GlobalConstants.PROGNOSE_DEPTH + 1];
 
-        public bool TurnedOn { get; private set; }
+        public bool TurnedOn { get; set; }
 
         public bool InMigration { get; set; }
 
         // TODO: switch to custom collection with inner dictionary
-        public List<VM> RunningVMs { get; private set; } = new List<VM>();
+        public List<VM> RunningVMs { get; set; } = new List<VM>();
 
         #region Statistics Properties
         public int SendingCount { get; set; }

@@ -11,7 +11,7 @@ namespace Simulation.Models
     {
         public int Id { get; set; }
 
-        public Resources Resources { get; private set; }
+        public Resources Resources { get; set; }
         
         public int HostServerId { get; set; } = 0;
 
