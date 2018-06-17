@@ -24,9 +24,8 @@ namespace Simulation.Models
 
         public bool TurnedOn { get; set; }
 
-        public bool InMigration { get; set; }
+        public bool InMigration => SendingCount + RecievingCount > 0;
 
-        // TODO: switch to custom collection with inner dictionary
         public List<VM> RunningVMs { get; set; } = new List<VM>();
 
         #region Statistics Properties
