@@ -24,7 +24,7 @@ namespace Simulation.Modules.Migration.Model
 
         protected override bool CalculateValidity()
         {
-            for (byte i = 0; i <= _root.Depth; i++)  // TODO: is cycle neccessary ?
+            for (byte i = 0; i <= _root.Depth; i++)
             {
                 if (Evaluator.IsOverloaded(
                     _root.TargetServer.PrognosedUsedResources[i] + GetTargetServerResourcesChange(i),

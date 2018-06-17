@@ -37,7 +37,6 @@ namespace Simulation.Modules.Diagnostic
         public DiagnosticResult DetectLowloadedMachines(ServerCollection collection)
         {
             byte depth = 0;
-            // TODO: record ordering herustic
             var lowLoaded = collection.Where(server => server.TurnedOn)
                 .Where((server) => !server.InMigration && Evaluator.IsLowLoaded(server, depth))
                 .OrderByDescending((server) => server.PrognosedUsedResources[depth].EvaluateVolume())
@@ -61,6 +60,11 @@ namespace Simulation.Modules.Diagnostic
                 .Aggregate((r1, r2) => r1 + r2);
 
             int vmsToMigrateCount = lowLoaded.Select(server => server.RunningVMs.Count).Sum();
+
+            if (vmsToMigrateCount == 0)
+            {
+                return DiagnosticResult.Empty;
+            }
             
             totalFree -= new Resources()
             {
@@ -84,6 +88,14 @@ namespace Simulation.Modules.Diagnostic
                         IOPS = server.Resources.IOPS * (1 - GlobalConstants.IOPS_THREADHOLD) - server.PrognosedUsedResources[depth].IOPS
                     };
                 }
+            }
+
+            if (
+                totalFree.Network - GlobalConstants.MAX_NETWORK_ON_MIGRATION * vmsToMigrateCount <= 0
+                || totalFree.CPU - GlobalConstants.CPU_ON_MIGRATION * vmsToMigrateCount <= 0
+                )
+            {
+                return DiagnosticResult.Empty;
             }
 
             return new DiagnosticResult(

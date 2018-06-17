@@ -45,7 +45,7 @@ namespace Simulation.Modules.Migration
                 foreach (var change in resultNode.Changes)
                 {
                     var srv = copies.Find(s => s.Id == change.Reciever.Id);
-                    srv.RunVM(change.Target);   // TODO: always run on 0 step. Consider depth param
+                    srv.RunVM(change.Target);
                     srv.PrognosedUsedResources[0] += Evaluator.GetMigrationResourceRequirments(srv, server);
                 }
             }

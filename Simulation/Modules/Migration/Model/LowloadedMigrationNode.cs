@@ -33,8 +33,7 @@ namespace Simulation.Modules.Migration.Model
         {
             if (_turnOnCount > 0)
             {
-                // TODO: Consider MinValue instead of Infinity
-                return float.NegativeInfinity;  // our task is to turn off server not turn on
+                return float.MinValue;  // our task is to turn off server not turn on
             }
 
             float val = previous.Value;
@@ -42,7 +41,7 @@ namespace Simulation.Modules.Migration.Model
             val += GetTargetServerResourcesChange(_root.Depth).EvaluateVolume();
 
             var change = Changes.LastItem();
-            val += CalculateDiffForUpdatedMachineCase(change.Target.Resources);
+            val += CalculateDiffForUpdatedMachineCase(change.Target.Resources + change.MigrationRequirment);
 
             return val;
         }

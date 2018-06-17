@@ -16,13 +16,14 @@ namespace Simulation.Modules.Migration.Model
         {
             public VM Target { get; set; }
             public Server Reciever { get; set; }
+            public Resources MigrationRequirment { get; private set; }
 
-            public MigrationRecord(VM target, Server reciever)
+            public MigrationRecord(VM target, Server reciever, Server sender)
             {
                 Target = target;
                 Reciever = reciever;
+                MigrationRequirment = Evaluator.GetMigrationResourceRequirments(reciever, sender);
             }
-            // TODO: do I need time?
         }
 
         public MigrationRecord[] Changes { get; private set; }
@@ -38,11 +39,7 @@ namespace Simulation.Modules.Migration.Model
         {
             Resources r = new Resources();
             Changes.ForEach((changes) => 
-                r += (
-                    Evaluator.GetMigrationResourceRequirments(changes.Reciever, _root.TargetServer))
-                    - changes.Target.Resources
-                );
-
+                r += (changes.MigrationRequirment - changes.Target.Resources));
             return r;
         }
 
@@ -52,11 +49,7 @@ namespace Simulation.Modules.Migration.Model
             Changes
                 .Where((change) => change.Reciever.Id == server.Id)
                 .ForEach((changes) =>
-                    r += (
-                        changes.Target.Resources +
-                        Evaluator.GetMigrationResourceRequirments(changes.Reciever, _root.TargetServer)
-                    )
-                );
+                    r += (changes.Target.Resources + changes.MigrationRequirment));
 
             return r + server.PrognosedUsedResources[depth];
         }
@@ -97,23 +90,22 @@ namespace Simulation.Modules.Migration.Model
 
         private bool CanServerRunVM(Server server, VM vm)
         {
-            bool result = true;
-
             for (byte i = 0; i < _root.Depth; i++)
             {
-                result = !Evaluator.IsOverloaded(
+                if (Evaluator.IsOverloaded(
                     GetRecieverUsedResources(server, i),
-                    server);
-                if (!result)
-                    return result;
+                    server))
+                {
+                    return false;
+                }
             }
-            return result;
+            return true;
         }
 
         public MigrationNode(MigrationRootNode root, VM target, Server reciever, bool turnOnNew = false)
         {
-            Changes = new MigrationRecord[1] { new MigrationRecord(target, reciever) };
             _root = root;
+            Changes = new MigrationRecord[1] { new MigrationRecord(target, reciever, _root.TargetServer) };
             IsValid = CalculateValidity();
             if (turnOnNew)
                 _turnOnCount = 1;
@@ -122,8 +114,8 @@ namespace Simulation.Modules.Migration.Model
 
         public MigrationNode(MigrationNode parent, VM target, Server reciever, bool turnOnNew = false)
         {
-            Changes = parent.Changes.PushToEnd(new MigrationRecord(target, reciever));
             _root = parent._root;
+            Changes = parent.Changes.PushToEnd(new MigrationRecord(target, reciever, _root.TargetServer));
             _turnOnCount = parent._turnOnCount;
             IsValid = CalculateValidity();
             if (turnOnNew)
