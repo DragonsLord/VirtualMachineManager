@@ -25,6 +25,12 @@ namespace Utilities
         /// </summary>
         public static int TIME_STEP_VALUE = 300;
 
+        /// <summary>
+        /// amount of simulation steps
+        /// 0 - to remove limitation (will simulate all provided steps)
+        /// </summary>
+        public static int STEPS_TO_SIMULATE = 0;
+
         #region Evaluation parameters
         /// <summary>
         /// Weight of every resource for comulative value

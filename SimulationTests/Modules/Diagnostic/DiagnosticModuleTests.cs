@@ -20,7 +20,6 @@ namespace Simulation.Modules.Diagnostic.Tests
                 new Server()
                 {
                     TurnedOn = true,
-                    InMigration = false,
                     Resources = new Resources
                     {
                         CPU = 1000,
@@ -39,7 +38,6 @@ namespace Simulation.Modules.Diagnostic.Tests
                 new Server()
                 {
                     TurnedOn = true,
-                    InMigration = false,
                     Resources = new Resources
                     {
                         CPU = 1000,
@@ -58,7 +56,6 @@ namespace Simulation.Modules.Diagnostic.Tests
                 new Server()
                 {
                     TurnedOn = true,
-                    InMigration = false,
                     Resources = new Resources
                     {
                         CPU = 1000,
@@ -90,7 +87,6 @@ namespace Simulation.Modules.Diagnostic.Tests
                 {
                     Id = 1,
                     TurnedOn = true,
-                    InMigration = false,
                     Resources = new Resources
                     {
                         CPU = 1000,
@@ -110,7 +106,6 @@ namespace Simulation.Modules.Diagnostic.Tests
                 {
                     Id = 2,
                     TurnedOn = true,
-                    InMigration = false,
                     Resources = new Resources
                     {
                         CPU = 1000,
@@ -130,7 +125,6 @@ namespace Simulation.Modules.Diagnostic.Tests
                 {
                     Id = 3,
                     TurnedOn = true,
-                    InMigration = false,
                     Resources = new Resources
                     {
                         CPU = 1000,

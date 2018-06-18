@@ -43,6 +43,11 @@ namespace Simulation
             AppDomain.CurrentDomain.SetData("DataDirectory", appDataDir);
             #endregion
 
+            if (!Directory.Exists("Logs"))
+            {
+                Directory.CreateDirectory("Logs");
+            }
+
             Logger.RegisterOutputChannels(Console.Write);
             GlobalConstants.LoadFromFile("Settings.ini");
         }
@@ -65,8 +70,13 @@ namespace Simulation
             {
                 Logger.RegisterOutputChannels(streamWriter.Write);
                 Logger.StartProcess("Simulation runnig");
+                var enumeration = dataContext.TimeEventRepository.EnumerateAll();
+                if (GlobalConstants.STEPS_TO_SIMULATE > 0)
+                {
+                    enumeration = enumeration.Take(GlobalConstants.STEPS_TO_SIMULATE);
+                }
                 #region Main Cycle
-                foreach (var timeEvent in dataContext.TimeEventRepository.EnumerateAll().Take(500))
+                foreach (var timeEvent in enumeration)
                 {
                     OnNextStep?.Invoke(this);
                     ProccessEvent(timeEvent);

@@ -23,7 +23,6 @@ namespace Simulation.Modules.Prognosing.Tests
                         new Server()
                         {
                             TurnedOn = true,
-                            InMigration = false,
                             Resources = new Resources
                             {
                                 CPU = 1000,
@@ -78,7 +77,6 @@ namespace Simulation.Modules.Prognosing.Tests
                     new Server()
                         {
                             TurnedOn = true,
-                            InMigration = false,
                             Resources = new Resources
                             {
                                 CPU = 1000,
@@ -110,7 +108,6 @@ namespace Simulation.Modules.Prognosing.Tests
                         new Server()
                         {
                             TurnedOn = true,
-                            InMigration = false,
                             Resources = new Resources
                             {
                                 CPU = 1000,
@@ -145,7 +142,6 @@ namespace Simulation.Modules.Prognosing.Tests
                     new Server()
                         {
                             TurnedOn = true,
-                            InMigration = false,
                             Resources = new Resources
                             {
                                 CPU = 1000,

@@ -9,7 +9,7 @@ using EntityFramework.BulkInsert.Extensions;
 
 namespace DAL.Context
 {
-    public class SimulationDbInitializer: DropCreateDatabaseIfModelChanges<SimulationContext>
+    public class SimulationDbInitializer: DropCreateDatabaseAlways<SimulationContext>
     {
         private readonly string inputDataFolder = "InputData";
         private readonly string VMTracesFolder = "Traces";
