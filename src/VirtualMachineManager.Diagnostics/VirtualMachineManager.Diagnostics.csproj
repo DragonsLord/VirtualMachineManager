@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Models\PrognosedServer.cs~RF178cae58.TMP" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\VirtualMachineManager.Core\VirtualMachineManager.Core.csproj" />
+    <ProjectReference Include="..\VirtualMachineManager.Evaluation\VirtualMachineManager.Evaluation.csproj" />
+    <ProjectReference Include="..\VirtualMachineManager.Services\VirtualMachineManager.Services.csproj" />
+  </ItemGroup>
+
+</Project>
