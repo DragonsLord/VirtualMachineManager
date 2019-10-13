@@ -21,33 +21,32 @@ namespace VirtualMachineManager.Diagnostics
             //_serverManager = serverManager;
         }
 
-        public DiagnosticResult DetectOverloadedMachines(/*ServerCollection*/IEnumerable<PrognosedServer> collection)
+        public DiagnosticResult DetectOverloadedMachines(/*ServerCollection*/IEnumerable<Server> collection)
         {
             byte depth = 0;
             //Logger.StartProcess("Diagnosting for overloaded servers");
-            var overloadedCurrently = collection
-                .Where(p => /*!server.InMigration &&*/ _evaluator.IsServerOverload(p.Server, p.CurrentUsage))
-                .OrderByDescending(s => GetThreadholdDiff(s.Server, s.CurrentUsage));
-            var overloadedPotencially = collection.Except(overloadedCurrently)
-                .Where(p => /*!server.InMigration &&*/ _evaluator.IsServerOverload(p.Server, p.PrognosedUsage))
+            var overloaded = collection
+                .Where(p => /*!server.InMigration &&*/ _evaluator.IsServerOverload(p, p.UsedResources))
+                .OrderByDescending(s => GetThreadholdDiff(s, s.UsedResources));
+            /* var overloadedPotencially = collection.Except(overloadedCurrently)
+                .Where(p => !server.InMigration && _evaluator.IsServerOverload(p, p.PrognosedUsage))
                 .OrderByDescending(s => GetThreadholdDiff(s.Server, s.PrognosedUsage));
-            var overloaded = overloadedCurrently.Concat(overloadedPotencially);
+            var overloaded = overloadedCurrently.Concat(overloadedPotencially); */
             var recipients = collection.Except(overloaded);
             // TODO: change result model to return prognosed values if needed
             var result = new DiagnosticResult(
-                overloaded.Select(s => s.Server).ToList(),
-                collection.Where(s => ValidateThreadhold(s, true)).Select(s => s.Server).ToList(),
-                depth);
+                overloaded.ToList(),
+                collection.Where(s => ValidateThreadhold(s, true)).ToList());
             //Logger.EndProccess("Diagnostic");
             return result;
         }
 
-        public DiagnosticResult DetectLowloadedMachines(/*ServerCollection*/IEnumerable<PrognosedServer> collection)
+        public DiagnosticResult DetectLowloadedMachines(/*ServerCollection*/IEnumerable<Server> collection)
         {
-            var lowLoaded = collection.Where(s => s.Server.TurnedOn)
-                .Where((s) => /*!server.InMigration && */ _evaluator.IsServerUnderload(s.Server, s.CurrentUsage))
-                .OrderByDescending((s) => _evaluator.Evaluate(s.CurrentUsage))
-                .ThenBy((s) => s.Server.RunningVMs.Count);
+            var lowLoaded = collection.Where(s => s.TurnedOn)
+                .Where((s) => /*!server.InMigration && */ _evaluator.IsServerUnderload(s, s.UsedResources))
+                .OrderByDescending((s) => _evaluator.Evaluate(s.UsedResources))
+                .ThenBy((s) => s.RunningVMs.Count);
 
             if (!lowLoaded.Any())
             {
@@ -55,7 +54,8 @@ namespace VirtualMachineManager.Diagnostics
             }
 
             var recievers = collection
-                .Where((s) => s.Server.TurnedOn && !lowLoaded.Any((l) => l.Id == s.Id))
+                .Except(lowLoaded).Where(s => s.TurnedOn)
+                //.Where((s) => s.Server.TurnedOn && !lowLoaded.Any((l) => l.Id == s.Id))
                 .Where(s => ValidateThreadhold(s, false));
 
             if (!recievers.Any())
@@ -63,10 +63,10 @@ namespace VirtualMachineManager.Diagnostics
                 return null; //DiagnosticResult.Empty;
             }
 
-            var totalFree = recievers.Select(s => s.AllResources - s.CurrentUsage)
+            var totalFree = recievers.Select(s => s.ResourcesCapacity - s.UsedResources)
                 .Aggregate((r1, r2) => r1 + r2);
 
-            int vmsToMigrateCount = lowLoaded.Select(s => s.Server.RunningVMs.Count).Sum();
+            int vmsToMigrateCount = lowLoaded.Select(s => s.RunningVMs.Count).Sum();
 
             if (vmsToMigrateCount == 0)
             {
@@ -84,17 +84,19 @@ namespace VirtualMachineManager.Diagnostics
             var exclusions = new List<Server>(lowLoaded.Count());
             foreach (var server in lowLoaded)
             {
-                if ((totalFree -= server.PrognosedUsedResources[depth]) < 0)  // TODO: [Error] no need to substruct if < 0 is true
+                var willLeft = totalFree - server.UsedResources;
+                if (willLeft < 0)  // TODO: [Error] no need to substruct if < 0 is true
                 {
                     exclusions.Add(server);
                     totalFree += new Resources()
                     {
-                        CPU = server.Resources.CPU * (1 - _params.Threadhold.CPU) - server.PrognosedUsedResources[depth].CPU,
-                        Memmory = server.Resources.Memmory * (1 - _params.Threadhold.Memmory) - server.PrognosedUsedResources[depth].Memmory,
-                        Network = server.Resources.Network * (1 - _params.Threadhold.Network) - server.PrognosedUsedResources[depth].Network,
-                        IOPS = server.Resources.IOPS * (1 - _params.Threadhold.IOPS) - server.PrognosedUsedResources[depth].IOPS
+                        CPU = server.ResourcesCapacity.CPU * (1 - _params.Threadhold.CPU) - server.UsedResources.CPU,
+                        Memmory = server.ResourcesCapacity.Memmory * (1 - _params.Threadhold.Memmory) - server.UsedResources.Memmory,
+                        Network = server.ResourcesCapacity.Network * (1 - _params.Threadhold.Network) - server.UsedResources.Network,
+                        IOPS = server.ResourcesCapacity.IOPS * (1 - _params.Threadhold.IOPS) - server.UsedResources.IOPS
                     };
                 }
+                else totalFree = willLeft;
             }
 
             if (
@@ -106,9 +108,8 @@ namespace VirtualMachineManager.Diagnostics
             }
 
             return new DiagnosticResult(
-                lowLoaded.Where((server) => !exclusions.Any(s => s.Id == server.Id)),
-                recievers.Concat(exclusions),
-                depth);
+                lowLoaded.Except(exclusions),
+                recievers.Concat(exclusions));
         }
 
         private float GetThreadholdDiff(Server server, Resources load)
@@ -123,22 +124,22 @@ namespace VirtualMachineManager.Diagnostics
             });
         }
 
-        private bool ValidateThreadhold(PrognosedServer s, bool includeOffline)
+        private bool ValidateThreadhold(Server s, bool includeOffline)
         {
             var worstCaseUsage = new Resources
             {
-                CPU = Math.Max(s.CurrentUsage.CPU, s.PrognosedUsage.CPU),
-                Network = Math.Max(s.CurrentUsage.Network, s.PrognosedUsage.Network),
-                Memmory = Math.Max(s.CurrentUsage.Memmory, s.PrognosedUsage.Memmory),
-                IOPS = Math.Max(s.CurrentUsage.IOPS, s.PrognosedUsage.IOPS)
+                CPU = Math.Max(s.UsedResources.CPU, s.UsedResources.CPU),
+                Network = Math.Max(s.UsedResources.Network, s.UsedResources.Network),
+                Memmory = Math.Max(s.UsedResources.Memmory, s.UsedResources.Memmory),
+                IOPS = Math.Max(s.UsedResources.IOPS, s.UsedResources.IOPS)
             };
 
-            var freeRes = s.Server.ResourcesCapacity - worstCaseUsage;
-            return /*!s.InMigration &&*/ ((!s.Server.TurnedOn && includeOffline) || (
-                freeRes.CPU > _params.RecieverThreadhold.CPU * s.AllResources.CPU &&
-                freeRes.Memmory > _params.RecieverThreadhold.Memmory * s.AllResources.Memmory &&
-                freeRes.IOPS > _params.RecieverThreadhold.IOPS * s.AllResources.IOPS &&
-                freeRes.Network > _params.RecieverThreadhold.Network * s.AllResources.Network));
+            var freeRes = s.ResourcesCapacity - worstCaseUsage;
+            return /*!s.InMigration &&*/ ((!s.TurnedOn && includeOffline) || (
+                freeRes.CPU > _params.RecieverThreadhold.CPU * s.ResourcesCapacity.CPU &&
+                freeRes.Memmory > _params.RecieverThreadhold.Memmory * s.ResourcesCapacity.Memmory &&
+                freeRes.IOPS > _params.RecieverThreadhold.IOPS * s.ResourcesCapacity.IOPS &&
+                freeRes.Network > _params.RecieverThreadhold.Network * s.ResourcesCapacity.Network));
         }
     }
 }
