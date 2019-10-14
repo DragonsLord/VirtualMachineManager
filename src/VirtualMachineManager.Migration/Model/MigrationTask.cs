@@ -1,11 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using VirtualMachineManager.Core.Models;
 
-namespace Simulation.Modules.Migration.Model
+namespace VirtualMachineManager.Migration.Model
 {
     public class MigrationTask
     {
@@ -29,7 +25,7 @@ namespace Simulation.Modules.Migration.Model
 
         public void CalculateResources()
         {
-            Resources = Evaluator.GetMigrationResourceRequirments(Reciever, Sender);
+            Resources = Sender.GetMigrationResourceRequirments(Reciever);
         }
 
         private void InitMigrationOnServers()

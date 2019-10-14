@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using VirtualMachineManager.Core.Models;
+using VirtualMachineManager.EvaluationExtensions;
 using VirtualMachineManager.Migration.Algorythm.Interfaces;
 
 namespace VirtualMachineManager.Migration.Model
@@ -32,7 +33,7 @@ namespace VirtualMachineManager.Migration.Model
 
             float val = previous.Value;
 
-            val += GetTargetServerResourcesChange(_root.Depth).EvaluateVolume();
+            val += GetTargetServerResourcesChange().GetValue();
 
             var change = Changes.Last();
             val += CalculateDiffForUpdatedMachineCase(change.Target.Resources + change.MigrationRequirment);
@@ -43,7 +44,7 @@ namespace VirtualMachineManager.Migration.Model
         private float CalculateDiffForUpdatedMachineCase(Resources serverResourcesChange)
         {
             var totalServers = _root.Recievers.Count() + _turnOnCount;
-            return serverResourcesChange.EvaluateVolume() / totalServers;
+            return serverResourcesChange.GetValue() / totalServers;
         }
 
         protected override IStateNode CreateNode(MigrationNode parent, VM target, Server reciever, bool turnOnNew = false)

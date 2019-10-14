@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using VirtualMachineManager.Core.Models;
+using VirtualMachineManager.EvaluationExtensions;
 using VirtualMachineManager.Migration.Algorythm.Interfaces;
 
 namespace VirtualMachineManager.Migration.Model
@@ -16,26 +17,19 @@ namespace VirtualMachineManager.Migration.Model
         {
         }
 
-        protected override bool CalculateValidity()
-        {
-            for (byte i = 0; i <= _root.Depth; i++)
-            {
-                if (Evaluator.IsOverloaded(
-                    _root.TargetServer.PrognosedUsedResources[i] + GetTargetServerResourcesChange(i),
-                    _root.TargetServer))
-                    return false;
-            }
-            return true;
-        }
+        protected override bool CalculateValidity() =>
+            !_root.TargetServer.IsOverloaded(
+                _root.TargetServer.UsedResources + GetTargetServerResourcesChange()
+            );
 
         protected override float CalculateValue(IStateNode previous, bool newTurnOn)
         {
             float val = previous.Value;
             
-            val += GetTargetServerResourcesChange(_root.Depth).EvaluateVolume();
+            val += GetTargetServerResourcesChange().GetValue();
 
             var change = Changes.Last();
-            var newServerResources = GetRecieverUsedResources(change.Reciever, _root.Depth);
+            var newServerResources = GetRecieverUsedResources(change.Reciever);
 
             if (newTurnOn) {
                 val -= MigrationParams.Current.ServerTurnOnPenalty;
@@ -50,13 +44,13 @@ namespace VirtualMachineManager.Migration.Model
         private float CalculateDiffForUpdatedMachineCase(Resources serverResourcesChange)
         {
             var totalServers = _root.Recievers.Count() + _turnOnCount;
-            return serverResourcesChange.EvaluateVolume() / totalServers;
+            return serverResourcesChange.GetValue() / totalServers;
         }
 
         private float CalculateDiffForNewMachineCase(float oldValue, Resources newServerValue)
         {
             var totalServers = _root.Recievers.Count() + _turnOnCount;
-            return (newServerValue.EvaluateVolume() - oldValue) / totalServers;
+            return (newServerValue.GetValue() - oldValue) / totalServers;
         }
 
         protected override IStateNode CreateNode(MigrationNode parent, VM target, Server reciever, bool turnOnNew = false)

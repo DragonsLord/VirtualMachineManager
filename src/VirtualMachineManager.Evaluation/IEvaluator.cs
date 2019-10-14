@@ -8,6 +8,6 @@ namespace VirtualMachineManager.Evaluation
 
         bool IsServerOverload(Server server, Resources load);
 
-        bool IsServerUnderload(Server server, Resources load)
+        bool IsServerUnderload(Server server, Resources load);
     }
 }

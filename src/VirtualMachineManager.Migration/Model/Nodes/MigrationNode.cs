@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using VirtualMachineManager.Core.Models;
+using VirtualMachineManager.EvaluationExtensions;
 using VirtualMachineManager.Migration.Algorythm.Interfaces;
 
 namespace VirtualMachineManager.Migration.Model
@@ -17,7 +18,7 @@ namespace VirtualMachineManager.Migration.Model
             {
                 Target = target;
                 Reciever = reciever;
-                MigrationRequirment = Evaluator.GetMigrationResourceRequirments(reciever, sender);
+                MigrationRequirment = sender.GetMigrationResourceRequirments(reciever);
             }
         }
 
@@ -53,7 +54,7 @@ namespace VirtualMachineManager.Migration.Model
             return _root.TargetServer.RunningVMs
                 .Where(vm => !vm.IsMigrating)
                 .Where(vm => Changes.All(record => record.Target.Id != vm.Id))
-                .OrderByDescending((vm) => vm.Resources.EvaluateVolume())
+                .OrderByDescending((vm) => vm.Resources.GetValue())
                 .Take(MigrationParams.Current.MaxMigrateCandidatesPerStep) // GlobalConstants.VM_PER_SERVER
                 .SelectMany((vm) => CreateChildNodes(vm));
         }
@@ -62,16 +63,14 @@ namespace VirtualMachineManager.Migration.Model
         {
             var nodes = _root.Recievers
                 .Where(server => CanServerRunVM(server, vm)) // !
-                .OrderByDescending(server => Evaluator.Evaluate(
-                    server.ResourcesCapacity - GetRecieverUsedResources(server, _root.Depth)))
+                .OrderByDescending(server => GetAviableResources(server).GetValue())
                 .Select(server => CreateNode(this, vm, server)).ToList();
             var remainigCount = MigrationParams.Current.MinChildNodesPerVM - nodes.Count; // MIN_CHILD_NODES_PER_VM
             if (remainigCount > 0)
             {
                 var toTurnOn = _root.Reservation
                     .Where(server => CanServerRunVM(server, vm))
-                    .OrderByDescending(server => Evaluator.Evaluate(
-                        server.Resources - GetRecieverUsedResources(server, _root.Depth)))
+                    .OrderByDescending(server => GetAviableResources(server).GetValue())
                     .Take(remainigCount)
                     .Select(server => CreateNode(this, vm, server, true));
 
@@ -82,19 +81,11 @@ namespace VirtualMachineManager.Migration.Model
             return nodes;
         }
 
-        private bool CanServerRunVM(Server server, VM vm)
-        {
-            for (byte i = 0; i < _root.Depth; i++)
-            {
-                if (Evaluator.IsOverloaded(
-                    GetRecieverUsedResources(server, i),
-                    server))
-                {
-                    return false;
-                }
-            }
-            return true;
-        }
+        private bool CanServerRunVM(Server server, VM vm) =>
+            !server.IsOverloaded(GetRecieverUsedResources(server) + vm.Resources); // !! vm part was missing
+
+        private Resources GetAviableResources(Server server) =>
+            server.ResourcesCapacity - GetRecieverUsedResources(server);
 
         public MigrationNode(MigrationRootNode root, VM target, Server reciever, bool turnOnNew = false)
         {

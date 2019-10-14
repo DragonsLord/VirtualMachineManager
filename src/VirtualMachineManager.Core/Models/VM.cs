@@ -6,6 +6,8 @@ namespace VirtualMachineManager.Core.Models
     {
         public int Id { get; set; }
 
+        public bool IsMigrating { get; set; } // Remove ?
+
         public Resources Resources { get; set; }
         
         public int HostId { get; set; } = 0;

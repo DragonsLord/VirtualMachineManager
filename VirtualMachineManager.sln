@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28307.421
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29409.12
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VirtualMachineManager.Core", "src\VirtualMachineManager.Core\VirtualMachineManager.Core.csproj", "{C5640273-F00B-4D60-84EB-F03ED0B1676D}"
 EndProject
@@ -15,9 +15,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VirtualMachineManager.Servi
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VirtualMachineManager.Diagnostics", "src\VirtualMachineManager.Diagnostics\VirtualMachineManager.Diagnostics.csproj", "{A010D503-FBA9-4AFF-8B14-82D2D7FF42A8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VirtualMachineManager.Migration", "src\VirtualMachineManager.Migration\VirtualMachineManager.Migration.csproj", "{1531E22B-899E-485B-A873-31CEF809B973}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VirtualMachineManager.Migration", "src\VirtualMachineManager.Migration\VirtualMachineManager.Migration.csproj", "{1531E22B-899E-485B-A873-31CEF809B973}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VirtualMachineManager.Prognosing", "src\VirtualMachineManager.Prognosing\VirtualMachineManager.Prognosing.csproj", "{2A863D3B-D755-4FF0-93E6-EDE3096DF302}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VirtualMachineManager.Prognosing", "src\VirtualMachineManager.Prognosing\VirtualMachineManager.Prognosing.csproj", "{2A863D3B-D755-4FF0-93E6-EDE3096DF302}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VirtualMachineManager.EvaluationExtensions", "src\VirtualMachineManager.EvaluationExtensions\VirtualMachineManager.EvaluationExtensions.csproj", "{75C3CF08-6045-4784-AA68-2389141A734B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -57,6 +59,10 @@ Global
 		{2A863D3B-D755-4FF0-93E6-EDE3096DF302}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2A863D3B-D755-4FF0-93E6-EDE3096DF302}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2A863D3B-D755-4FF0-93E6-EDE3096DF302}.Release|Any CPU.Build.0 = Release|Any CPU
+		{75C3CF08-6045-4784-AA68-2389141A734B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{75C3CF08-6045-4784-AA68-2389141A734B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{75C3CF08-6045-4784-AA68-2389141A734B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{75C3CF08-6045-4784-AA68-2389141A734B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

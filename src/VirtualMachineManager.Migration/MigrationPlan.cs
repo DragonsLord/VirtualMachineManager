@@ -1,9 +1,9 @@
-﻿using Simulation.Modules.Migration.Model;
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using VirtualMachineManager.Core.Models;
+using VirtualMachineManager.Migration.Model;
 
 namespace VirtualMachineManager.Migration
 {
