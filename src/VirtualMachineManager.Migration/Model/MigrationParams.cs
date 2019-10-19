@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using VirtualMachineManager.Core.Models;
 
 namespace VirtualMachineManager.Migration.Model
 {
@@ -17,16 +18,8 @@ namespace VirtualMachineManager.Migration.Model
         public float MaxNetworkOnMigration { get; set; }
         public float CpuOnMigration { get; set; }
 
-
-        public float CpuLowLevel { get; set; }
-        public float MemoryLowLevel { get; set; }
-        public float NetworkLowLevel { get; set; }
-        public float IopsLowLevel { get; set; }
-
-        public float CpuDesiredLevel { get; set; }
-        public float MemoryDesiredLevel { get; set; }
-        public float NetworkDesiredLevel { get; set; }
-        public float IopsDesiredLevel { get; set; }
+        public ResourceParam<float> LowLevel { get; set; }
+        public ResourceParam<float> DesiredLevel { get; set; }
 
         public static MigrationParams Current { get; set; }
     }

@@ -162,7 +162,8 @@ namespace VirtualMachineManager.Services
 
         public void Save()
         {
-            _excelPackage.Workbook.Worksheets.ForEach((ws) => ws.Cells.AutoFitColumns());
+            foreach (var ws in _excelPackage.Workbook.Worksheets)
+                ws.Cells.AutoFitColumns();
             _excelPackage.SaveAs(new FileInfo(_outputFilename));
         }
 

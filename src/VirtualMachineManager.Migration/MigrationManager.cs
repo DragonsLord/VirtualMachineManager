@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using VirtualMachineManager.Core.Models;
 using VirtualMachineManager.EvaluationExtensions;
 using VirtualMachineManager.Migration.Algorythm;
@@ -124,10 +123,10 @@ namespace VirtualMachineManager.Migration
             var usedResources = server.UsedResources;
             var toFreeCap = new Resources()
             {
-                CPU = server.ResourcesCapacity.CPU * _params.CpuLowLevel,
-                Memmory = server.ResourcesCapacity.Memmory * _params.MemoryLowLevel,
-                Network = server.ResourcesCapacity.Network * _params.NetworkLowLevel,
-                IOPS = server.ResourcesCapacity.IOPS * _params.IopsLowLevel
+                CPU = server.ResourcesCapacity.CPU * _params.LowLevel.CPU,
+                Memmory = server.ResourcesCapacity.Memmory * _params.LowLevel.Memmory,
+                Network = server.ResourcesCapacity.Network * _params.LowLevel.Network,
+                IOPS = server.ResourcesCapacity.IOPS * _params.LowLevel.IOPS
             };
             if (usedResources < toFreeCap)
             {
@@ -137,10 +136,10 @@ namespace VirtualMachineManager.Migration
             {
                 var desiredLevel = new Resources()
                 {
-                    CPU = server.ResourcesCapacity.CPU * _params.CpuDesiredLevel,
-                    Memmory = server.ResourcesCapacity.Memmory * _params.MemoryDesiredLevel,
-                    Network = server.ResourcesCapacity.Network * _params.NetworkDesiredLevel,
-                    IOPS = server.ResourcesCapacity.IOPS * _params.IopsDesiredLevel
+                    CPU = server.ResourcesCapacity.CPU * _params.DesiredLevel.CPU,
+                    Memmory = server.ResourcesCapacity.Memmory * _params.DesiredLevel.Memmory,
+                    Network = server.ResourcesCapacity.Network * _params.DesiredLevel.Network,
+                    IOPS = server.ResourcesCapacity.IOPS * _params.DesiredLevel.IOPS
                 };
                 // "-" is used to transform it to maximization task
                 return -Math.Abs((desiredLevel - usedResources).GetValue());
@@ -152,10 +151,10 @@ namespace VirtualMachineManager.Migration
             var usedResources = server.UsedResources;
             var desiredLevel = new Resources()
             {
-                CPU = server.ResourcesCapacity.CPU * _params.CpuDesiredLevel,
-                Memmory = server.ResourcesCapacity.Memmory * _params.MemoryDesiredLevel,
-                Network = server.ResourcesCapacity.Network * _params.NetworkDesiredLevel,
-                IOPS = server.ResourcesCapacity.IOPS * _params.IopsDesiredLevel
+                CPU = server.ResourcesCapacity.CPU * _params.DesiredLevel.CPU,
+                Memmory = server.ResourcesCapacity.Memmory * _params.DesiredLevel.Memmory,
+                Network = server.ResourcesCapacity.Network * _params.DesiredLevel.Network,
+                IOPS = server.ResourcesCapacity.IOPS * _params.DesiredLevel.IOPS
             };
             // "-" is used to transform it to maximization task
             return -Math.Abs((desiredLevel - usedResources).GetValue());
