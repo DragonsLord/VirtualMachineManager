@@ -2,22 +2,20 @@
 using System.Collections.Generic;
 using System.Linq;
 using VirtualMachineManager.Core.Models;
-using VirtualMachineManager.Evaluation;
 using VirtualMachineManager.Asigning.Models;
 using VirtualMachineManager.Services;
+using VirtualMachineManager.EvaluationExtensions;
 
 namespace VirtualMachineManager.Asigning
 {
     public class VmAsigner
     {
         private readonly AsigningParams _params;
-        private readonly IEvaluator _evaluator;
         private readonly IServerManager _serverManager;
 
-        public VmAsigner(AsigningParams settings, IEvaluator evaluator, IServerManager serverManager)
+        public VmAsigner(AsigningParams settings, IServerManager serverManager)
         {
             _params = settings;
-            _evaluator = evaluator;
             _serverManager = serverManager;
         }
 
@@ -25,11 +23,11 @@ namespace VirtualMachineManager.Asigning
         {
             var workingServers = servers
                 .Where(s => s.TurnedOn)
-                .OrderBy(s => _evaluator.Evaluate(s.ResourcesCapacity)) // TODO: Is it worth it?
+                .OrderBy(s => s.ResourcesCapacity.GetValue()) // TODO: Is it worth it?
                 .ToList();
             var disabledServers = servers
                 .Where(s => !s.TurnedOn)
-                .OrderBy(s => _evaluator.Evaluate(s.ResourcesCapacity))
+                .OrderBy(s => s.ResourcesCapacity.GetValue())
                 .ToList();
             
             var unasigned = BestFitDecreasing(vms, workingServers, disabledServers);
@@ -47,12 +45,12 @@ namespace VirtualMachineManager.Asigning
         {
             //Logger.StartProcess("Assigning VMs");
             bool unAsigned = false;
-            foreach (var vm in vms.OrderByDescending(GetVMResourceVolume))
+            foreach (var vm in vms.OrderByDescending(vm => vm.Resources.GetValue()))
             {
                 unAsigned = true;
                 foreach (var server in workingServers)
                 {
-                    if (_serverManager.CanRunVM(server, vm) /*server.CanRunVM(vm, 0)*/)
+                    if (server.CanRunVM(vm) /*server.CanRunVM(vm, 0)*/)
                     {
                         _serverManager.RunVM(server, vm);
                         unAsigned = false;
@@ -63,7 +61,7 @@ namespace VirtualMachineManager.Asigning
                 {
                     foreach (var server in disabledServers)
                     {
-                        if (_serverManager.CanRunVM(server, vm) /*server.CanRunVM(vm, 0)*/)
+                        if (server.CanRunVM(vm) /*server.CanRunVM(vm, 0)*/)
                         {
                             TurnOnServer(server, workingServers, disabledServers);
                             _serverManager.RunVM(server, vm);
@@ -89,20 +87,20 @@ namespace VirtualMachineManager.Asigning
                     Memmory = s.ResourcesCapacity.CPU * _params.DesiredLoadLevel.Memmory,
                     IOPS = s.ResourcesCapacity.CPU * _params.DesiredLoadLevel.IOPS
                 };
-                return Math.Abs(_evaluator.Evaluate((res - desired)));
+                return Math.Abs((res - desired).GetValue());
             }
             //Logger.StartProcess("Assigning VMs");
             var rejected = new List<VM>();
             bool unAsigned = false;
             float minVolume = float.PositiveInfinity;
             Server currentServer = null;
-            foreach (var vm in vms.OrderByDescending(GetVMResourceVolume))
+            foreach (var vm in vms.OrderByDescending(vm => vm.Resources.GetValue()))
             {
                 unAsigned = true;
                 minVolume = float.PositiveInfinity;
                 foreach (var server in workingServers)
                 {
-                    if (_serverManager.CanRunVM(server, vm) /*server.CanRunVM(vm, 0)*/)
+                    if (server.CanRunVM(vm) /*server.CanRunVM(vm, 0)*/)
                     {
                         var diff = getDiff(server, vm.Resources);
                         if (diff < minVolume)
@@ -117,7 +115,7 @@ namespace VirtualMachineManager.Asigning
                 {
                     foreach (var server in disabledServers)
                     {
-                        if (_serverManager.CanRunVM(server, vm) /*server.CanRunVM(vm, 0)*/)
+                        if (server.CanRunVM(vm) /*server.CanRunVM(vm, 0)*/)
                         {
                             TurnOnServer(server, workingServers, disabledServers);
                             _serverManager.RunVM(server, vm);
@@ -144,11 +142,6 @@ namespace VirtualMachineManager.Asigning
             _serverManager.TurnOn(server);
             working.Add(server);
             disabled.Remove(server);
-        }
-
-        private float GetVMResourceVolume(VM vm)
-        {
-            return _evaluator.Evaluate(vm.Resources);
         }
     }
 }

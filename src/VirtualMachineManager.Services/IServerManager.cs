@@ -7,8 +7,6 @@ namespace VirtualMachineManager.Services
 {
     public interface IServerManager
     {
-        bool CanRunVM(Server server, VM vm);
-
         Server RunVM(Server server, VM vm);
 
        /* bool IsOverloaded(Server server);

@@ -6,7 +6,10 @@ namespace VirtualMachineManager.Diagnostics.Models
     {
         // public int PrognoseDepth { get; set; }
 
-        public ResourceParam<float> Threadhold { get; set; }
+        /// <summary>
+        /// Overloading Threadhold
+        /// </summary>
+        public ResourceParam<float> Threadhold { get; set; } 
 
         public ResourceParam<float> RecieverThreadhold { get; set; }
 

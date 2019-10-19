@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using VirtualMachineManager.Core.Models;
 using VirtualMachineManager.Diagnostics.Models;
-using VirtualMachineManager.Evaluation;
+using VirtualMachineManager.EvaluationExtensions;
 using VirtualMachineManager.Services;
 
 namespace VirtualMachineManager.Diagnostics
@@ -11,22 +11,19 @@ namespace VirtualMachineManager.Diagnostics
     public class DiagnosticService
     {
         private readonly DiagnosticParams _params;
-        private readonly IEvaluator _evaluator;
         //private readonly IServerManager _serverManager;
 
-        public DiagnosticService(DiagnosticParams settings, IEvaluator evaluator, IServerManager serverManager)
+        public DiagnosticService(DiagnosticParams settings, IServerManager serverManager)
         {
             _params = settings;
-            _evaluator = evaluator;
             //_serverManager = serverManager;
         }
 
         public DiagnosticResult DetectOverloadedMachines(/*ServerCollection*/IEnumerable<Server> collection)
         {
-            byte depth = 0;
             //Logger.StartProcess("Diagnosting for overloaded servers");
             var overloaded = collection
-                .Where(p => /*!server.InMigration &&*/ _evaluator.IsServerOverload(p, p.UsedResources))
+                .Where(p => /*!server.InMigration &&*/ p.IsOverloaded())
                 .OrderByDescending(s => GetThreadholdDiff(s, s.UsedResources));
             /* var overloadedPotencially = collection.Except(overloadedCurrently)
                 .Where(p => !server.InMigration && _evaluator.IsServerOverload(p, p.PrognosedUsage))
@@ -44,8 +41,8 @@ namespace VirtualMachineManager.Diagnostics
         public DiagnosticResult DetectLowloadedMachines(/*ServerCollection*/IEnumerable<Server> collection)
         {
             var lowLoaded = collection.Where(s => s.TurnedOn)
-                .Where((s) => /*!server.InMigration && */ _evaluator.IsServerUnderload(s, s.UsedResources))
-                .OrderByDescending((s) => _evaluator.Evaluate(s.UsedResources))
+                .Where((s) => /*!server.InMigration && */ s.IsLowloaded())
+                .OrderByDescending((s) => s.UsedResources.GetValue())
                 .ThenBy((s) => s.RunningVMs.Count);
 
             if (!lowLoaded.Any())
@@ -54,8 +51,7 @@ namespace VirtualMachineManager.Diagnostics
             }
 
             var recievers = collection
-                .Except(lowLoaded).Where(s => s.TurnedOn)
-                //.Where((s) => s.Server.TurnedOn && !lowLoaded.Any((l) => l.Id == s.Id))
+                .Except(lowLoaded).Where(s => s.TurnedOn) //.Where((s) => s.Server.TurnedOn && !lowLoaded.Any((l) => l.Id == s.Id))
                 .Where(s => ValidateThreadhold(s, false));
 
             if (!recievers.Any())
@@ -115,13 +111,13 @@ namespace VirtualMachineManager.Diagnostics
         private float GetThreadholdDiff(Server server, Resources load)
         {
             var aviable = server.ResourcesCapacity - load;
-            return _evaluator.Evaluate(new Resources()
+            return new Resources()
             {
                 CPU = Math.Abs(server.ResourcesCapacity.CPU * _params.Threadhold.CPU - aviable.CPU),
                 Memmory = Math.Abs(server.ResourcesCapacity.Memmory * _params.Threadhold.Memmory - aviable.Memmory),
                 Network = Math.Abs(server.ResourcesCapacity.Network * _params.Threadhold.Network - aviable.Network),
                 IOPS = Math.Abs(server.ResourcesCapacity.IOPS * _params.Threadhold.IOPS - aviable.IOPS)
-            });
+            }.GetValue();
         }
 
         private bool ValidateThreadhold(Server s, bool includeOffline)

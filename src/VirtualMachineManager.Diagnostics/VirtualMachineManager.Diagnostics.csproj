@@ -10,7 +10,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\VirtualMachineManager.Core\VirtualMachineManager.Core.csproj" />
-    <ProjectReference Include="..\VirtualMachineManager.Evaluation\VirtualMachineManager.Evaluation.csproj" />
+    <ProjectReference Include="..\VirtualMachineManager.EvaluationExtensions\VirtualMachineManager.EvaluationExtensions.csproj" />
     <ProjectReference Include="..\VirtualMachineManager.Services\VirtualMachineManager.Services.csproj" />
   </ItemGroup>
 
