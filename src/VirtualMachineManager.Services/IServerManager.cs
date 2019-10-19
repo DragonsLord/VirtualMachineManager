@@ -16,5 +16,7 @@ namespace VirtualMachineManager.Services
         bool IsLowloaded(Server server);*/
 
         Server TurnOn(Server server);
+
+        Server Get(int serverId);
     }
 }

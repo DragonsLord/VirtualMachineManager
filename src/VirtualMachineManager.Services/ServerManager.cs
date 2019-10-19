@@ -18,6 +18,11 @@ namespace VirtualMachineManager.Services
             throw new NotImplementedException();
         }
 
+        public Server Get(int serverId)
+        {
+            throw new NotImplementedException();
+        }
+
         public Server RunVM(Server server, VM vm)
         {
             throw new NotImplementedException();
