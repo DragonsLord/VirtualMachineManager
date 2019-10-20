@@ -8,7 +8,7 @@ namespace VirtualMachineManager.Services
     {
         private ServerMgmtParams _params;
 
-        public ServerManager(ServerMgmtParams setting) // TODO: insert EventManager
+        public ServerManager(ServerMgmtParams setting)
         {
             _params = setting;
         }

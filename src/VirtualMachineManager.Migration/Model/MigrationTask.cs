@@ -19,7 +19,7 @@ namespace VirtualMachineManager.Migration.Model
             Sender = sender;
             CalculateResources();
             steps = Math.Max(1, (int)Math.Ceiling(TargetVM.Resources.Memmory / Resources.Network)); // for 0 memmory tasks
-            InitMigrationOnServers();
+            // InitMigrationOnServers();
             System.Diagnostics.Debug.WriteLine($"migration task created: vm{TargetVM.Id} from {Sender.Id} to {Reciever.Id} for {steps}");
         }
 
@@ -28,7 +28,7 @@ namespace VirtualMachineManager.Migration.Model
             Resources = Sender.GetMigrationResourceRequirments(Reciever);
         }
 
-        private void InitMigrationOnServers()
+        /*private void InitMigrationOnServers()
         {
             TargetVM.IsMigrating = true;
             Sender.UsedResources += Resources;
@@ -59,6 +59,6 @@ namespace VirtualMachineManager.Migration.Model
             Reciever.RunVM(TargetVM);
             Sender.SendingCount--;
             Reciever.RecievingCount--;
-        }
+        }*/
     }
 }

@@ -60,7 +60,7 @@ namespace VirtualMachineManager.Services
 
         public void WriteServerStatistics(int step, Server server)  // TODO: Create ServerStatistic Model
         {
-            var depth = _prognoseDepth;
+            /*var depth = _prognoseDepth;
             var capacityOffset = 4 * depth;
             var res = server.PrognosedUsedResources;
             var ws = _excelPackage.Workbook.Worksheets[server.Id];
@@ -81,7 +81,7 @@ namespace VirtualMachineManager.Services
             ws.Cells[2 + step, capacityOffset + 12].Value = server.ResourcesCapacity.Network;
             ws.Cells[2 + step, capacityOffset + 13].Value = server.ResourcesCapacity.IOPS;
 
-            _currentStep = step;
+            _currentStep = step;*/
         }
 
         public void DrawCharts()
