@@ -1,4 +1,5 @@
-﻿using VirtualMachineManager.DataAccess.Traces;
+﻿using VirtualMachineManager.App.Services;
+using VirtualMachineManager.DataAccess.Traces;
 
 namespace VirtualMachineManager.App
 {
@@ -17,7 +18,9 @@ namespace VirtualMachineManager.App
                 })
                 .RunConsoleAsync();*/
 
-            using(var dbContext = new TracesDataContextBuilder()
+            var paramsManager = new ParametersManager("Settings.ini");
+
+            using (var dbContext = new TracesDataContextBuilder()
                 .WithDbFilePath("data\\traces.db")
                 .WithInputTracesPath("input")
                 .Build())
