@@ -5,7 +5,7 @@ namespace VirtualMachineManager.EvaluationExtensions
 {
     public static class ResourcesExtensions
     {
-        public static ResourcesEvaluationParams Config { get; } = new ResourcesEvaluationParams();
+        public static ResourcesEvaluationParams Config { get; set; } = new ResourcesEvaluationParams();
 
         public static float GetValue(this Resources res) =>
                 Config.Weight.CPU * res.CPU / Config.Cap.CPU +

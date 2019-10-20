@@ -5,7 +5,7 @@ namespace VirtualMachineManager.EvaluationExtensions
 {
     public static class ServerExtensions
     {
-        public static ServerEvaluationParams Config { get; } = new ServerEvaluationParams();
+        public static ServerEvaluationParams Config { get; set; } = new ServerEvaluationParams();
 
         public static bool IsOverloaded(this Server server)
         {

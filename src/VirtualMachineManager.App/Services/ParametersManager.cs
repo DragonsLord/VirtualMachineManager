@@ -4,6 +4,7 @@ using System.IO;
 using System.Text.RegularExpressions;
 using VirtualMachineManager.Asigning.Models;
 using VirtualMachineManager.Core.Models;
+using VirtualMachineManager.EvaluationExtensions.Configs;
 
 namespace VirtualMachineManager.App.Services
 {
@@ -148,6 +149,40 @@ namespace VirtualMachineManager.App.Services
                     _allParams.MEMMORY_DESIRED_LEVEL,
                     _allParams.IOPS_DESIRED_LEVEL,
                     _allParams.NETWORK_DESIRED_LEVEL)
+            };
+        }
+
+        public ResourcesEvaluationParams GetResourcesEvaluationParams()
+        {
+            return new ResourcesEvaluationParams()
+            {
+                Cap = new ResourceParam<float>(
+                    _allParams.CPU_CAP,
+                    _allParams.MEMMORY_CAP,
+                    _allParams.IOPS_CAP,
+                    _allParams.NETWORK_CAP),
+                Weight = new ResourceParam<float>(
+                    _allParams.CPU_WEIGHT,
+                    _allParams.MEMMORY_WEIGHT,
+                    _allParams.IOPS_WEIGHT,
+                    _allParams.NETWORK_WEIGHT)
+            };
+        }
+
+        public ServerEvaluationParams GetServerEvaluationParams()
+        {
+            return new ServerEvaluationParams()
+            {
+                OverloadThreadhold = new ResourceParam<float>(
+                    _allParams.CPU_THREADHOLD,
+                    _allParams.MEMMORY_THREADHOLD,
+                    _allParams.IOPS_THREADHOLD,
+                    _allParams.NETWORK_THREADHOLD),
+                UnderloadThreadhold = new ResourceParam<float>(
+                    _allParams.CPU_LOW_LEVEL,
+                    _allParams.MEMMORY_LOW_LEVEL,
+                    _allParams.IOPS_LOW_LEVEL,
+                    _allParams.NETWORK_LOW_LEVEL)
             };
         }
 

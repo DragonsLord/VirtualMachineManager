@@ -30,12 +30,7 @@ namespace VirtualMachineManager.Asigning
                 .OrderBy(s => s.ResourcesCapacity.GetValue())
                 .ToList();
             
-            var unasigned = BestFitDecreasing(vms, workingServers, disabledServers);
-
-            return new AsigningResult
-            {
-                Unasigned = unasigned
-            };
+            return BestFitDecreasing(vms, workingServers, disabledServers);
         }
 
         private void FirstFitDecreasing(
@@ -73,7 +68,7 @@ namespace VirtualMachineManager.Asigning
             Logger.EndProccess("Assigning VMs");
         }
 
-        private List<VM> BestFitDecreasing(
+        private AsigningResult BestFitDecreasing(
             IEnumerable<VM> vms,
             IList<Server> workingServers,
             IList<Server> disabledServers)
@@ -91,6 +86,7 @@ namespace VirtualMachineManager.Asigning
             }
             Logger.StartProcess("Assigning VMs");
             var rejected = new List<VM>();
+            var added = new List<VM>();
             bool unAsigned = false;
             float minVolume = float.PositiveInfinity;
             Server currentServer = null;
@@ -118,7 +114,7 @@ namespace VirtualMachineManager.Asigning
                         if (server.CanRunVM(vm) /*server.CanRunVM(vm, 0)*/)
                         {
                             TurnOnServer(server, workingServers, disabledServers);
-                            _serverManager.RunVM(server, vm);
+                            currentServer = server;
                             break;
                         }
                     }
@@ -127,6 +123,7 @@ namespace VirtualMachineManager.Asigning
                 {
                     _serverManager.RunVM(currentServer, vm);
                     currentServer = null;
+                    added.Add(vm);
                 } else if (vm.HostId == 0)
                 {
                     rejected.Add(vm);
@@ -134,7 +131,11 @@ namespace VirtualMachineManager.Asigning
                 }
             }
             Logger.EndProccess("Assigning VMs");
-            return rejected;
+            return new AsigningResult()
+            {
+                Unasigned = rejected,
+                Asigned = added
+            };
         }
 
         private void TurnOnServer(Server server, IList<Server> working, IList<Server> disabled)

@@ -13,19 +13,14 @@ namespace VirtualMachineManager.Services
             this.servers = servers.ToDictionary(s => s.Id);
         }
 
-        public Server Get(int serverId)
-        {
-            throw new NotImplementedException();
-        }
+        public IEnumerable<Server> Servers => servers.Values;
 
-        public Server RunVM(Server server, VM vm)
-        {
-            throw new NotImplementedException();
-        }
+        public Server Get(int serverId) => servers[serverId];
 
-        public Server TurnOn(Server server)
+        public void RunVM(Server server, VM vm) => server.AsignVM(vm);
+
+        public void TurnOn(Server server)
         {
-            throw new NotImplementedException();
         }
     }
 }

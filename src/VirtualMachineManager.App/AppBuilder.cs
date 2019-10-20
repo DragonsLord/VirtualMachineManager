@@ -1,9 +1,11 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.IO;
 using System.Linq;
 using VirtualMachineManager.App.Services;
 using VirtualMachineManager.Asigning;
 using VirtualMachineManager.DataAccess.Traces;
+using VirtualMachineManager.EvaluationExtensions;
 using VirtualMachineManager.Services;
 
 namespace VirtualMachineManager.App
@@ -42,13 +44,21 @@ namespace VirtualMachineManager.App
 
         public App Build()
         {
+            SetupEvaluationConfigs();
+
             var serverManager = new ServerManager(tracesDataContext.PhysicalMachines.AsEnumerable().Select(Mapper.Map));
 
             var events = Enumerable
                 .Range(0, parametersManager.StepsToSimulate ?? tracesDataContext.TimeEvents.Count())
-                .Select(i => tracesDataContext.TimeEvents.Skip(i).First());
+                .Select(i => tracesDataContext.TimeEvents.Include(te => te.VMEvents).Include(te => te.RemovedVMs).Skip(i).First());
 
             return new App(serverManager, events, new VmAsigner(parametersManager.GetAsigningParams(), serverManager));
+        }
+
+        private void SetupEvaluationConfigs()
+        {
+            ResourcesExtensions.Config = parametersManager.GetResourcesEvaluationParams();
+            ServerExtensions.Config = parametersManager.GetServerEvaluationParams();
         }
 
         public void Dispose()

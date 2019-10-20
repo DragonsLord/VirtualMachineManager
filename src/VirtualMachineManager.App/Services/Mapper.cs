@@ -17,5 +17,18 @@ namespace VirtualMachineManager.App.Services
                     Network = pm.Network
                 }
             };
+
+        public static VM Map(VMEvent vme) =>
+           new VM()
+           {
+               Id = vme.VMId,
+               Resources = new Resources
+               {
+                   IOPS = vme.IOPS,
+                   Memmory = vme.Memory,
+                   CPU = vme.CPU,
+                   Network = vme.Network
+               }
+           };
     }
 }

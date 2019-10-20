@@ -10,6 +10,6 @@ namespace VirtualMachineManager.DataAccess.Traces.Entities
 
         public virtual IList<VMEvent> VMEvents { get; set; }
 
-        public virtual IList<RemovedVMEvent> RemovedVM { get; set; }
+        public virtual IList<RemovedVMEvent> RemovedVMs { get; set; }
     }
 }

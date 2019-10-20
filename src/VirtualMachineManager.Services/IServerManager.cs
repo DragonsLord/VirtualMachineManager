@@ -7,14 +7,12 @@ namespace VirtualMachineManager.Services
 {
     public interface IServerManager
     {
-        Server RunVM(Server server, VM vm);
+        void RunVM(Server server, VM vm);
 
-       /* bool IsOverloaded(Server server);
-
-        bool IsLowloaded(Server server);*/
-
-        Server TurnOn(Server server);
+        void TurnOn(Server server);
 
         Server Get(int serverId);
+
+        IEnumerable<Server> Servers { get; }
     }
 }

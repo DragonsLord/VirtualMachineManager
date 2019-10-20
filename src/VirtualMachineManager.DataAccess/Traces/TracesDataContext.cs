@@ -62,7 +62,7 @@ namespace VirtualMachineManager.DataAccess.Traces
                 .WithOne()
                 .HasForeignKey(vm => vm.TimeEventId);
 
-            builder.HasMany(e => e.RemovedVM)
+            builder.HasMany(e => e.RemovedVMs)
                 .WithOne()
                 .HasForeignKey(re => re.TimeEventId);
         }
