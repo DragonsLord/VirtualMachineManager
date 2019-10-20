@@ -43,7 +43,7 @@ namespace VirtualMachineManager.Asigning
             IList<Server> workingServers,
             IList<Server> disabledServers)
         {
-            //Logger.StartProcess("Assigning VMs");
+            Logger.StartProcess("Assigning VMs");
             bool unAsigned = false;
             foreach (var vm in vms.OrderByDescending(vm => vm.Resources.GetValue()))
             {
@@ -70,7 +70,7 @@ namespace VirtualMachineManager.Asigning
                     }
                 }
             }
-            //Logger.EndProccess("Assigning VMs");
+            Logger.EndProccess("Assigning VMs");
         }
 
         private List<VM> BestFitDecreasing(
@@ -89,7 +89,7 @@ namespace VirtualMachineManager.Asigning
                 };
                 return Math.Abs((res - desired).GetValue());
             }
-            //Logger.StartProcess("Assigning VMs");
+            Logger.StartProcess("Assigning VMs");
             var rejected = new List<VM>();
             bool unAsigned = false;
             float minVolume = float.PositiveInfinity;
@@ -130,10 +130,10 @@ namespace VirtualMachineManager.Asigning
                 } else if (vm.HostId == 0)
                 {
                     rejected.Add(vm);
-                    //Logger.LogMessage($"VM{vm.Id} was rejected");
+                    Logger.LogMessage($"VM{vm.Id} was rejected");
                 }
             }
-            //Logger.EndProccess("Assigning VMs");
+            Logger.EndProccess("Assigning VMs");
             return rejected;
         }
 

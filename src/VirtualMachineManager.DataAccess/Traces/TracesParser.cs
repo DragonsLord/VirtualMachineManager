@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
-using System.Text;
 using System.Linq;
 using VirtualMachineManager.DataAccess.Traces.Entities;
+using VirtualMachineManager.Services;
 
 namespace VirtualMachineManager.DataAccess.Traces
 {
@@ -27,13 +27,13 @@ namespace VirtualMachineManager.DataAccess.Traces
 
         public void ParseData()
         {
-            // Logger.StartProcess("Mapping Traces Data to DataBase Model");
+            Logger.StartProcess("Mapping Traces Data to DataBase Model");
 
             CreateTimeEvents();
             MapPhysicalMachines();
             MapFromVMTraces();
 
-            //Logger.EndProccess("Mapping Traces Data to DataBase Model");
+            Logger.EndProccess("Mapping Traces Data to DataBase Model");
         }
 
         private int GetTimeEventId(long time) => (int)((time - startTime) / timeStep) + 1;
@@ -43,7 +43,7 @@ namespace VirtualMachineManager.DataAccess.Traces
             var tracesDir = new DirectoryInfo(Path.Combine(inputDataFolderPath, VMTracesFolder));
             var removedVmEvents = new List<RemovedVMEvent>();
 
-            // Logger.StartProcess("Reading traces");
+            Logger.StartProcess("Reading traces");
 
             foreach (var trace in tracesDir.GetFiles())
             {
@@ -53,10 +53,10 @@ namespace VirtualMachineManager.DataAccess.Traces
 
                 dataContext.BulkInsert(vmTrace);
 
-                //Logger.LogMessage($"VM {vmId} - done");
+                Logger.LogMessage($"VM {vmId} - done");
             }
 
-            // Logger.EndProccess("Reading treaces", "done");
+            Logger.EndProccess("Reading treaces", "done");
             dataContext.BulkInsert(removedVmEvents);
         }
 
@@ -139,7 +139,7 @@ namespace VirtualMachineManager.DataAccess.Traces
 
         private void MapPhysicalMachines()
         {
-            // Logger.StartAction("Reading PM capacities");
+            Logger.StartAction("Reading PM capacities");
             using (StreamReader reader = new StreamReader(Path.Combine(inputDataFolderPath, serversFile)))
             {
                 reader.ReadLine();  // skip headers
@@ -168,7 +168,7 @@ namespace VirtualMachineManager.DataAccess.Traces
                 }
             }
             dataContext.SaveChanges();
-            //Logger.EndAction();
+            Logger.EndAction();
         }
     }
 }

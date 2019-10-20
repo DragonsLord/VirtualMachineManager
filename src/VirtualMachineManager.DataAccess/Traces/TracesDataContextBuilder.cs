@@ -23,6 +23,7 @@ namespace VirtualMachineManager.DataAccess.Traces
         public TracesDataContext Build()
         {
             EntityFrameworkManager.ContextFactory = context => context;
+
             if (File.Exists(_dbPath))
             {
                 return new TracesDataContext(_dbPath);

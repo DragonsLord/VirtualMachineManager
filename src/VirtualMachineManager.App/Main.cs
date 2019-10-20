@@ -1,4 +1,5 @@
-﻿using VirtualMachineManager.App.Services;
+﻿using System;
+using System.IO;
 using VirtualMachineManager.DataAccess.Traces;
 
 namespace VirtualMachineManager.App
@@ -7,24 +8,28 @@ namespace VirtualMachineManager.App
     {
         static void Main()
         {
-            /*await new HostBuilder()
-                .ConfigureAppConfiguration((configBuilder) =>
-                {
-                    //configBuilder.
-                })
-                .ConfigureServices((hostContext, services) =>
-                {
-                    //services
-                })
-                .RunConsoleAsync();*/
+            string dataFolder = "Data";
+            string outputFolder = "Result";
+            string inputFolder = "Input";
+            string settingsPath = "Settings.ini";
 
-            var paramsManager = new ParametersManager("Settings.ini");
+            var identifier = DateTime.Now.ToString("yyyy-MM-dd hh mm ss");
+            var logFileName = $"{outputFolder}\\Simualtion log - {identifier}.txt";
 
-            using (var dbContext = new TracesDataContextBuilder()
-                .WithDbFilePath("data\\traces.db")
-                .WithInputTracesPath("input")
-                .Build())
+            using (var streamWriter = new StreamWriter(File.Create(logFileName)))
             {
+                using (var tracesContext = new TracesDataContextBuilder()
+                    .WithDbFilePath($"{dataFolder}\\traces.db")
+                    .WithInputTracesPath(inputFolder)
+                    .Build())
+                {
+                    new AppBuilder()
+                        .SetupDirectory(dataFolder)
+                        .SetupDirectory(outputFolder)
+                        .WithSettingsFrom(settingsPath)
+                        .WithLoggerOutputs(Console.Write, streamWriter.Write);
+                }
+                
             }
         }
     }
