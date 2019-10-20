@@ -13,21 +13,26 @@ namespace VirtualMachineManager.App
             string inputFolder = "Input";
             string settingsPath = "Settings.ini";
 
-            var identifier = DateTime.Now.ToString("yyyy-MM-dd hh mm ss");
-            var logFileName = $"{outputFolder}\\Simualtion log - {identifier}.txt";
+            // var identifier = DateTime.Now.ToString("yyyy-MM-dd hh mm ss");
+            // var logFileName = $"{outputFolder}\\Simualtion log - {identifier}.txt";
 
-            using (var streamWriter = new StreamWriter(File.Create(logFileName)))
+            // using (var streamWriter = new StreamWriter(File.Create(logFileName)))
             {
-                using (var tracesContext = new TracesDataContextBuilder()
-                    .WithDbFilePath($"{dataFolder}\\traces.db")
-                    .WithInputTracesPath(inputFolder)
-                    .Build())
+                using(var appBuilder = new AppBuilder())
                 {
-                    new AppBuilder()
+                    var app = appBuilder
                         .SetupDirectory(dataFolder)
                         .SetupDirectory(outputFolder)
                         .WithSettingsFrom(settingsPath)
-                        .WithLoggerOutputs(Console.Write, streamWriter.Write);
+                        .WithLoggerOutputs(Console.Write)
+                        .WithTracesDataContext(
+                            new TracesDataContextBuilder()
+                                .WithDbFilePath($"{dataFolder}\\traces.db")
+                                .WithInputTracesPath(inputFolder)
+                                .Build())
+                        .Build();
+
+                    app.Start();
                 }
                 
             }

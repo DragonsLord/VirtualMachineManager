@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -10,6 +10,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\VirtualMachineManager.Asigning\VirtualMachineManager.Asigning.csproj" />
     <ProjectReference Include="..\VirtualMachineManager.DataAccess\VirtualMachineManager.DataAccess.csproj" />
     <ProjectReference Include="..\VirtualMachineManager.Services\VirtualMachineManager.Services.csproj" />
   </ItemGroup>

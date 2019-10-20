@@ -1,13 +1,18 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using VirtualMachineManager.App.Services;
+using VirtualMachineManager.Asigning;
+using VirtualMachineManager.DataAccess.Traces;
 using VirtualMachineManager.Services;
 
 namespace VirtualMachineManager.App
 {
-    public class AppBuilder
+    public class AppBuilder: IDisposable
     {
         private ParametersManager parametersManager;
+        private TracesDataContext tracesDataContext;
+
         public AppBuilder SetupDirectory(string path)
         {
             if (!Directory.Exists(path))
@@ -23,10 +28,32 @@ namespace VirtualMachineManager.App
             return this;
         }
 
+        public AppBuilder WithTracesDataContext(TracesDataContext dataContext)
+        {
+            tracesDataContext = dataContext;
+            return this;
+        }
+
         public AppBuilder WithLoggerOutputs(params Action<string>[] channels)
         {
             Logger.RegisterOutputChannels(channels);
             return this;
+        }
+
+        public App Build()
+        {
+            var serverManager = new ServerManager(tracesDataContext.PhysicalMachines.AsEnumerable().Select(Mapper.Map));
+
+            var events = Enumerable
+                .Range(0, parametersManager.StepsToSimulate ?? tracesDataContext.TimeEvents.Count())
+                .Select(i => tracesDataContext.TimeEvents.Skip(i).First());
+
+            return new App(serverManager, events, new VmAsigner(parametersManager.GetAsigningParams(), serverManager));
+        }
+
+        public void Dispose()
+        {
+            tracesDataContext?.Dispose();
         }
     }
 }

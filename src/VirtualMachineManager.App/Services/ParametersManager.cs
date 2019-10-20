@@ -2,6 +2,8 @@
 using System.Globalization;
 using System.IO;
 using System.Text.RegularExpressions;
+using VirtualMachineManager.Asigning.Models;
+using VirtualMachineManager.Core.Models;
 
 namespace VirtualMachineManager.App.Services
 {
@@ -134,6 +136,20 @@ namespace VirtualMachineManager.App.Services
         }
 
         private AllParams _allParams;
+
+        public int? StepsToSimulate => _allParams.STEPS_TO_SIMULATE == 0 ? (int?)null : _allParams.STEPS_TO_SIMULATE;
+
+        public AsigningParams GetAsigningParams()
+        {
+            return new AsigningParams()
+            {
+                DesiredLoadLevel = new ResourceParam<float>(
+                    _allParams.CPU_DESIRED_LEVEL,
+                    _allParams.MEMMORY_DESIRED_LEVEL,
+                    _allParams.IOPS_DESIRED_LEVEL,
+                    _allParams.NETWORK_DESIRED_LEVEL)
+            };
+        }
 
         public ParametersManager(string filePath) => LoadFromFile(filePath);
 

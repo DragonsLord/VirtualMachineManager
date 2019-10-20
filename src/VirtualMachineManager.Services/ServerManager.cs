@@ -1,16 +1,16 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using VirtualMachineManager.Core.Models;
-using VirtualMachineManager.Services.Models;
 
 namespace VirtualMachineManager.Services
 {
     public class ServerManager : IServerManager
     {
-        private ServerMgmtParams _params;
-
-        public ServerManager(ServerMgmtParams setting)
+        private Dictionary<int, Server> servers;
+        public ServerManager(IEnumerable<Server> servers)
         {
-            _params = setting;
+            this.servers = servers.ToDictionary(s => s.Id);
         }
 
         public Server Get(int serverId)

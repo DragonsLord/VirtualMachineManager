@@ -14,7 +14,7 @@ namespace VirtualMachineManager.Core.Models
 
         public T Network { get; set; }
 
-        public ResourceParam(T iops, T memmory, T cpu, T network)
+        public ResourceParam(T cpu, T memmory, T iops, T network)
         {
             IOPS = iops;
             Memmory = memmory;
