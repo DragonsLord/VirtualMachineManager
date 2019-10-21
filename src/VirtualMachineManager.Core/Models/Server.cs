@@ -15,16 +15,20 @@ namespace VirtualMachineManager.Core.Models
 
         public bool TurnedOn { get; set; }
 
-        public List<VM> RunningVMs { get; private set; } = new List<VM>();
-
+        public List<VM> RunningVMs { get; set; } = new List<VM>();
+        
         public void AsignVM(VM vm)
         {
             RunningVMs.Add(vm);
+            UsedResources += vm.Resources;
+            vm.AsignToHost(Id, res => UsedResources += res);
         }
 
         public void RemoveVM(VM vm)
         {
             RunningVMs.Remove(vm);
+            UsedResources -= vm.Resources;
+            vm.Terminate();
         }
     }
 }
