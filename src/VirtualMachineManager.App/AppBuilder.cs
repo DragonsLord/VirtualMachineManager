@@ -48,18 +48,16 @@ namespace VirtualMachineManager.App
         {
             SetupEvaluationConfigs();
 
-            var serverManager = new ServerManager(tracesDataContext.PhysicalMachines.AsEnumerable().Select(Mapper.Map));
-
             var events = Enumerable
                 .Range(0, parametersManager.StepsToSimulate ?? tracesDataContext.TimeEvents.Count())
                 .Select(i => tracesDataContext.TimeEvents.Include(te => te.VMEvents).Include(te => te.RemovedVMs).Skip(i).First());
 
             return new App(
-                serverManager,
                 events,
-                new VmAsigner(parametersManager.GetAsigningParams(), serverManager),
+                new ServerCollection(tracesDataContext.PhysicalMachines.AsEnumerable().Select(Mapper.Map)),
+                new VmAsigner(parametersManager.GetAsigningParams()),
                 new DiagnosticService(parametersManager.GetDiagnosticParams()),
-                new MigrationManager(parametersManager.GetMigrationParams(), serverManager));
+                new MigrationManager(parametersManager.GetMigrationParams()));
         }
 
         private void SetupEvaluationConfigs()

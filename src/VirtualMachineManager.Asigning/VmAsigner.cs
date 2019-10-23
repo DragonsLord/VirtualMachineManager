@@ -11,12 +11,10 @@ namespace VirtualMachineManager.Asigning
     public class VmAsigner
     {
         private readonly AsigningParams _params;
-        private readonly IServerManager _serverManager;
 
-        public VmAsigner(AsigningParams settings, IServerManager serverManager)
+        public VmAsigner(AsigningParams settings)
         {
             _params = settings;
-            _serverManager = serverManager;
         }
 
         public AsigningResult Asign(IEnumerable<VM> vms, IEnumerable<Server> servers)
@@ -47,7 +45,7 @@ namespace VirtualMachineManager.Asigning
                 {
                     if (server.CanRunVM(vm) /*server.CanRunVM(vm, 0)*/)
                     {
-                        _serverManager.RunVM(server, vm);
+                        server.AsignVM(vm);
                         unAsigned = false;
                         break;
                     }
@@ -59,7 +57,7 @@ namespace VirtualMachineManager.Asigning
                         if (server.CanRunVM(vm) /*server.CanRunVM(vm, 0)*/)
                         {
                             TurnOnServer(server, workingServers, disabledServers);
-                            _serverManager.RunVM(server, vm);
+                            server.AsignVM(vm);
                             break;
                         }
                     }
@@ -121,7 +119,7 @@ namespace VirtualMachineManager.Asigning
                 }
                 if (currentServer != null)
                 {
-                    _serverManager.RunVM(currentServer, vm);
+                    currentServer.AsignVM(vm);
                     currentServer = null;
                     added.Add(vm);
                 } else if (vm.HostId == 0)
@@ -140,7 +138,7 @@ namespace VirtualMachineManager.Asigning
 
         private void TurnOnServer(Server server, IList<Server> working, IList<Server> disabled)
         {
-            _serverManager.TurnOn(server);
+            server.TurnOn();
             working.Add(server);
             disabled.Remove(server);
         }

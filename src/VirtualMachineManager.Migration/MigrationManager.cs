@@ -5,7 +5,6 @@ using VirtualMachineManager.Core.Models;
 using VirtualMachineManager.EvaluationExtensions;
 using VirtualMachineManager.Migration.Algorythm;
 using VirtualMachineManager.Migration.Model;
-using VirtualMachineManager.Services;
 
 namespace VirtualMachineManager.Migration
 {
@@ -13,13 +12,11 @@ namespace VirtualMachineManager.Migration
     {
         private readonly BeamSearchAlgorythm _searchEngine;
         private readonly MigrationParams _params;
-        private readonly IServerManager _serverManager;
 
-        public MigrationManager(MigrationParams config, IServerManager serverManager)
+        public MigrationManager(MigrationParams config)
         {
             _params = config;
             MigrationParams.Current = _params;
-            _serverManager = serverManager;
             _searchEngine = new BeamSearchAlgorythm(config.BeamLength);
         }
 
@@ -47,10 +44,11 @@ namespace VirtualMachineManager.Migration
                 if (resultNode == null)
                     break;
                 migrationPlan.Add(resultNode, server);
+                // TODO: reconsider
                 foreach (var change in resultNode.Changes)
                 {
                     var srv = targetsCopies.Find(s => s.Id == change.Reciever.Id);
-                    _serverManager.RunVM(srv, change.Target);
+                    srv.AsignVM(change.Target);
                     srv.UsedResources += server.GetMigrationResourceRequirments(srv);
                 }
             }
@@ -83,7 +81,7 @@ namespace VirtualMachineManager.Migration
                 foreach (var change in resultNode.Changes)
                 {
                     var reciever = targetsCopies.Find(s => s.Id == change.Reciever.Id);
-                    _serverManager.RunVM(reciever, change.Target);
+                    reciever.AsignVM(change.Target);
                     reciever.UsedResources += server.GetMigrationResourceRequirments(reciever);
                 }
             }
