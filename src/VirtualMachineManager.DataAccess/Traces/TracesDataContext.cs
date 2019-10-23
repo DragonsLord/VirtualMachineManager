@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.Data.Sqlite;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using VirtualMachineManager.DataAccess.Traces.Entities;
 
@@ -18,7 +19,18 @@ namespace VirtualMachineManager.DataAccess.Traces
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlite($"Filename={_dbPath}");
+            var dbConnection = new SqliteConnection();
+
+            dbConnection.ConnectionString = $"Filename={_dbPath}";
+            dbConnection.Open();
+            var command = dbConnection.CreateCommand();
+            command.CommandText =
+                "PRAGMA JOURNAL_MODE=OFF;" +
+                "PRAGMA TEMP_STORE=MEMORY;" +
+                "PRAGMA SYNCHRONOUS=OFF;" +
+                "PRAGMA LOCKING_MODE=EXCLUSIVE";
+            command.ExecuteNonQuery();
+            optionsBuilder.UseSqlite(dbConnection);
             base.OnConfiguring(optionsBuilder);
         }
 

@@ -2,8 +2,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using VirtualMachineManager.Core.Models;
 using VirtualMachineManager.Migration.Model;
+using VirtualMachineManager.Services;
 
 namespace VirtualMachineManager.Migration
 {
@@ -47,7 +49,7 @@ namespace VirtualMachineManager.Migration
                                                 change.Reciever )));
         }
 
-        /*public string GetFullInfo()
+        public string GetFullInfo()
         {
             var sb = new StringBuilder("VM\tFrom\tTo\n");
 
@@ -57,7 +59,7 @@ namespace VirtualMachineManager.Migration
             }
 
             return sb.ToString();
-        }*/ 
+        }
 
         public string GetShortInfo()
         {

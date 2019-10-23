@@ -1,11 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using VirtualMachineManager.App.Services;
 using VirtualMachineManager.Asigning;
 using VirtualMachineManager.Core.Models;
 using VirtualMachineManager.DataAccess.Traces.Entities;
+using VirtualMachineManager.Diagnostics;
+using VirtualMachineManager.Migration;
 using VirtualMachineManager.Services;
 
 namespace VirtualMachineManager.App
@@ -17,16 +17,22 @@ namespace VirtualMachineManager.App
         private readonly VirtualMachines VMs = new VirtualMachines();
 
         private readonly VmAsigner vmAsigner;
+        private readonly DiagnosticService diagnosticService;
+        private readonly MigrationManager migrationManager;
 
         public App(
             IServerManager serverManager,
             IEnumerable<SimualtionTimeEvent> events,
-            VmAsigner vmAsigner
+            VmAsigner vmAsigner,
+            DiagnosticService diagnosticService,
+            MigrationManager migrationManager
             )
         {
             this.serverManager = serverManager;
             this.events = events;
             this.vmAsigner = vmAsigner;
+            this.diagnosticService = diagnosticService;
+            this.migrationManager = migrationManager;
         }
 
         public void Start()
@@ -35,11 +41,33 @@ namespace VirtualMachineManager.App
             {
                 var newVMs = AdvanceSimulation(@event);
 
+                var overloadedDiagnostic = diagnosticService.DetectOverloadedMachines(serverManager.Servers);
+
+                if (overloadedDiagnostic.Targets.Any())
+                {
+                    var migrationPlan = migrationManager.MigrateFromOverloaded(
+                        overloadedDiagnostic.Targets,
+                        overloadedDiagnostic.Recievers);
+
+                    Logger.LogMessage(migrationPlan.GetFullInfo());
+                }
+
                 if (newVMs.Count() > 0)
                 {
                     // assign new VMs
                     var result = vmAsigner.Asign(newVMs, serverManager.Servers);
                     VMs.Add(result.Asigned);
+                }
+
+                var lowloadedDiagnostic = diagnosticService.DetectLowloadedMachines(serverManager.Servers);
+
+                if (lowloadedDiagnostic.Targets.Any())
+                {
+                    var migrationPlan = migrationManager.ReleaseLowloadedMachines(
+                        lowloadedDiagnostic.Targets,
+                        lowloadedDiagnostic.Recievers);
+
+                    Logger.LogMessage(migrationPlan.GetFullInfo());
                 }
             }
         }

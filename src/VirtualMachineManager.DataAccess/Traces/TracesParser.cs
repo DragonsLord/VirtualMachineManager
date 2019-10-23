@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
-using System.Linq;
 using VirtualMachineManager.DataAccess.Traces.Entities;
 using VirtualMachineManager.Services;
 
@@ -54,10 +53,10 @@ namespace VirtualMachineManager.DataAccess.Traces
                 dataContext.BulkInsert(vmTrace);
 
                 Logger.LogMessage($"VM {vmId} - done");
-            }
+            };
 
-            Logger.EndProccess("Reading treaces", "done");
             dataContext.BulkInsert(removedVmEvents);
+            Logger.EndProccess("Reading treaces", "done");
         }
 
         private IEnumerable<VMEvent> ReadTrace(FileInfo trace, int vmId, IList<RemovedVMEvent> removed)
@@ -65,6 +64,7 @@ namespace VirtualMachineManager.DataAccess.Traces
             var vmEvents = new List<VMEvent>();
 
             bool isNew = true;
+            int lastTimeId = 0;
             using (StreamReader reader = new StreamReader(trace.OpenRead()))
             {
                 reader.ReadLine();  // skip headers
@@ -73,12 +73,18 @@ namespace VirtualMachineManager.DataAccess.Traces
                 {
                     string[] line = reader.ReadLine().Split(new String[] { ";\t" }, StringSplitOptions.RemoveEmptyEntries);
 
-                    var time = long.Parse(line[0]);
+                    var timeId = GetTimeEventId(long.Parse(line[0]));
                     var cpuCores = int.Parse(line[1], CultureInfo.InvariantCulture);
                     var cpu = float.Parse(line[3], CultureInfo.InvariantCulture);
                     var memmory = float.Parse(line[6], CultureInfo.InvariantCulture);
                     var iops = float.Parse(line[8], CultureInfo.InvariantCulture);
                     var network = float.Parse(line[9], CultureInfo.InvariantCulture);
+
+                    // check for duplicate record by timeId
+                    if (lastTimeId == timeId)
+                        continue;
+                    else
+                        lastTimeId = timeId;
 
                     if (cpu == 0 && memmory == 0 && iops == 0 && network == 0)
                     {
@@ -86,31 +92,26 @@ namespace VirtualMachineManager.DataAccess.Traces
                         {
                             removed.Add(new RemovedVMEvent()
                             {
-                                TimeEventId = GetTimeEventId(time),
+                                TimeEventId = timeId,
                                 VMId = vmId
                             });
+                            isNew = true;
                         }
-                        isNew = true;
-                        continue;
-                    }
-
-                    var vmEvent = new VMEvent()
+                    } else
                     {
-                        TimeEventId = GetTimeEventId(time),
-                        CPU = cpu,
-                        CpuCores = cpuCores,
-                        Memory = memmory,
-                        IOPS = iops,
-                        Network = network,
-                        VMId = vmId,
-                        IsNew = isNew
-                    };
-
-                    // check for duplicate record by timeId
-                    if (vmEvents.LastOrDefault()?.TimeEventId != vmEvent.TimeEventId)
-                        vmEvents.Add(vmEvent);
-
-                    isNew = false;
+                        vmEvents.Add(new VMEvent()
+                        {
+                            TimeEventId = timeId,
+                            CPU = cpu,
+                            CpuCores = cpuCores,
+                            Memory = memmory,
+                            IOPS = iops,
+                            Network = network,
+                            VMId = vmId,
+                            IsNew = isNew
+                        });
+                        isNew = false;
+                    }
                 }
             }
 

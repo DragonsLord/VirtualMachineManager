@@ -1,16 +1,16 @@
 ﻿using System;
-using System.IO;
+using System.Linq;
 using VirtualMachineManager.DataAccess.Traces;
 
 namespace VirtualMachineManager.App
 {
     class Program
     {
-        static void Main()
+        static void Main(string[] args)
         {
             string dataFolder = "Data";
             string outputFolder = "Result";
-            string inputFolder = "Input";
+            string inputFolder = args.Any() ? args[0] : "Input";
             string settingsPath = "Settings.ini";
 
             // var identifier = DateTime.Now.ToString("yyyy-MM-dd hh mm ss");

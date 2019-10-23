@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 
 namespace VirtualMachineManager.Core.Models
@@ -13,10 +12,17 @@ namespace VirtualMachineManager.Core.Models
         // TODO: [idea] do not store all prognose values and just used the biggest value from prognosing (there should not be any prognose values in this model)
         public Resources UsedResources { get; set; }
 
-        public bool TurnedOn { get; set; }
+        public bool TurnedOn { get; private set; }
 
-        public List<VM> RunningVMs { get; set; } = new List<VM>();
+        public List<VM> RunningVMs { get; private set; } = new List<VM>();
         
+        public void TurnOn()
+        {
+            TurnedOn = true;
+        }
+
+        //TODO: ShoutDown
+
         public void AsignVM(VM vm)
         {
             RunningVMs.Add(vm);
@@ -30,5 +36,15 @@ namespace VirtualMachineManager.Core.Models
             UsedResources -= vm.Resources;
             vm.Terminate();
         }
+
+        public Server Copy() =>
+            new Server()
+            {
+                Id = Id,
+                ResourcesCapacity = ResourcesCapacity,
+                TurnedOn = TurnedOn,
+                UsedResources = UsedResources,
+                RunningVMs = RunningVMs?.ToList()
+            };
     }
 }

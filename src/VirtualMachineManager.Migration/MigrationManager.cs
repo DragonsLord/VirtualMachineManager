@@ -26,7 +26,7 @@ namespace VirtualMachineManager.Migration
         public MigrationPlan MigrateFromOverloaded(IEnumerable<Server> targets, IEnumerable<Server> recievers)
         {
             var migrationPlan = new MigrationPlan();
-            var targetsCopies = recievers.Select(Copy)
+            var targetsCopies = recievers.Select(s => s.Copy())
                 .OrderBy(s => s.ResourcesCapacity.GetValue())
                 .ThenBy(s => s.RunningVMs.Count)
                 .ThenBy(s => s.UsedResources.GetValue() / s.RunningVMs.Count)
@@ -60,7 +60,7 @@ namespace VirtualMachineManager.Migration
         public MigrationPlan ReleaseLowloadedMachines(IEnumerable<Server> targets, IEnumerable<Server> recieversCandidates) // TODO: Migration Res consider too late
         {
             var migrationPlan = new MigrationPlan();
-            var targetsCopies = recieversCandidates.Select(Copy)
+            var targetsCopies = recieversCandidates.Select(s => s.Copy())
                 .OrderBy(s => s.ResourcesCapacity.GetValue())
                 .ThenBy(s => s.RunningVMs.Count)
                 .ThenBy(s => s.UsedResources.GetValue() / s.RunningVMs.Count)
@@ -90,6 +90,7 @@ namespace VirtualMachineManager.Migration
             return migrationPlan;
         }
 
+        //[TODO] Move to other place?
         public List<MigrationTask> ApplyMigrations(MigrationPlan migrationPlan)
         {
             var migrationTasks = new List<MigrationTask>(migrationPlan.Count);
@@ -104,16 +105,6 @@ namespace VirtualMachineManager.Migration
 
             return migrationTasks;
         }
-
-        private Server Copy(Server server) =>
-            new Server()
-            {
-                Id = server.Id,
-                ResourcesCapacity = server.ResourcesCapacity,
-                TurnedOn = server.TurnedOn,
-                UsedResources = server.UsedResources,
-                RunningVMs = server.RunningVMs.ToList()
-            };
 
         private float GetInitialValue(IEnumerable<Server> recievers, Func<Server, float> evaluator) =>
             recievers.Any() ? recievers.Average(evaluator) : 0;
@@ -146,7 +137,7 @@ namespace VirtualMachineManager.Migration
             }
         }
 
-        public float EvaluateForReleasing(Server server)
+        private float EvaluateForReleasing(Server server)
         {
             var usedResources = server.UsedResources;
             var desiredLevel = new Resources()

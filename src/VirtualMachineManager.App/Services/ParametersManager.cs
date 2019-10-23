@@ -4,7 +4,9 @@ using System.IO;
 using System.Text.RegularExpressions;
 using VirtualMachineManager.Asigning.Models;
 using VirtualMachineManager.Core.Models;
+using VirtualMachineManager.Diagnostics.Models;
 using VirtualMachineManager.EvaluationExtensions.Configs;
+using VirtualMachineManager.Migration.Model;
 
 namespace VirtualMachineManager.App.Services
 {
@@ -149,6 +151,50 @@ namespace VirtualMachineManager.App.Services
                     _allParams.MEMMORY_DESIRED_LEVEL,
                     _allParams.IOPS_DESIRED_LEVEL,
                     _allParams.NETWORK_DESIRED_LEVEL)
+            };
+        }
+
+        public DiagnosticParams GetDiagnosticParams()
+        {
+            return new DiagnosticParams()
+            {
+                Threadhold = new ResourceParam<float>(
+                    _allParams.CPU_THREADHOLD,
+                    _allParams.MEMMORY_THREADHOLD,
+                    _allParams.IOPS_THREADHOLD,
+                    _allParams.NETWORK_THREADHOLD),
+                RecieverThreadhold = new ResourceParam<float>(
+                    _allParams.CPU_RECIEVER_THREADHOLD,
+                    _allParams.MEMMORY_RECIEVER_THREADHOLD,
+                    _allParams.IOPS_RECIEVER_THREADHOLD,
+                    _allParams.NETWORK_RECIEVER_THREADHOLD),
+                CpuOnMigration = _allParams.CPU_ON_MIGRATION,
+                MaxNetworkOnMigration = _allParams.MAX_NETWORK_ON_MIGRATION
+            };
+        }
+
+        public MigrationParams GetMigrationParams()
+        {
+            return new MigrationParams()
+            {
+                BeamLength = _allParams.BEAM_LENTH,
+                MinChildNodesPerVM = _allParams.MIN_CHILD_NODES_PER_VM,
+                MaxMigrateCandidatesPerStep = _allParams.VM_PER_SERVER, // TODO: rename
+                ServerTurnOnPenalty = _allParams.TURN_ON_PENALTY,
+                MinNetworkOnMigration = _allParams.MIN_NETWORK_ON_MIGRATION,
+                NetworkOnMigration = _allParams.NETWORK_ON_MIGRATION,
+                MaxNetworkOnMigration = _allParams.MAX_NETWORK_ON_MIGRATION,
+                CpuOnMigration = _allParams.CPU_ON_MIGRATION,
+                LowLevel = new ResourceParam<float>(
+                    _allParams.CPU_LOW_LEVEL,
+                    _allParams.MEMMORY_LOW_LEVEL,
+                    _allParams.IOPS_LOW_LEVEL,
+                    _allParams.NETWORK_LOW_LEVEL),
+                DesiredLevel = new ResourceParam<float>(
+                    _allParams.CPU_DESIRED_LEVEL,
+                    _allParams.MEMMORY_DESIRED_LEVEL,
+                    _allParams.IOPS_DESIRED_LEVEL,
+                    _allParams.NETWORK_DESIRED_LEVEL),
             };
         }
 

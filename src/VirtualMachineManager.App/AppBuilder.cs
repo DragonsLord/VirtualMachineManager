@@ -5,7 +5,9 @@ using System.Linq;
 using VirtualMachineManager.App.Services;
 using VirtualMachineManager.Asigning;
 using VirtualMachineManager.DataAccess.Traces;
+using VirtualMachineManager.Diagnostics;
 using VirtualMachineManager.EvaluationExtensions;
+using VirtualMachineManager.Migration;
 using VirtualMachineManager.Services;
 
 namespace VirtualMachineManager.App
@@ -52,7 +54,12 @@ namespace VirtualMachineManager.App
                 .Range(0, parametersManager.StepsToSimulate ?? tracesDataContext.TimeEvents.Count())
                 .Select(i => tracesDataContext.TimeEvents.Include(te => te.VMEvents).Include(te => te.RemovedVMs).Skip(i).First());
 
-            return new App(serverManager, events, new VmAsigner(parametersManager.GetAsigningParams(), serverManager));
+            return new App(
+                serverManager,
+                events,
+                new VmAsigner(parametersManager.GetAsigningParams(), serverManager),
+                new DiagnosticService(parametersManager.GetDiagnosticParams()),
+                new MigrationManager(parametersManager.GetMigrationParams(), serverManager));
         }
 
         private void SetupEvaluationConfigs()

@@ -19,6 +19,6 @@ namespace VirtualMachineManager.Services
 
         public void RunVM(Server server, VM vm) => server.AsignVM(vm);
 
-        public void TurnOn(Server server) => server.TurnedOn = true;
+        public void TurnOn(Server server) => server.TurnOn();
     }
 }

@@ -11,17 +11,15 @@ namespace VirtualMachineManager.Diagnostics
     public class DiagnosticService
     {
         private readonly DiagnosticParams _params;
-        //private readonly IServerManager _serverManager;
 
-        public DiagnosticService(DiagnosticParams settings, IServerManager serverManager)
+        public DiagnosticService(DiagnosticParams settings)
         {
             _params = settings;
-            //_serverManager = serverManager;
         }
 
         public DiagnosticResult DetectOverloadedMachines(/*ServerCollection*/IEnumerable<Server> collection)
         {
-            //Logger.StartProcess("Diagnosting for overloaded servers");
+            // Logger.StartProcess("Diagnosting for overloaded servers");
             var overloaded = collection
                 .Where(p => /*!server.InMigration &&*/ p.IsOverloaded())
                 .OrderByDescending(s => GetThreadholdDiff(s, s.UsedResources));
@@ -34,7 +32,7 @@ namespace VirtualMachineManager.Diagnostics
             var result = new DiagnosticResult(
                 overloaded.ToList(),
                 collection.Where(s => ValidateThreadhold(s, true)).ToList());
-            //Logger.EndProccess("Diagnostic");
+            // Logger.EndProccess("Diagnostic");
             return result;
         }
 
@@ -47,7 +45,7 @@ namespace VirtualMachineManager.Diagnostics
 
             if (!lowLoaded.Any())
             {
-                return null; //DiagnosticResult.Empty;
+                return DiagnosticResult.Empty;
             }
 
             var recievers = collection
@@ -56,7 +54,7 @@ namespace VirtualMachineManager.Diagnostics
 
             if (!recievers.Any())
             {
-                return null; //DiagnosticResult.Empty;
+                return DiagnosticResult.Empty;
             }
 
             var totalFree = recievers.Select(s => s.ResourcesCapacity - s.UsedResources)
@@ -66,7 +64,7 @@ namespace VirtualMachineManager.Diagnostics
 
             if (vmsToMigrateCount == 0)
             {
-                return null; // DiagnosticResult.Empty;
+                return DiagnosticResult.Empty;
             }
 
             totalFree -= new Resources()
@@ -100,7 +98,7 @@ namespace VirtualMachineManager.Diagnostics
                 || totalFree.CPU - _params.CpuOnMigration * vmsToMigrateCount <= 0
                 )
             {
-                return null; // DiagnosticResult.Empty;
+                return DiagnosticResult.Empty;
             }
 
             return new DiagnosticResult(

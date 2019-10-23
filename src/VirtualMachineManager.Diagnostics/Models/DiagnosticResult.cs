@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using VirtualMachineManager.Core.Models;
 
@@ -10,14 +11,12 @@ namespace VirtualMachineManager.Diagnostics.Models
 
         public IEnumerable<Server> Recievers { get; }
 
-        // public bool AreTargetMachines => Targets.Any();
-
         public DiagnosticResult(IEnumerable<Server> targets, IEnumerable<Server> recievers)
         {
             Targets = targets;
             Recievers = recievers;
         }
 
-        //public static DiagnosticResult Empty => new DiagnosticResult(new Server[0], null, 0);
+        public static DiagnosticResult Empty = new DiagnosticResult(Array.Empty<Server>(), Array.Empty<Server>());
     }
 }

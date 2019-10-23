@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "VirtualMachineManager.App": {
+      "commandName": "Project",
+      "commandLineArgs": "D:\\Projects\\Data\\VmManagement"
+    }
+  }
+}

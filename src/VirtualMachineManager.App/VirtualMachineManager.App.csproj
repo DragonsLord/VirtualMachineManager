@@ -12,6 +12,8 @@
   <ItemGroup>
     <ProjectReference Include="..\VirtualMachineManager.Asigning\VirtualMachineManager.Asigning.csproj" />
     <ProjectReference Include="..\VirtualMachineManager.DataAccess\VirtualMachineManager.DataAccess.csproj" />
+    <ProjectReference Include="..\VirtualMachineManager.Diagnostics\VirtualMachineManager.Diagnostics.csproj" />
+    <ProjectReference Include="..\VirtualMachineManager.Migration\VirtualMachineManager.Migration.csproj" />
     <ProjectReference Include="..\VirtualMachineManager.Services\VirtualMachineManager.Services.csproj" />
   </ItemGroup>
 
