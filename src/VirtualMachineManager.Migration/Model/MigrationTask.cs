@@ -10,42 +10,40 @@ namespace VirtualMachineManager.Migration.Model
         public Server Reciever { get; }
         public VM TargetVM { get; }
 
-        private int steps = 0;
+        private int _steps = 0;
 
         public MigrationTask(VM targerVM, Server sender, Server reciever)
         {
             Reciever = reciever;
             TargetVM = targerVM;
             Sender = sender;
-            CalculateResources();
-            steps = Math.Max(1, (int)Math.Ceiling(TargetVM.Resources.Memmory / Resources.Network)); // for 0 memmory tasks
-            // InitMigrationOnServers();
-            System.Diagnostics.Debug.WriteLine($"migration task created: vm{TargetVM.Id} from {Sender.Id} to {Reciever.Id} for {steps}");
-        }
-
-        public void CalculateResources()
-        {
             Resources = Sender.GetMigrationResourceRequirments(Reciever);
+            _steps = Math.Max(1, (int)Math.Ceiling(TargetVM.Resources.Memmory / Resources.Network)); // for 0 memmory tasks
+            InitMigrationOnServers();
+            // TODO: not debug
+            System.Diagnostics.Debug.WriteLine($"migration task created: vm{TargetVM.Id} from {Sender.Id} to {Reciever.Id} for {_steps}");
         }
 
-        /*private void InitMigrationOnServers()
+        private void InitMigrationOnServers()
         {
             TargetVM.IsMigrating = true;
             Sender.UsedResources += Resources;
             Reciever.UsedResources += Resources;
 
-            Sender.SendingCount++;
-            Reciever.RecievingCount++;
+            /*Sender.SendingCount++;
+            Reciever.RecievingCount++;*/
         }
 
-        public void OnNextTimeEvent(Simulation simulation)
+        public bool Advance()
         {
-            if (--steps == 0)
+            if (--_steps == 0)
             {
                 EndMigration();
-                simulation.OnNextStep -= this.OnNextTimeEvent;
+                // TODO: same here
                 System.Diagnostics.Debug.WriteLine($"VM{TargetVM.Id} migrated to {Reciever.Id}");
+                return false;
             }
+            return true;
         }
 
         private void EndMigration()
@@ -56,9 +54,9 @@ namespace VirtualMachineManager.Migration.Model
             Reciever.UsedResources -= Resources;
 
             Sender.RemoveVM(TargetVM);
-            Reciever.RunVM(TargetVM);
-            Sender.SendingCount--;
-            Reciever.RecievingCount--;
-        }*/
+            Reciever.AsignVM(TargetVM);
+            /*Sender.SendingCount--;
+            Reciever.RecievingCount--;*/
+        }
     }
 }

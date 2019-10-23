@@ -6,6 +6,7 @@ using VirtualMachineManager.Core.Models;
 using VirtualMachineManager.DataAccess.Traces.Entities;
 using VirtualMachineManager.Diagnostics;
 using VirtualMachineManager.Migration;
+using VirtualMachineManager.Migration.Model;
 using VirtualMachineManager.Services;
 
 namespace VirtualMachineManager.App
@@ -15,6 +16,7 @@ namespace VirtualMachineManager.App
         private readonly IServerManager serverManager;
         private readonly IEnumerable<SimualtionTimeEvent> events;
         private readonly VirtualMachines VMs = new VirtualMachines();
+        private readonly MigrationJobs migrations = new MigrationJobs();
 
         private readonly VmAsigner vmAsigner;
         private readonly DiagnosticService diagnosticService;
@@ -50,6 +52,8 @@ namespace VirtualMachineManager.App
                         overloadedDiagnostic.Recievers);
 
                     Logger.LogMessage(migrationPlan.GetFullInfo());
+
+                    ApplyMigrations(migrationPlan);
                 }
 
                 if (newVMs.Count() > 0)
@@ -68,7 +72,22 @@ namespace VirtualMachineManager.App
                         lowloadedDiagnostic.Recievers);
 
                     Logger.LogMessage(migrationPlan.GetFullInfo());
+
+                    ApplyMigrations(migrationPlan);
                 }
+            }
+        }
+
+        private void ApplyMigrations(MigrationPlan migrationPlan)
+        {
+            if (migrationPlan.IsEmpty) return;
+
+            foreach (var migration in migrationPlan)
+            {
+                migrations.Add(new MigrationTask(
+                        migration.Target,
+                        serverManager.Get(migration.SourceId),
+                        serverManager.Get(migration.RecieverId)));
             }
         }
 
@@ -76,6 +95,7 @@ namespace VirtualMachineManager.App
         {
             HandleRemovedEvent(@event.RemovedVMs);
             VMs.AdvanceRunningVMs(@event.VMEvents);
+            migrations.Advance();
 
             return @event.VMEvents.Where(vm => vm.IsNew).Select(Mapper.Map);
         }

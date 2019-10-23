@@ -21,7 +21,7 @@ namespace VirtualMachineManager.Core.Models
             TurnedOn = true;
         }
 
-        //TODO: ShoutDown
+        //TODO: ShutDown
 
         public void AsignVM(VM vm)
         {

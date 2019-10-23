@@ -90,22 +90,6 @@ namespace VirtualMachineManager.Migration
             return migrationPlan;
         }
 
-        //[TODO] Move to other place?
-        public List<MigrationTask> ApplyMigrations(MigrationPlan migrationPlan)
-        {
-            var migrationTasks = new List<MigrationTask>(migrationPlan.Count);
-
-            foreach (var migration in migrationPlan)
-            {
-                migrationTasks.Add(new MigrationTask(
-                        migration.Target,
-                        _serverManager.Get(migration.SourceId),
-                        _serverManager.Get(migration.RecieverId)));
-            }
-
-            return migrationTasks;
-        }
-
         private float GetInitialValue(IEnumerable<Server> recievers, Func<Server, float> evaluator) =>
             recievers.Any() ? recievers.Average(evaluator) : 0;
 
