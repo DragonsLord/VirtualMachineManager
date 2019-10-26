@@ -99,7 +99,7 @@ namespace VirtualMachineManager.App
                 new VmAsigner(parametersManager.GetAsigningParams()),
                 new DiagnosticService(parametersManager.GetDiagnosticParams()),
                 new MigrationManager(parametersManager.GetMigrationParams()),
-                new PrognosingService(seriesStorage));
+                new PrognosingService(parametersManager.GetPrognosingParams(), seriesStorage));
         }
 
         private void SetupEvaluationConfigs()

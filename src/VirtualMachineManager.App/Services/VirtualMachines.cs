@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,7 +8,7 @@ using VirtualMachineManager.DataAccess.Traces.Entities;
 
 namespace VirtualMachineManager.App.Services
 {
-    public class VirtualMachines
+    public class VirtualMachines : IEnumerable<VM>
     {
         private Dictionary<int, VM> _vms = new Dictionary<int, VM>();
 
@@ -36,5 +37,9 @@ namespace VirtualMachineManager.App.Services
                 };
             }
         }
+
+        public IEnumerator<VM> GetEnumerator() => _vms.Values.GetEnumerator();
+
+        IEnumerator IEnumerable.GetEnumerator() => _vms.Values.GetEnumerator();
     }
 }

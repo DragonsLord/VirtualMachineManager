@@ -47,7 +47,15 @@ namespace VirtualMachineManager.Core.Models
                 ResourcesCapacity = ResourcesCapacity,
                 TurnedOn = TurnedOn,
                 UsedResources = UsedResources,
-                RunningVMs = RunningVMs?.ToList()
+                RunningVMs = RunningVMs.ToList()
+            };
+
+        public Server CopyWithoutVms() =>
+            new Server()
+            {
+                Id = Id,
+                ResourcesCapacity = ResourcesCapacity,
+                TurnedOn = TurnedOn
             };
     }
 }

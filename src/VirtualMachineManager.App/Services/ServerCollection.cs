@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using VirtualMachineManager.Core.Models;
 
-namespace VirtualMachineManager.Services
+namespace VirtualMachineManager.App.Services
 {
     public class ServerCollection: IEnumerable<Server>
     {
@@ -14,6 +14,8 @@ namespace VirtualMachineManager.Services
         }
 
         public Server Get(int serverId) => servers[serverId];
+
+        public ServerCollection GetCopies() => new ServerCollection(servers.Values.Select(s => s.CopyWithoutVms()));
 
         public IEnumerator<Server> GetEnumerator() => servers.Values.GetEnumerator();
 

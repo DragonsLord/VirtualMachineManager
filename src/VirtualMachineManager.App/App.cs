@@ -1,13 +1,16 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using VirtualMachineManager.App.Services;
 using VirtualMachineManager.Asigning;
 using VirtualMachineManager.Core.Models;
 using VirtualMachineManager.DataAccess.Traces.Entities;
 using VirtualMachineManager.Diagnostics;
+using VirtualMachineManager.Diagnostics.Models;
 using VirtualMachineManager.Migration;
 using VirtualMachineManager.Migration.Model;
 using VirtualMachineManager.Prognosing;
+using VirtualMachineManager.Prognosing.Models;
 using VirtualMachineManager.Services;
 
 namespace VirtualMachineManager.App
@@ -52,18 +55,9 @@ namespace VirtualMachineManager.App
             {
                 var newVMs = AdvanceSimulation(@event);
 
-                var overloadedDiagnostic = diagnosticService.DetectOverloadedMachines(servers);
+                var prognoses = prognosingService.Forecast(VMs);
 
-                if (overloadedDiagnostic.Targets.Any())
-                {
-                    var migrationPlan = migrationManager.MigrateFromOverloaded(
-                        overloadedDiagnostic.Targets,
-                        overloadedDiagnostic.Recievers);
-
-                    Logger.LogMessage(migrationPlan.GetFullInfo());
-
-                    ApplyMigrations(migrationPlan);
-                }
+                DiagnoseAndMigrateIfNeeded(prognoses, diagnosticService.DetectOverloadedMachines, migrationManager.MigrateFromOverloaded);
 
                 if (newVMs.Count() > 0)
                 {
@@ -72,24 +66,54 @@ namespace VirtualMachineManager.App
                     VMs.Add(result.Asigned);
                 }
 
-                var lowloadedDiagnostic = diagnosticService.DetectLowloadedMachines(servers);
-
-                if (lowloadedDiagnostic.Targets.Any())
-                {
-                    var migrationPlan = migrationManager.ReleaseLowloadedMachines(
-                        lowloadedDiagnostic.Targets,
-                        lowloadedDiagnostic.Recievers);
-
-                    Logger.LogMessage(migrationPlan.GetFullInfo());
-
-                    ApplyMigrations(migrationPlan);
-                }
+                // TODO: should we used prgnoses for releasing too?
+                DiagnoseAndMigrateIfNeeded(prognoses, diagnosticService.DetectLowloadedMachines, migrationManager.ReleaseLowloadedMachines);
 
                 foreach (var server in servers) reportService.WriteServerStatistics(@event.Id, server);
             }
 
             reportService.DrawCharts();
             reportService.Save();
+        }
+
+        private void DiagnoseAndMigrateIfNeeded(
+            IEnumerable<VMPrognose> prognoses,
+            Func<IEnumerable<Server>, DiagnosticResult> diagnose,
+            Func<IEnumerable<Server>, IEnumerable<Server>, MigrationPlan> migrate
+            )
+        {
+            int i = 0;
+            var serversState = servers;
+            do
+            {
+                var overloadedDiagnostic = diagnose(serversState);
+
+                if (overloadedDiagnostic.Targets.Any())
+                {
+                    var migrationPlan = migrate(
+                        overloadedDiagnostic.Targets,
+                        overloadedDiagnostic.Recievers);
+
+                    Logger.LogMessage(migrationPlan.GetFullInfo());
+
+                    ApplyMigrations(migrationPlan);
+                    return;
+                }
+                serversState = MakePrognosedState(prognoses, ++i);
+            } while (i <= prognosingService.Params.PrognoseDepth);
+        }
+
+        private ServerCollection MakePrognosedState(IEnumerable<VMPrognose> prognoses, int prognoseDepth)
+        {
+            var prognosedState = servers.GetCopies();
+
+            foreach (var vmPrognose in prognoses)
+            {
+                var serverId = vmPrognose.VM.HostId;
+                prognosedState.Get(serverId).AsignVM(vmPrognose.GetPrognosedVmState(prognoseDepth));
+            }
+
+            return prognosedState;
         }
 
         private void ApplyMigrations(MigrationPlan migrationPlan)
@@ -110,6 +134,7 @@ namespace VirtualMachineManager.App
             HandleRemovedEvent(@event.RemovedVMs);
             VMs.AdvanceRunningVMs(@event.VMEvents);
             migrations.Advance();
+            prognosingService.UpdateTraces(VMs, @event.Time);
 
             return @event.VMEvents.Where(vm => vm.IsNew).Select(Mapper.Map);
         }

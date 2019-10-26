@@ -7,6 +7,7 @@ using VirtualMachineManager.Core.Models;
 using VirtualMachineManager.Diagnostics.Models;
 using VirtualMachineManager.EvaluationExtensions.Configs;
 using VirtualMachineManager.Migration.Model;
+using VirtualMachineManager.Prognosing.Models;
 
 namespace VirtualMachineManager.App.Services
 {
@@ -141,6 +142,14 @@ namespace VirtualMachineManager.App.Services
         private AllParams _allParams;
 
         public int? StepsToSimulate => _allParams.STEPS_TO_SIMULATE == 0 ? (int?)null : _allParams.STEPS_TO_SIMULATE;
+
+        public PrognosingParams GetPrognosingParams()
+        {
+            return new PrognosingParams()
+            {
+                PrognoseDepth = _allParams.PROGNOSE_DEPTH
+            };
+        }
 
         public AsigningParams GetAsigningParams()
         {
