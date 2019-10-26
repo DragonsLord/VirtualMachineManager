@@ -15,7 +15,10 @@ namespace VirtualMachineManager.Core.Models
         public bool TurnedOn { get; private set; }
 
         public List<VM> RunningVMs { get; private set; } = new List<VM>();
-        
+
+        public int SendingCount { get; set; }
+        public int RecievingCount { get; set; }
+
         public void TurnOn()
         {
             TurnedOn = true;

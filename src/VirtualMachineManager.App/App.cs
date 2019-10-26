@@ -14,6 +14,7 @@ namespace VirtualMachineManager.App
     public class App
     {
         private readonly ServerCollection servers;
+        private readonly IReportService reportService;
         private readonly IEnumerable<SimualtionTimeEvent> events;
         private readonly VirtualMachines VMs = new VirtualMachines();
         private readonly MigrationJobs migrations = new MigrationJobs();
@@ -24,6 +25,7 @@ namespace VirtualMachineManager.App
 
         public App(
             IEnumerable<SimualtionTimeEvent> events,
+            IReportService reportService,
             ServerCollection serverCollection,
             VmAsigner vmAsigner,
             DiagnosticService diagnosticService,
@@ -31,6 +33,7 @@ namespace VirtualMachineManager.App
             )
         {
             this.servers = serverCollection;
+            this.reportService = reportService;
             this.events = events;
             this.vmAsigner = vmAsigner;
             this.diagnosticService = diagnosticService;
@@ -39,6 +42,8 @@ namespace VirtualMachineManager.App
 
         public void Start()
         {
+            reportService.Initialize(servers.Select(s => s.Id));
+
             foreach (var @event in events)
             {
                 var newVMs = AdvanceSimulation(@event);
@@ -75,7 +80,12 @@ namespace VirtualMachineManager.App
 
                     ApplyMigrations(migrationPlan);
                 }
+
+                foreach (var server in servers) reportService.WriteServerStatistics(@event.Id, server);
             }
+
+            reportService.DrawCharts();
+            reportService.Save();
         }
 
         private void ApplyMigrations(MigrationPlan migrationPlan)

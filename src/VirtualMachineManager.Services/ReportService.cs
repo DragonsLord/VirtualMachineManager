@@ -17,20 +17,20 @@ namespace VirtualMachineManager.Services
 
         private int _currentStep = 0;
 
-        public ReportService(string outputFilename, int prognoseDepth)
+        public ReportService(string outputFilename/*, int prognoseDepth*/)
         {
             _excelPackage = new ExcelPackage();
             _outputFilename = outputFilename;
-            _prognoseDepth = prognoseDepth;
+            _prognoseDepth = 0;
         }
 
-        public void Initialize(int serversCount)
+        public void Initialize(IEnumerable<int> serverIds)
         {
             var steps = _prognoseDepth;
             ExcelWorkbook workbook = _excelPackage.Workbook;
-            for (int i = 0; i < serversCount; i++)
+            foreach (int serverId in serverIds)
             {
-                var ws = workbook.Worksheets.Add($"{i + 1}");
+                var ws = workbook.Worksheets.Add($"{serverId}");
 
                 ws.Cells.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
                 ws.Cells[1, 1].Value = "Step";
@@ -60,10 +60,10 @@ namespace VirtualMachineManager.Services
 
         public void WriteServerStatistics(int step, Server server)  // TODO: Create ServerStatistic Model
         {
-            /*var depth = _prognoseDepth;
+            var depth = _prognoseDepth;
             var capacityOffset = 4 * depth;
-            var res = server.PrognosedUsedResources;
-            var ws = _excelPackage.Workbook.Worksheets[server.Id];
+            var res = new[] { server.UsedResources }; // server.PrognosedUsedResources;
+            var ws = _excelPackage.Workbook.Worksheets[$"{server.Id}"];
             ws.Cells[2 + step, 1].Value = step;
             for (int j = 0; j < depth + 1; j++)
             {
@@ -81,7 +81,7 @@ namespace VirtualMachineManager.Services
             ws.Cells[2 + step, capacityOffset + 12].Value = server.ResourcesCapacity.Network;
             ws.Cells[2 + step, capacityOffset + 13].Value = server.ResourcesCapacity.IOPS;
 
-            _currentStep = step;*/
+            _currentStep = step;
         }
 
         public void DrawCharts()

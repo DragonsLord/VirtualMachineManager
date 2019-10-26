@@ -1,10 +1,11 @@
-﻿using VirtualMachineManager.Core.Models;
+﻿using System.Collections.Generic;
+using VirtualMachineManager.Core.Models;
 
 namespace VirtualMachineManager.Services
 {
     public interface IReportService
     {
-        void Initialize(int serversCount);
+        void Initialize(IEnumerable<int> serverIds);
 
         void WriteServerStatistics(int step, Server server);
 

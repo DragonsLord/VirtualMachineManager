@@ -30,8 +30,8 @@ namespace VirtualMachineManager.Migration.Model
             Sender.UsedResources += Resources;
             Reciever.UsedResources += Resources;
 
-            /*Sender.SendingCount++;
-            Reciever.RecievingCount++;*/
+            Sender.SendingCount++;
+            Reciever.RecievingCount++;
         }
 
         public bool Advance()
@@ -55,8 +55,8 @@ namespace VirtualMachineManager.Migration.Model
 
             Sender.RemoveVM(TargetVM);
             Reciever.AsignVM(TargetVM);
-            /*Sender.SendingCount--;
-            Reciever.RecievingCount--;*/
+            Sender.SendingCount--;
+            Reciever.RecievingCount--;
         }
     }
 }
