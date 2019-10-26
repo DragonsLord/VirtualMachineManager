@@ -58,7 +58,7 @@ namespace VirtualMachineManager.App
             var p = Process.Start(startInfo);
             disposableResources.Add(() =>
             {
-                p.CloseMainWindow();
+                p.Kill();
                 p.Dispose();
             });
 

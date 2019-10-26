@@ -15,9 +15,9 @@ namespace VirtualMachineManager.App
             string settingsPath = "Settings.ini";
             string influxdPath = @"D:\Projects\VirtualMachineManager\influxdb-1.7.8-1\influxd.exe";
 
-            var identifier = DateTime.Now.ToString("yyyy-MM-dd hh mm ss");
-            var logFileName = $"{logsFolder}\\Simualtion log - {identifier}.txt";
-            var reportPath = $"{outputFolder}\\Servers statistics - {identifier}.xlsx";
+            string identifier = DateTime.Now.ToString("yyyy-MM-dd hh mm ss");
+            string logFileName = $"{logsFolder}\\Simualtion log - {identifier}.txt";
+            string reportPath = $"{outputFolder}\\Servers statistics - {identifier}.xlsx";
 
             //using (var streamWriter = new StreamWriter(File.Create(logFileName)))
             using(var appBuilder = new AppBuilder())
