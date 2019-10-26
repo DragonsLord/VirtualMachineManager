@@ -10,6 +10,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\VirtualMachineManager.TimeSeriesStorage\VirtualMachineManager.TimeSeriesStorage.csproj" />
     <ProjectReference Include="..\VirtualMachineManager.Asigning\VirtualMachineManager.Asigning.csproj" />
     <ProjectReference Include="..\VirtualMachineManager.DataAccess\VirtualMachineManager.DataAccess.csproj" />
     <ProjectReference Include="..\VirtualMachineManager.Diagnostics\VirtualMachineManager.Diagnostics.csproj" />

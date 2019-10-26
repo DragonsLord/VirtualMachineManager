@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using VirtualMachineManager.App.Services;
@@ -9,7 +10,10 @@ using VirtualMachineManager.DataAccess.Traces;
 using VirtualMachineManager.Diagnostics;
 using VirtualMachineManager.EvaluationExtensions;
 using VirtualMachineManager.Migration;
+using VirtualMachineManager.Prognosing;
+using VirtualMachineManager.Prognosing.Models;
 using VirtualMachineManager.Services;
+using VirtualMachineManager.TimeSeriesStorage.Influx;
 
 namespace VirtualMachineManager.App
 {
@@ -17,9 +21,10 @@ namespace VirtualMachineManager.App
     {
         private ParametersManager parametersManager;
         private TracesDataContext tracesDataContext;
+        private ISeriesStorage seriesStorage;
         private string outputFolder;
 
-        private List<IDisposable> disposableResources = new List<IDisposable>();
+        private List<Action> disposableResources = new List<Action>();
 
         public AppBuilder SetupDirectory(string path)
         {
@@ -39,7 +44,28 @@ namespace VirtualMachineManager.App
         public AppBuilder WithTracesDataContext(TracesDataContext dataContext)
         {
             tracesDataContext = dataContext;
-            disposableResources.Add(dataContext);
+            disposableResources.Add(dataContext.Dispose);
+            return this;
+        }
+
+        public AppBuilder WithLocalInfluxDb(string dbExePath, string dbName)
+        {
+            var startInfo = new ProcessStartInfo(dbExePath)
+            {
+                UseShellExecute = true,
+                WindowStyle = ProcessWindowStyle.Hidden
+            };
+            var p = Process.Start(startInfo);
+            disposableResources.Add(() =>
+            {
+                p.CloseMainWindow();
+                p.Dispose();
+            });
+
+            var influxDbUrl = "http://localhost:8086/";
+            var influxStorage = new InfluxStorage(new InfluxHttpClient(influxDbUrl), dbName);
+            disposableResources.Add(influxStorage.Dispose);
+            seriesStorage = influxStorage;
             return this;
         }
 
@@ -64,7 +90,7 @@ namespace VirtualMachineManager.App
                 .Select(i => tracesDataContext.TimeEvents.Include(te => te.VMEvents).Include(te => te.RemovedVMs).Skip(i).First());
 
             var reportService = new ReportService(outputFolder);
-            disposableResources.Add(reportService);
+            disposableResources.Add(reportService.Dispose);
 
             return new App(
                 events,
@@ -72,7 +98,8 @@ namespace VirtualMachineManager.App
                 new ServerCollection(tracesDataContext.PhysicalMachines.AsEnumerable().Select(Mapper.Map)),
                 new VmAsigner(parametersManager.GetAsigningParams()),
                 new DiagnosticService(parametersManager.GetDiagnosticParams()),
-                new MigrationManager(parametersManager.GetMigrationParams()));
+                new MigrationManager(parametersManager.GetMigrationParams()),
+                new PrognosingService(seriesStorage));
         }
 
         private void SetupEvaluationConfigs()
@@ -83,9 +110,9 @@ namespace VirtualMachineManager.App
 
         public void Dispose()
         {
-            foreach (var resource in disposableResources)
+            foreach (var disposeResource in disposableResources)
             {
-                resource.Dispose();
+                disposeResource();
             }
         }
     }

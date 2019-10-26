@@ -7,6 +7,7 @@ using VirtualMachineManager.DataAccess.Traces.Entities;
 using VirtualMachineManager.Diagnostics;
 using VirtualMachineManager.Migration;
 using VirtualMachineManager.Migration.Model;
+using VirtualMachineManager.Prognosing;
 using VirtualMachineManager.Services;
 
 namespace VirtualMachineManager.App
@@ -22,6 +23,7 @@ namespace VirtualMachineManager.App
         private readonly VmAsigner vmAsigner;
         private readonly DiagnosticService diagnosticService;
         private readonly MigrationManager migrationManager;
+        private readonly PrognosingService prognosingService;
 
         public App(
             IEnumerable<SimualtionTimeEvent> events,
@@ -29,7 +31,8 @@ namespace VirtualMachineManager.App
             ServerCollection serverCollection,
             VmAsigner vmAsigner,
             DiagnosticService diagnosticService,
-            MigrationManager migrationManager
+            MigrationManager migrationManager,
+            PrognosingService prognosingService
             )
         {
             this.servers = serverCollection;
@@ -38,6 +41,7 @@ namespace VirtualMachineManager.App
             this.vmAsigner = vmAsigner;
             this.diagnosticService = diagnosticService;
             this.migrationManager = migrationManager;
+            this.prognosingService = prognosingService;
         }
 
         public void Start()
