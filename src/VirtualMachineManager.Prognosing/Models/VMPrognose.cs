@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using VirtualMachineManager.Core.Models;
+﻿using VirtualMachineManager.Core.Models;
 
 namespace VirtualMachineManager.Prognosing.Models
 {

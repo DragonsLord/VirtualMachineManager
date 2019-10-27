@@ -4,6 +4,6 @@ namespace VirtualMachineManager.Prognosing.Models
 {
     public interface IForcastAlgorythm
     {
-        public T[] Forecast<T>(IEnumerable<T> series, int amountToPredict);
+        public T[] Forecast<T>(IEnumerable<T> series, int predictionHorizon);
     }
 }

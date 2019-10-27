@@ -10,6 +10,7 @@
 
         public float Network { get; set; }
 
+        public static Resources Empty { get; } = 0;
 
         public static Resources operator -(Resources r1, Resources r2)
         {

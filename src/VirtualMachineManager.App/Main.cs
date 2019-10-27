@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 using VirtualMachineManager.DataAccess.Traces;
 
@@ -8,12 +9,13 @@ namespace VirtualMachineManager.App
     {
         static void Main(string[] args)
         {
-            string dataFolder = "Data";
+            string inputFolder = args.Any() ? args[0] : "Input";
+            string dataFolder = args.Any() ? Path.Combine(args[0], "Data") : "Data";
             string outputFolder = "Result";
             string logsFolder = "Logs";
-            string inputFolder = args.Any() ? args[0] : "Input";
             string settingsPath = "Settings.ini";
             string influxdPath = @"D:\Projects\VirtualMachineManager\influxdb-1.7.8-1\influxd.exe";
+            string rPackagesPath = "rPackages";
 
             string identifier = DateTime.Now.ToString("yyyy-MM-dd hh mm ss");
             string logFileName = $"{logsFolder}\\Simualtion log - {identifier}.txt";
@@ -26,6 +28,7 @@ namespace VirtualMachineManager.App
                     .SetupDirectory(dataFolder)
                     .SetupDirectory(outputFolder)
                     .SetupDirectory(logsFolder)
+                    .SetupDirectory(rPackagesPath)
                     .WithSettingsFrom(settingsPath)
                     .WithLoggerOutputs(Console.Write/*, streamWriter.Write*/)
                     .WithTracesDataContext(
@@ -34,10 +37,19 @@ namespace VirtualMachineManager.App
                             .WithInputTracesPath(inputFolder)
                             .Build())
                     .WithLocalInfluxDb(influxdPath, "vm_traces")
+                    .WithREngine(rPackagesPath)
                     .OutputTo(reportPath)
                     .Build();
-
-                app.Start();
+                try
+                {
+                    app.Start();
+                }catch (Exception ex) {
+                    var color = Console.ForegroundColor;
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("Sumilation stopped due to:");
+                    Console.WriteLine(ex.Message);
+                    Console.ForegroundColor = color;
+                }
             }
         }
     }

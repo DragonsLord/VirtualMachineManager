@@ -28,6 +28,8 @@ namespace VirtualMachineManager.App
         private readonly MigrationManager migrationManager;
         private readonly PrognosingService prognosingService;
 
+        private ServerCollection[] prognoseStates;
+
         public App(
             IEnumerable<SimualtionTimeEvent> events,
             IReportService reportService,
@@ -45,6 +47,8 @@ namespace VirtualMachineManager.App
             this.diagnosticService = diagnosticService;
             this.migrationManager = migrationManager;
             this.prognosingService = prognosingService;
+
+            prognoseStates = new ServerCollection[prognosingService.Params.PrognoseDepth];
         }
 
         public void Start()
@@ -53,11 +57,12 @@ namespace VirtualMachineManager.App
 
             foreach (var @event in events)
             {
+                Logger.LogMessage($"Simualtion step {@event.Id} (t={@event.Time})");
                 var newVMs = AdvanceSimulation(@event);
 
-                var prognoses = prognosingService.Forecast(VMs);
+                Prognose(@event.Id);
 
-                DiagnoseAndMigrateIfNeeded(prognoses, diagnosticService.DetectOverloadedMachines, migrationManager.MigrateFromOverloaded);
+                DiagnoseAndMigrateIfNeeded(diagnosticService.DetectOverloadedMachines, migrationManager.MigrateFromOverloaded);
 
                 if (newVMs.Count() > 0)
                 {
@@ -67,25 +72,38 @@ namespace VirtualMachineManager.App
                 }
 
                 // TODO: should we used prgnoses for releasing too?
-                DiagnoseAndMigrateIfNeeded(prognoses, diagnosticService.DetectLowloadedMachines, migrationManager.ReleaseLowloadedMachines);
+                DiagnoseAndMigrateIfNeeded(diagnosticService.DetectLowloadedMachines, migrationManager.ReleaseLowloadedMachines);
 
-                foreach (var server in servers) reportService.WriteServerStatistics(@event.Id, server);
+                WriteServerStatistics(@event.Id);
             }
 
             reportService.DrawCharts();
             reportService.Save();
         }
 
+        private void Prognose(int eventId)
+        {
+            if (eventId > 5)
+            {
+                var prognoses =  prognosingService.Forecast(VMs);
+                for (int i = 0; i < prognosingService.Params.PrognoseDepth; i++)
+                {
+                    prognoseStates[i] = MakePrognosedState(prognoses, i + 1);
+                }
+            }
+        }
+
         private void DiagnoseAndMigrateIfNeeded(
-            IEnumerable<VMPrognose> prognoses,
             Func<IEnumerable<Server>, DiagnosticResult> diagnose,
             Func<IEnumerable<Server>, IEnumerable<Server>, MigrationPlan> migrate
             )
         {
-            int i = 0;
-            var serversState = servers;
-            do
+            for(int i = 0; i <= prognosingService.Params.PrognoseDepth; i++)
             {
+                var serversState = i == 0 ? servers : prognoseStates[i-1];
+
+                if (serversState == null) return;
+
                 var overloadedDiagnostic = diagnose(serversState);
 
                 if (overloadedDiagnostic.Targets.Any())
@@ -99,8 +117,7 @@ namespace VirtualMachineManager.App
                     ApplyMigrations(migrationPlan);
                     return;
                 }
-                serversState = MakePrognosedState(prognoses, ++i);
-            } while (i <= prognosingService.Params.PrognoseDepth);
+            };
         }
 
         private ServerCollection MakePrognosedState(IEnumerable<VMPrognose> prognoses, int prognoseDepth)
@@ -150,6 +167,15 @@ namespace VirtualMachineManager.App
                     server.RemoveVM(vm);
                 }
                 VMs.Remove(vm.Id);
+            }
+        }
+
+        private void WriteServerStatistics(int eventId)
+        {
+            foreach (var server in servers)
+            {
+                var prognosedResources = prognoseStates.Select(sc => sc?.Get(server.Id)?.UsedResources ?? Resources.Empty);
+                reportService.WriteServerStatistics(eventId, server, prognosedResources);
             }
         }
     }

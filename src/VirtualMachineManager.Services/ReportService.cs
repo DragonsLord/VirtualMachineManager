@@ -4,6 +4,7 @@ using OfficeOpenXml.Style;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using VirtualMachineManager.Core.Models;
 
@@ -21,7 +22,7 @@ namespace VirtualMachineManager.Services
         {
             _excelPackage = new ExcelPackage();
             _outputFilename = outputFilename;
-            _prognoseDepth = 0;
+            _prognoseDepth = 1;
         }
 
         public void Initialize(IEnumerable<int> serverIds)
@@ -58,11 +59,11 @@ namespace VirtualMachineManager.Services
             }
         }
 
-        public void WriteServerStatistics(int step, Server server)  // TODO: Create ServerStatistic Model
+        public void WriteServerStatistics(int step, Server server, IEnumerable<Resources> prognosed)  // TODO: Create ServerStatistic Model
         {
             var depth = _prognoseDepth;
             var capacityOffset = 4 * depth;
-            var res = new[] { server.UsedResources }; // server.PrognosedUsedResources;
+            var res =  new[] { server.UsedResources }.Concat(prognosed).ToArray(); // server.PrognosedUsedResources;
             var ws = _excelPackage.Workbook.Worksheets[$"{server.Id}"];
             ws.Cells[2 + step, 1].Value = step;
             for (int j = 0; j < depth + 1; j++)

@@ -7,7 +7,7 @@ namespace VirtualMachineManager.Services
     {
         void Initialize(IEnumerable<int> serverIds);
 
-        void WriteServerStatistics(int step, Server server);
+        void WriteServerStatistics(int step, Server server, IEnumerable<Resources> prognosed);
 
         void DrawCharts();
 

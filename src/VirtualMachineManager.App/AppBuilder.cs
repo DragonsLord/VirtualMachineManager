@@ -11,6 +11,7 @@ using VirtualMachineManager.Diagnostics;
 using VirtualMachineManager.EvaluationExtensions;
 using VirtualMachineManager.Migration;
 using VirtualMachineManager.Prognosing;
+using VirtualMachineManager.Prognosing.Algorythms;
 using VirtualMachineManager.Prognosing.Models;
 using VirtualMachineManager.Services;
 using VirtualMachineManager.TimeSeriesStorage.Influx;
@@ -66,6 +67,13 @@ namespace VirtualMachineManager.App
             var influxStorage = new InfluxStorage(new InfluxHttpClient(influxDbUrl), dbName);
             disposableResources.Add(influxStorage.Dispose);
             seriesStorage = influxStorage;
+            return this;
+        }
+
+        public AppBuilder WithREngine(string packagesPath)
+        {
+            RGlobalEnvironment.InitREngineWithForecasing(packagesPath);
+            disposableResources.Add(RGlobalEnvironment.R.Dispose);
             return this;
         }
 
