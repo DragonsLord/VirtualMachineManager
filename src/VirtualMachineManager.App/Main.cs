@@ -48,6 +48,7 @@ namespace VirtualMachineManager.App
                     Console.ForegroundColor = ConsoleColor.Red;
                     Console.WriteLine("Sumilation stopped due to:");
                     Console.WriteLine(ex.Message);
+                    Console.WriteLine(ex.StackTrace);
                     Console.ForegroundColor = color;
                 }
             }

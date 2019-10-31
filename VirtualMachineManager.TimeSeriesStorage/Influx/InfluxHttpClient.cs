@@ -20,8 +20,8 @@ namespace VirtualMachineManager.TimeSeriesStorage.Influx
 
         public Task CreateDataBase(string dbName) => ExecuteQuery(string.Empty, $"CREATE DATABASE {dbName}");
         public Task DropDataBase(string dbName) => ExecuteQuery(string.Empty, $"DROP DATABASE {dbName}");
-        public async Task<QueryResult> GetSeries(string dbName, string measure) =>
-            JsonConvert.DeserializeObject<QueryResult>(await ExecuteQuery(dbName, $"SELECT * FROM {measure}"));
+        public async Task<QueryResult> GetSeries(string dbName, string measure, long takeFrom = 0) =>
+            JsonConvert.DeserializeObject<QueryResult>(await ExecuteQuery(dbName, $"SELECT * FROM {measure} WHERE time > {takeFrom}"));
         public async Task WriteMeasures(string db, IEnumerable<ResourcesMeasure> measures)
         {
             using (var content = new StringContent(GetLineProtocol(measures), Encoding.UTF8))

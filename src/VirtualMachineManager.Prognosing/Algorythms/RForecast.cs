@@ -1,58 +1,62 @@
 ﻿using RDotNet;
-using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Linq;
+using VirtualMachineManager.Prognosing.Models;
 
 namespace VirtualMachineManager.Prognosing.Algorythms
 {
     public class RForecast
     {
-        private const string ArimaResultVariable = "ArimaPrediction";
-        private readonly int prognoseHorizon;
-
-        private bool arimaResultExist = false;
+        private const string ProccessTraceFunction = "proccess_trace";
+        private const string InputListName = "traces";
+        private readonly PrognosingParams Params;
 
         public REngine R => RGlobalEnvironment.R;
 
-        public RForecast(int prognoseHorizon)
+        public RForecast(PrognosingParams @params)
         {
-            this.prognoseHorizon = prognoseHorizon;
+            Params = @params;
+            InitRScript();
         }
 
-        public Dictionary<string, double[]> RunAlgorythms(string traceId, IEnumerable<double> series)
+        public IEnumerable<VmResourceForecast> RunAlgorythms(IEnumerable<VmResourceTrace> traces)
         {
-            RGlobalEnvironment.SetTimeSeries(series);
+            var inputList = new GenericVector(R, traces.Select(ConvertToRList));
+            R.SetSymbol(InputListName, inputList);
+            var result = R.Evaluate($"foreach(i = {InputListName}) %dopar% {ProccessTraceFunction}(i)");
 
-            return new Dictionary<string, double[]>
-            {
-                { AlgorythmNames.ARIMA, GetArimaResults(traceId) }
-            };
+            return result.AsList().Select(r => ReadRList(r.AsList()));
         }
 
-        public Dictionary<string, double> GetMAPE(string traceId, double realValue)
+        private void InitRScript()
         {
-            RGlobalEnvironment.SetRealValue(realValue);
-
-            return new Dictionary<string, double>
-            {
-                { AlgorythmNames.ARIMA, GetArimaAccuracy(traceId) }
-            };
+            R.Evaluate($"prognoseHorizon = {Params.PrognoseDepth}");
+            R.Evaluate(
+                ProccessTraceFunction + @"<- function(trace) {
+                    ARIMAfit = auto.arima(trace$series, lambda=0, biasadj=TRUE)
+                    result = forecast(ARIMAfit, h = prognoseHorizon, level = 95)
+                    list(vmId = trace$vmId, resourceId = trace$resourceId, forecast = result$mean)
+                }"
+            );
         }
 
-        private double[] GetArimaResults(string traceId)
+        private GenericVector ConvertToRList(VmResourceTrace trace)
         {
-            R.Evaluate($"ARIMAfit = auto.arima({RGlobalEnvironment.TimeSeries}, lambda=0, biasadj=TRUE)");
-            return R.Evaluate($"{ArimaResultVariable}{traceId} = forecast(ARIMAfit, h = {prognoseHorizon}, level = 95)")
-                .AsList()[3].AsNumeric().ToArray();
+            var list = new GenericVector(R, 3);
+            list.SetNames("vmId", "resourceId", "series");
+            list["vmId"] = new IntegerVector(R, new int[] { trace.VmId });
+            list["resourceId"] = new IntegerVector(R, new int[] { (int)trace.Resource });
+            list["series"] = new NumericVector(R, trace.Series.Select(f => (double)(f + 1)));
+            return list;
         }
 
-        private double GetArimaAccuracy(string traceId)
+        private VmResourceForecast ReadRList(GenericVector row)
         {
-            if (!arimaResultExist)
-            {
-                return 0;
-            }
-            return R.Evaluate($"accuracy({ArimaResultVariable}{traceId}, {RGlobalEnvironment.RealValue})").AsNumeric()[9];
+            return new VmResourceForecast(
+                row["vmId"].AsInteger()[0],
+                (Resource)row["resourceId"].AsInteger()[0],
+                row["forecast"].AsNumeric().Select(f => (float)(f - 1)).ToArray()
+                );
         }
     }
 }

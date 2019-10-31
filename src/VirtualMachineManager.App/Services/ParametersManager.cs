@@ -122,7 +122,9 @@ namespace VirtualMachineManager.App.Services
             #endregion
 
             #region Prognosing Parameters
-            /// <summary>
+            public int MAX_TRACE_WINDOW_SIZE = 20;
+            public int MIN_TRACE_WINDOW_SIZE = 20;
+            /*/// <summary>
             /// amount of independent variables in model
             /// </summary>
             public int INDEPENDENT_VALUES_AMOUNT = 30;
@@ -135,19 +137,22 @@ namespace VirtualMachineManager.App.Services
             /// <summary>
             /// max difference between prognosed and real val
             /// </summary>
-            public int MAX_DEVIATION = 30000;
+            public int MAX_DEVIATION = 30000;*/
             #endregion
         }
 
         private AllParams _allParams;
 
         public int? StepsToSimulate => _allParams.STEPS_TO_SIMULATE == 0 ? (int?)null : _allParams.STEPS_TO_SIMULATE;
+        public int SimulationTimeStep => _allParams.TIME_STEP_VALUE;
 
         public PrognosingParams GetPrognosingParams()
         {
             return new PrognosingParams()
             {
-                PrognoseDepth = _allParams.PROGNOSE_DEPTH
+                PrognoseDepth = _allParams.PROGNOSE_DEPTH,
+                MinTraceWindow = _allParams.MIN_TRACE_WINDOW_SIZE,
+                MaxTraceWindow = _allParams.MAX_TRACE_WINDOW_SIZE
             };
         }
 

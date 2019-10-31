@@ -1,34 +1,39 @@
 ﻿using RDotNet;
-using System.Collections.Generic;
+using System;
 
 namespace VirtualMachineManager.Prognosing.Algorythms
 {
     public static class RGlobalEnvironment
     {
-        public const string TimeSeries = "ts";
-        public const string RealValue = "realValue";
         public static REngine R { get; private set; }
 
         public static void InitREngineWithForecasing(string packageLibPath)
         {
-            var engine = REngine.GetInstance();
+            R = REngine.GetInstance();
 
             // Add package lib path
-            engine.Evaluate($".libPaths(c('{packageLibPath}', .libPaths()))");
+            R.Evaluate($".libPaths(c('{packageLibPath}', .libPaths()))");
 
-            // install (if not installed) and load forecast package
-            string script = $"if (!require('forecast')) install.packages('forecast', repos='https://cloud.r-project.org/')";
+            InstallRPackages("foreach", "doParallel", "forecast");
 
-            engine.Evaluate(script);
+            // Register parallel R cluster and load required packages
+            R.Evaluate(
+                $"myCluster = makeCluster({Environment.ProcessorCount})\n" +
+                $"registerDoParallel(myCluster)\n" +
+                @"clusterCall(myCluster, function() {
+                    .libPaths(c('" + packageLibPath + @"', .libPaths()))
+                    library('forecast')
+                })"
+                );
 
-            R = engine;
         }
 
-        public static void SetTimeSeries(IEnumerable<double> series) =>
-            R.SetSymbol(TimeSeries, R.CreateNumericVector(series));
-
-        public static void SetRealValue(double val) =>
-            R.SetSymbol(RealValue, R.CreateNumericVector(new double[] { val }));
-
+        private static void InstallRPackages(params string[] packages)
+        {
+            foreach (var package in packages)
+            {
+                R.Evaluate($"if (!require('{package}')) install.packages('{package}', repos='https://cloud.r-project.org/')");
+            }
+        }
     }
 }

@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using VirtualMachineManager.Core.Models;
 
@@ -10,6 +8,6 @@ namespace VirtualMachineManager.Prognosing.Models
     {
         public Task PushNextRecord(IEnumerable<VM> vms, long timestamp);
 
-        public Task<IEnumerable<Resources>> GetVMTrace(int vmId);
+        public Task<IEnumerable<Resources>> GetVMTrace(int vmId, long takeFrom);
     }
 }

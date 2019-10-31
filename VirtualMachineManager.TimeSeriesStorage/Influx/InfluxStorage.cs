@@ -27,9 +27,9 @@ namespace VirtualMachineManager.TimeSeriesStorage.Influx
             return influxClient.WriteMeasures(db, measures);
         }
 
-        public async Task<IEnumerable<Resources>> GetVMTrace(int vmId)
+        public async Task<IEnumerable<Resources>> GetVMTrace(int vmId, long takeFrom)
         {
-            var result = await influxClient.GetSeries(db, GetVmSeriesName(vmId));
+            var result = await influxClient.GetSeries(db, GetVmSeriesName(vmId), takeFrom);
             return Parse(result).ToArray();
         }
 

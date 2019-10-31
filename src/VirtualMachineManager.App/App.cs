@@ -83,9 +83,9 @@ namespace VirtualMachineManager.App
 
         private void Prognose(int eventId)
         {
-            if (eventId > 5)
+            if (prognosingService.CanPrognose(eventId))
             {
-                var prognoses =  prognosingService.Forecast(VMs);
+                var prognoses =  prognosingService.Forecast(VMs, eventId);
                 for (int i = 0; i < prognosingService.Params.PrognoseDepth; i++)
                 {
                     prognoseStates[i] = MakePrognosedState(prognoses, i + 1);
@@ -151,7 +151,7 @@ namespace VirtualMachineManager.App
             HandleRemovedEvent(@event.RemovedVMs);
             VMs.AdvanceRunningVMs(@event.VMEvents);
             migrations.Advance();
-            prognosingService.UpdateTraces(VMs, @event.Time);
+            prognosingService.UpdateTraces(VMs, @event.Id);
 
             return @event.VMEvents.Where(vm => vm.IsNew).Select(Mapper.Map);
         }
