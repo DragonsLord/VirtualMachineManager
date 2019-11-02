@@ -23,6 +23,7 @@ namespace VirtualMachineManager.Prognosing.Algorythms
                 @"clusterCall(myCluster, function() {
                     .libPaths(c('" + packageLibPath + @"', .libPaths()))
                     library('forecast')
+                    library('foreach')
                 })"
                 );
 

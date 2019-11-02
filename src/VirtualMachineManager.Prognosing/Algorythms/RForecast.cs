@@ -24,27 +24,34 @@ namespace VirtualMachineManager.Prognosing.Algorythms
         {
             var timer = new Stopwatch();
 
+            var windowsCount = traces.First().Series.Count() - Params.MinTraceWindow + 1;
             var inputList = new GenericVector(R, traces.Select(ConvertToRList));
             R.SetSymbol(InputListName, inputList);
             timer.Start();
-            var result = R.Evaluate($"foreach(i = {InputListName}) %dopar% {ProccessTraceFunction}(i)");
+            var result = R.Evaluate($"foreach(i = {InputListName}) %dopar% {ProccessTraceFunction}(i, {Params.MinTraceWindow}, {windowsCount})");
 
             timer.Stop();
-            Debug.WriteLine($"{traces.Count()}  evaluated in {timer.ElapsedMilliseconds}ms");
+            Debug.WriteLine($"{traces.Count()} with {windowsCount} windows evaluated in {timer.ElapsedMilliseconds}ms");
 
             return result.AsList().Select(r => ReadRList(r.AsList()));
         }
 
         private void InitRScript()
         {
-            R.Evaluate($"prognoseHorizon = {Params.PrognoseDepth}");
+            R.Evaluate($"horizon = {Params.PrognoseDepth}");
             R.Evaluate(
-                ProccessTraceFunction + @"<- function(trace) {
-                    ARIMAfit = auto.arima(trace$series, lambda=0, biasadj=TRUE)
-                    arimaResult = forecast(ARIMAfit, h = prognoseHorizon, level = 95)
-                    sesResult <- ses(trace$series, h=prognoseHorizon)
-                    holtResult <- holt(trace$series, h=prognoseHorizon)
-                    list(vmId = trace$vmId, resourceId = trace$resourceId, arima = arimaResult$mean, ses = sesResult$mean, holt = holtResult$mean)
+                ProccessTraceFunction + @"<- function(trace, windowSize, windows) {
+                    #arimaResult = foreach(i=1:windows) %do% {
+                    #    arimaFit = auto.arima(window(trace$series, i, windowSize - 1 + i), lambda=0, biasadj=TRUE)
+                    #    list(offset=i, result=forecast(arimaFit, h = horizon, level = 95)$mean)
+                    #}
+                    sesResult = foreach(i=1:windows) %do%
+                        list(offset=i, result=ses(window(trace$series, i, windowSize - 1 + i), h=horizon)$mean)
+
+                    holtResult = foreach(i=1:windows) %do%
+                        list(offset=i, result=holt(window(trace$series, i, windowSize - 1 + i), h=horizon)$mean)
+
+                    list(vmId = trace$vmId, resourceId = trace$resourceId, ses = sesResult, holt = holtResult)
                 }"
             );
         }
@@ -64,13 +71,19 @@ namespace VirtualMachineManager.Prognosing.Algorythms
             return new VmResourceForecast(
                 row["vmId"].AsInteger()[0],
                 (Resource)row["resourceId"].AsInteger()[0],
-                new Dictionary<string, float[]>
+                new Dictionary<string, IEnumerable<ForecastResult>>
                     {
-                        { "ARIMA", row["arima"].AsNumeric().Select(f => (float)(f - 1)).ToArray() },
-                        { "SES", row["ses"].AsNumeric().Select(f => (float)(f - 1)).ToArray() },
-                        { "HOLT", row["holt"].AsNumeric().Select(f => (float)(f - 1)).ToArray() }
+                        // { "ARIMA", ParseForecastResult(row["arima"].AsList())},
+                        { "SES", ParseForecastResult(row["ses"].AsList())},
+                        { "HOLT", ParseForecastResult(row["holt"].AsList())}
                     }
                 );
         }
+
+        private IEnumerable<ForecastResult> ParseForecastResult(GenericVector list) =>
+            list.Select(exp => exp.AsList())
+                .Select(r => new ForecastResult(
+                    r["offset"].AsInteger()[0],
+                    r["result"].AsNumeric().Select(f => (float)(f - 1)).ToArray()));
     }
 }

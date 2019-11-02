@@ -10,11 +10,28 @@ namespace VirtualMachineManager.Prognosing
 {
     public class PrognosingService
     {
+        struct ForecastCompositeKey
+        {
+            public int vmId;
+            public Resource resource;
+            public string method;
+
+            public ForecastCompositeKey(int vmId, Resource res, string method)
+            {
+                this.vmId = vmId;
+                this.resource = res;
+                this.method = method;
+            }
+        }
+
         delegate void WriteToResources(ref Resources s, float value);
 
         private readonly ISeriesStorage seriesStorage;
         private readonly RForecast rForecast;
         private long traceWindowTime = 0;
+
+        private Dictionary<ForecastCompositeKey, IEnumerable<ForecastResult>> lastForecasts
+            = new Dictionary<ForecastCompositeKey, IEnumerable<ForecastResult>>();
         public PrognosingParams Params { get; }
 
         public PrognosingService(PrognosingParams @params, ISeriesStorage seriesStorage)
@@ -47,17 +64,35 @@ namespace VirtualMachineManager.Prognosing
                 {
                     Resources[] prognoses = new Resources[Params.PrognoseDepth];
                     Array.Fill(prognoses, new Resources());
+                    var vm = vms.First(vm => vm.Id == group.Key);
+
                     foreach (var resourceForecast in group)
                     {
                         switch (resourceForecast.Resource)
                         {
-                            case Resource.Cpu: FillResources(prognoses, GetForecast(resourceForecast), (ref Resources r, float f) => r.CPU = f); break;
-                            case Resource.Network: FillResources(prognoses, GetForecast(resourceForecast), (ref Resources r, float f) => r.Network = f); break;
-                            case Resource.Memory: FillResources(prognoses, GetForecast(resourceForecast), (ref Resources r, float f) => r.Memmory = f); break;
-                            case Resource.Iops: FillResources(prognoses, GetForecast(resourceForecast), (ref Resources r, float f) => r.IOPS = f); break;
+                            case Resource.Cpu: FillResources(
+                                prognoses,
+                                GetForecast(resourceForecast, vm.Resources.CPU),
+                                (ref Resources r, float f) => r.CPU = f
+                            ); break;
+                            case Resource.Network: FillResources(
+                                prognoses,
+                                GetForecast(resourceForecast, vm.Resources.Network),
+                                (ref Resources r, float f) => r.Network = f
+                            ); break;
+                            case Resource.Memory: FillResources(
+                                prognoses,
+                                GetForecast(resourceForecast, vm.Resources.Memmory),
+                                (ref Resources r, float f) => r.Memmory = f
+                            ); break;
+                            case Resource.Iops: FillResources(
+                                prognoses,
+                                GetForecast(resourceForecast, vm.Resources.IOPS),
+                                (ref Resources r, float f) => r.IOPS = f
+                            ); break;
                         }
                     }
-                    return new VMPrognose(vms.First(vm => vm.Id == group.Key), prognoses);
+                    return new VMPrognose(vm, prognoses);
                 });
 
             timer.Stop();
@@ -69,10 +104,35 @@ namespace VirtualMachineManager.Prognosing
         public void UpdateTraces(IEnumerable<VM> vms, int timeId) =>
             seriesStorage.PushNextRecord(vms, timeId).Wait();
 
-        private float[] GetForecast(VmResourceForecast forecast)
+        private float[] GetForecast(VmResourceForecast forecast, float realValue)
         {
-            var values = forecast.Forecast.Select(pair => pair.Value);
-            return Enumerable.Range(0, Params.PrognoseDepth).Select(i => values.Select(arr => arr[i]).Average()).ToArray();
+            var values = forecast.Forecast.Select(pair => {
+                var key = new ForecastCompositeKey(forecast.VmId, forecast.Resource, pair.Key);
+
+                if (!lastForecasts.ContainsKey(key))
+                {
+                    lastForecasts.Add(key, pair.Value);
+                    return pair.Value.First();
+                }
+                ForecastResult best = null;
+                float minErr = float.MaxValue, currErr = 0;
+
+                foreach (var fr in lastForecasts[key])
+                {
+                    currErr = Math.Abs(fr.Result[0] - realValue);
+                    if (currErr < minErr)
+                    {
+                        minErr = currErr;
+                        best = fr;
+                    }
+                }
+
+                lastForecasts[key] = pair.Value;
+
+                return best;
+            });
+
+            return Enumerable.Range(0, Params.PrognoseDepth).Select(i => values.Select(arr => arr.Result[i]).Average()).ToArray();
         }
 
         private void CalculateTraceWindowTime(int simulationStep)
