@@ -43,7 +43,11 @@ namespace VirtualMachineManager.App
                 try
                 {
                     app.Start();
-                }catch (Exception ex) {
+                }
+                catch (Exception ex)
+                {
+                    app.SaveResults();
+
                     var color = Console.ForegroundColor;
                     Console.ForegroundColor = ConsoleColor.Red;
                     Console.WriteLine("Sumilation stopped due to:");

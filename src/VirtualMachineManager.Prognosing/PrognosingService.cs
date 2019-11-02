@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using VirtualMachineManager.Core.Models;
 using VirtualMachineManager.Prognosing.Algorythms;
@@ -34,9 +35,13 @@ namespace VirtualMachineManager.Prognosing
                     fill(ref resources[i], forecasts[i]);
             }
 
+            var timer = new Stopwatch();
+
             CalculateTraceWindowTime(simulationStep);
 
-            return rForecast.RunAlgorythms(vms.SelectMany(MapToResourceTraces))
+            timer.Start();
+
+            var r = rForecast.RunAlgorythms(vms.SelectMany(MapToResourceTraces))
                 .GroupBy(trace => trace.VmId)
                 .Select(group =>
                 {
@@ -46,18 +51,29 @@ namespace VirtualMachineManager.Prognosing
                     {
                         switch (resourceForecast.Resource)
                         {
-                            case Resource.Cpu: FillResources(prognoses, resourceForecast.Forecast, (ref Resources r, float f) => r.CPU = f); break;
-                            case Resource.Network: FillResources(prognoses, resourceForecast.Forecast, (ref Resources r, float f) => r.Network = f); break;
-                            case Resource.Memory: FillResources(prognoses, resourceForecast.Forecast, (ref Resources r, float f) => r.Memmory = f); break;
-                            case Resource.Iops: FillResources(prognoses, resourceForecast.Forecast, (ref Resources r, float f) => r.IOPS = f); break;
+                            case Resource.Cpu: FillResources(prognoses, GetForecast(resourceForecast), (ref Resources r, float f) => r.CPU = f); break;
+                            case Resource.Network: FillResources(prognoses, GetForecast(resourceForecast), (ref Resources r, float f) => r.Network = f); break;
+                            case Resource.Memory: FillResources(prognoses, GetForecast(resourceForecast), (ref Resources r, float f) => r.Memmory = f); break;
+                            case Resource.Iops: FillResources(prognoses, GetForecast(resourceForecast), (ref Resources r, float f) => r.IOPS = f); break;
                         }
                     }
                     return new VMPrognose(vms.First(vm => vm.Id == group.Key), prognoses);
                 });
+
+            timer.Stop();
+
+            Debug.WriteLine($"Step: {simulationStep}: {vms.Count()} vms forecasted in {timer.ElapsedMilliseconds}ms");
+            return r;
         }
 
         public void UpdateTraces(IEnumerable<VM> vms, int timeId) =>
             seriesStorage.PushNextRecord(vms, timeId).Wait();
+
+        private float[] GetForecast(VmResourceForecast forecast)
+        {
+            var values = forecast.Forecast.Select(pair => pair.Value);
+            return Enumerable.Range(0, Params.PrognoseDepth).Select(i => values.Select(arr => arr[i]).Average()).ToArray();
+        }
 
         private void CalculateTraceWindowTime(int simulationStep)
         {

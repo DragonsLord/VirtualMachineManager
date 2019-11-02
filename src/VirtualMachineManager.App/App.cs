@@ -77,6 +77,11 @@ namespace VirtualMachineManager.App
                 WriteServerStatistics(@event.Id);
             }
 
+            SaveResults();
+        }
+
+        public void SaveResults()
+        {
             reportService.DrawCharts();
             reportService.Save();
         }

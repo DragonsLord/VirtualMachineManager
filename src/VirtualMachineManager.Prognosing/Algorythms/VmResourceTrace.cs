@@ -32,9 +32,9 @@ namespace VirtualMachineManager.Prognosing.Algorythms
 
         public Resource Resource { get; private set; }
 
-        public float[] Forecast { get; private set; }
+        public Dictionary<string, float[]> Forecast { get; private set; }
 
-        public VmResourceForecast(int vmId, Resource resource, float[] forecast)
+        public VmResourceForecast(int vmId, Resource resource, Dictionary<string, float[]> forecast)
         {
             VmId = vmId;
             Resource = resource;

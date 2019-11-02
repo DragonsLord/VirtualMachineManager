@@ -21,7 +21,7 @@ namespace VirtualMachineManager.Migration.Model
             _steps = Math.Max(1, (int)Math.Ceiling(TargetVM.Resources.Memmory / Resources.Network)); // for 0 memmory tasks
             InitMigrationOnServers();
             // TODO: not debug
-            System.Diagnostics.Debug.WriteLine($"migration task created: vm{TargetVM.Id} from {Sender.Id} to {Reciever.Id} for {_steps}");
+            // System.Diagnostics.Debug.WriteLine($"migration task created: vm{TargetVM.Id} from {Sender.Id} to {Reciever.Id} for {_steps}");
         }
 
         private void InitMigrationOnServers()
@@ -40,7 +40,7 @@ namespace VirtualMachineManager.Migration.Model
             {
                 EndMigration();
                 // TODO: same here
-                System.Diagnostics.Debug.WriteLine($"VM{TargetVM.Id} migrated to {Reciever.Id}");
+                // System.Diagnostics.Debug.WriteLine($"VM{TargetVM.Id} migrated to {Reciever.Id}");
                 return false;
             }
             return true;

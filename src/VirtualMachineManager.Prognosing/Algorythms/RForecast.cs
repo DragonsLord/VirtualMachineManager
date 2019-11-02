@@ -1,5 +1,6 @@
 ﻿using RDotNet;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using VirtualMachineManager.Prognosing.Models;
 
@@ -21,9 +22,15 @@ namespace VirtualMachineManager.Prognosing.Algorythms
 
         public IEnumerable<VmResourceForecast> RunAlgorythms(IEnumerable<VmResourceTrace> traces)
         {
+            var timer = new Stopwatch();
+
             var inputList = new GenericVector(R, traces.Select(ConvertToRList));
             R.SetSymbol(InputListName, inputList);
+            timer.Start();
             var result = R.Evaluate($"foreach(i = {InputListName}) %dopar% {ProccessTraceFunction}(i)");
+
+            timer.Stop();
+            Debug.WriteLine($"{traces.Count()}  evaluated in {timer.ElapsedMilliseconds}ms");
 
             return result.AsList().Select(r => ReadRList(r.AsList()));
         }
@@ -34,8 +41,10 @@ namespace VirtualMachineManager.Prognosing.Algorythms
             R.Evaluate(
                 ProccessTraceFunction + @"<- function(trace) {
                     ARIMAfit = auto.arima(trace$series, lambda=0, biasadj=TRUE)
-                    result = forecast(ARIMAfit, h = prognoseHorizon, level = 95)
-                    list(vmId = trace$vmId, resourceId = trace$resourceId, forecast = result$mean)
+                    arimaResult = forecast(ARIMAfit, h = prognoseHorizon, level = 95)
+                    sesResult <- ses(trace$series, h=prognoseHorizon)
+                    holtResult <- holt(trace$series, h=prognoseHorizon)
+                    list(vmId = trace$vmId, resourceId = trace$resourceId, arima = arimaResult$mean, ses = sesResult$mean, holt = holtResult$mean)
                 }"
             );
         }
@@ -55,7 +64,12 @@ namespace VirtualMachineManager.Prognosing.Algorythms
             return new VmResourceForecast(
                 row["vmId"].AsInteger()[0],
                 (Resource)row["resourceId"].AsInteger()[0],
-                row["forecast"].AsNumeric().Select(f => (float)(f - 1)).ToArray()
+                new Dictionary<string, float[]>
+                    {
+                        { "ARIMA", row["arima"].AsNumeric().Select(f => (float)(f - 1)).ToArray() },
+                        { "SES", row["ses"].AsNumeric().Select(f => (float)(f - 1)).ToArray() },
+                        { "HOLT", row["holt"].AsNumeric().Select(f => (float)(f - 1)).ToArray() }
+                    }
                 );
         }
     }
