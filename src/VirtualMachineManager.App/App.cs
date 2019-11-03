@@ -156,6 +156,7 @@ namespace VirtualMachineManager.App
             HandleRemovedEvent(@event.RemovedVMs);
             VMs.AdvanceRunningVMs(@event.VMEvents);
             migrations.Advance();
+            servers.UpdateUsedResources();
             prognosingService.UpdateTraces(VMs, @event.Id);
 
             return @event.VMEvents.Where(vm => vm.IsNew).Select(Mapper.Map);

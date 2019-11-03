@@ -16,6 +16,8 @@ namespace VirtualMachineManager.Core.Models
 
         public List<VM> RunningVMs { get; private set; } = new List<VM>();
 
+        public List<IServerJob> Jobs { get; private set; } = new List<IServerJob>();
+
         public int SendingCount { get; set; }
         public int RecievingCount { get; set; }
 
@@ -26,18 +28,35 @@ namespace VirtualMachineManager.Core.Models
 
         //TODO: ShutDown
 
+        public void StartJob(IServerJob job)
+        {
+            Jobs.Add(job);
+            UsedResources += job.Resources;
+        }
+
+        public void FinishJob(IServerJob job)
+        {
+            Jobs.Remove(job);
+        }
+
         public void AsignVM(VM vm)
         {
             RunningVMs.Add(vm);
             UsedResources += vm.Resources;
-            vm.AsignToHost(Id, res => UsedResources += res);
+            vm.AsignToHost(Id);
         }
 
         public void RemoveVM(VM vm)
         {
             RunningVMs.Remove(vm);
-            UsedResources -= vm.Resources;
             vm.Terminate();
+        }
+
+        public void UpdateUsedResources()
+        {
+            UsedResources = RunningVMs.Select(vm => vm.Resources)
+                .Concat(Jobs.Select(job => job.Resources))
+                .Aggregate(new Resources(), (r, acc) => acc += r);
         }
 
         public Server Copy() =>
@@ -55,6 +74,8 @@ namespace VirtualMachineManager.Core.Models
             {
                 Id = Id,
                 ResourcesCapacity = ResourcesCapacity,
+                Jobs = Jobs.ToList(),
+                UsedResources = Jobs.Aggregate(new Resources(), (acc, job) => acc += job.Resources),
                 TurnedOn = TurnedOn
             };
     }

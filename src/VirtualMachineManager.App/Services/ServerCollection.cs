@@ -15,6 +15,14 @@ namespace VirtualMachineManager.App.Services
 
         public Server Get(int serverId) => servers[serverId];
 
+        public void UpdateUsedResources()
+        {
+            foreach (var server in servers.Values)
+            {
+                server.UpdateUsedResources();
+            }
+        }
+
         public ServerCollection GetCopies() => new ServerCollection(servers.Values.Select(s => s.CopyWithoutVms()));
 
         public IEnumerator<Server> GetEnumerator() => servers.Values.GetEnumerator();

@@ -3,7 +3,7 @@ using VirtualMachineManager.Core.Models;
 
 namespace VirtualMachineManager.Migration.Model
 {
-    public class MigrationTask
+    public class MigrationTask : IServerJob
     {
         public Resources @Resources { get; private set; }
         public Server Sender { get; }
@@ -27,8 +27,8 @@ namespace VirtualMachineManager.Migration.Model
         private void InitMigrationOnServers()
         {
             TargetVM.IsMigrating = true;
-            Sender.UsedResources += Resources;
-            Reciever.UsedResources += Resources;
+            Sender.StartJob(this);
+            Reciever.StartJob(this);
 
             Sender.SendingCount++;
             Reciever.RecievingCount++;
@@ -50,12 +50,12 @@ namespace VirtualMachineManager.Migration.Model
         {
             TargetVM.IsMigrating = false;
 
-            Sender.UsedResources -= Resources;
-            Reciever.UsedResources -= Resources;
-
+            Sender.FinishJob(this);
             Sender.RemoveVM(TargetVM);
-            Reciever.AsignVM(TargetVM);
             Sender.SendingCount--;
+
+            Reciever.FinishJob(this);
+            Reciever.AsignVM(TargetVM);
             Reciever.RecievingCount--;
         }
     }
