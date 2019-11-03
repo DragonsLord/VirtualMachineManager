@@ -117,8 +117,6 @@ namespace VirtualMachineManager.App
                         overloadedDiagnostic.Targets,
                         overloadedDiagnostic.Recievers);
 
-                    Logger.LogMessage(migrationPlan.GetFullInfo());
-
                     ApplyMigrations(migrationPlan);
                     return;
                 }
@@ -141,6 +139,8 @@ namespace VirtualMachineManager.App
         private void ApplyMigrations(MigrationPlan migrationPlan)
         {
             if (migrationPlan.IsEmpty) return;
+
+            Logger.LogMessage(migrationPlan.GetFullInfo());
 
             foreach (var migration in migrationPlan)
             {

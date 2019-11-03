@@ -146,6 +146,8 @@ namespace VirtualMachineManager.App.Services
         public int? StepsToSimulate => _allParams.STEPS_TO_SIMULATE == 0 ? (int?)null : _allParams.STEPS_TO_SIMULATE;
         public int SimulationTimeStep => _allParams.TIME_STEP_VALUE;
 
+        public int PrognoseDepth => _allParams.PROGNOSE_DEPTH;
+
         public PrognosingParams GetPrognosingParams()
         {
             return new PrognosingParams()

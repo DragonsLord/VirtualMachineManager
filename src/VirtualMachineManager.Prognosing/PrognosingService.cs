@@ -10,6 +10,7 @@ namespace VirtualMachineManager.Prognosing
 {
     public class PrognosingService
     {
+        const int BathSize = 30;
         struct ForecastCompositeKey
         {
             public int vmId;
@@ -52,13 +53,16 @@ namespace VirtualMachineManager.Prognosing
                     fill(ref resources[i], forecasts[i]);
             }
 
+            var vmsCount = vms.Count();
+            var batchesCount = vmsCount % BathSize == 0 ? vmsCount / BathSize : vmsCount / BathSize + 1;
             var timer = new Stopwatch();
 
             CalculateTraceWindowTime(simulationStep);
 
             timer.Start();
 
-            var r = rForecast.RunAlgorythms(vms.SelectMany(MapToResourceTraces))
+            var r = Enumerable.Range(0, batchesCount)
+                .SelectMany(i => rForecast.RunAlgorythms(vms.Skip(i * BathSize).Take(BathSize).SelectMany(MapToResourceTraces)))
                 .GroupBy(trace => trace.VmId)
                 .Select(group =>
                 {
@@ -93,7 +97,7 @@ namespace VirtualMachineManager.Prognosing
                         }
                     }
                     return new VMPrognose(vm, prognoses);
-                });
+                }).ToList();
 
             timer.Stop();
 

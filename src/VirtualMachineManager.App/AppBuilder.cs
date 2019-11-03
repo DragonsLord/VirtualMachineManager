@@ -97,7 +97,7 @@ namespace VirtualMachineManager.App
                 .Range(0, parametersManager.StepsToSimulate ?? tracesDataContext.TimeEvents.Count())
                 .Select(i => tracesDataContext.TimeEvents.Include(te => te.VMEvents).Include(te => te.RemovedVMs).Skip(i).First());
 
-            var reportService = new ReportService(outputFolder);
+            var reportService = new ReportService(outputFolder, parametersManager.PrognoseDepth);
             disposableResources.Add(reportService.Dispose);
 
             return new App(

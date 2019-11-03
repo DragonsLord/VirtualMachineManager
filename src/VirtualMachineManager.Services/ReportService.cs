@@ -17,11 +17,11 @@ namespace VirtualMachineManager.Services
 
         private int _currentStep = 0;
 
-        public ReportService(string outputFilename/*, int prognoseDepth*/)
+        public ReportService(string outputFilename, int prognoseDepth)
         {
             _excelPackage = new ExcelPackage();
             _outputFilename = outputFilename;
-            _prognoseDepth = 1;
+            _prognoseDepth = prognoseDepth;
         }
 
         public void Initialize(IEnumerable<int> serverIds)
