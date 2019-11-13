@@ -14,7 +14,7 @@ namespace VirtualMachineManager.Prognosing.Algorythms
             // Add package lib path
             R.Evaluate($".libPaths(c('{packageLibPath}', .libPaths()))");
 
-            InstallRPackages("foreach", "doParallel", "forecast");
+            InstallRPackages("foreach", "doParallel", "forecast", "tsintermittent");
 
             // Register parallel R cluster and load required packages
             R.Evaluate(
@@ -23,6 +23,7 @@ namespace VirtualMachineManager.Prognosing.Algorythms
                 @"clusterCall(myCluster, function() {
                     .libPaths(c('" + packageLibPath + @"', .libPaths()))
                     library('forecast')
+                    library('tsintermittent')
                     library('foreach')
                 })"
                 );

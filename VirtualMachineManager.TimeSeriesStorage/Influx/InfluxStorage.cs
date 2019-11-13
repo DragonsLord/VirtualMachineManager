@@ -18,7 +18,8 @@ namespace VirtualMachineManager.TimeSeriesStorage.Influx
             influxClient = influxHttpClient;
             db = dbName;
 
-            influxClient.CreateDataBase(db);
+            influxClient.DropDataBase(db).Wait();
+            influxClient.CreateDataBase(db).Wait();
         }
 
         public Task PushNextRecord(IEnumerable<VM> vms, long timestamp)

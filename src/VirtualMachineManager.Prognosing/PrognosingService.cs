@@ -33,6 +33,7 @@ namespace VirtualMachineManager.Prognosing
 
         private Dictionary<ForecastCompositeKey, IEnumerable<ForecastResult>> lastForecasts
             = new Dictionary<ForecastCompositeKey, IEnumerable<ForecastResult>>();
+
         public PrognosingParams Params { get; }
 
         public PrognosingService(PrognosingParams @params, ISeriesStorage seriesStorage)
@@ -63,6 +64,7 @@ namespace VirtualMachineManager.Prognosing
 
             var r = Enumerable.Range(0, batchesCount)
                 .SelectMany(i => rForecast.RunAlgorythms(vms.Skip(i * BathSize).Take(BathSize).SelectMany(MapToResourceTraces)))
+                .ToList()
                 .GroupBy(trace => trace.VmId)
                 .Select(group =>
                 {
@@ -97,7 +99,7 @@ namespace VirtualMachineManager.Prognosing
                         }
                     }
                     return new VMPrognose(vm, prognoses);
-                }).ToList();
+                }).AsParallel().ToList();
 
             timer.Stop();
 
@@ -107,7 +109,7 @@ namespace VirtualMachineManager.Prognosing
 
         public void UpdateTraces(IEnumerable<VM> vms, int timeId) =>
             seriesStorage.PushNextRecord(vms, timeId).Wait();
-
+        
         private float[] GetForecast(VmResourceForecast forecast, float realValue)
         {
             var values = forecast.Forecast.Select(pair => {
@@ -118,30 +120,32 @@ namespace VirtualMachineManager.Prognosing
                     lastForecasts.Add(key, pair.Value);
                     return pair.Value.First();
                 }
-                ForecastResult best = null;
+                int? bestOffset = null;
                 float minErr = float.MaxValue, currErr = 0;
 
-                foreach (var fr in lastForecasts[key])
+                // filtering only for available offsets
+                foreach (var fr in lastForecasts[key].Where(r => pair.Value.Any(x => x.WindowOffset == r.WindowOffset)))
                 {
+                    // TODO: MAPE ?
                     currErr = Math.Abs(fr.Result[0] - realValue);
                     if (currErr < minErr)
                     {
                         minErr = currErr;
-                        best = fr;
+                        bestOffset = fr.WindowOffset;
                     }
                 }
 
                 lastForecasts[key] = pair.Value;
 
-                return best;
+                return bestOffset.HasValue ? pair.Value.First(x => x.WindowOffset == bestOffset) : pair.Value.First();
             });
-
+            
             return Enumerable.Range(0, Params.PrognoseDepth).Select(i => values.Select(arr => arr.Result[i]).Average()).ToArray();
         }
 
         private void CalculateTraceWindowTime(int simulationStep)
         {
-            if (simulationStep > Params.MaxTraceWindow) traceWindowTime++;
+            if (simulationStep > Params.MaxTraceWindow) ++traceWindowTime;
         }
 
         private IEnumerable<VmResourceTrace> MapToResourceTraces(VM vm)

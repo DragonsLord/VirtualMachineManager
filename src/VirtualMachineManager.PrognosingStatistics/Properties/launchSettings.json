@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "VirtualMachineManager.PrognosingStatistics": {
+      "commandName": "Project",
+      "commandLineArgs": "D:\\Projects\\Data\\VmManagement"
+    }
+  }
+}

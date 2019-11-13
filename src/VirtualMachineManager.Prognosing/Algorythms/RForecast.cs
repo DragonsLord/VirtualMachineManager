@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using VirtualMachineManager.Core.Models;
 using VirtualMachineManager.Prognosing.Models;
 
 namespace VirtualMachineManager.Prognosing.Algorythms
@@ -25,15 +26,30 @@ namespace VirtualMachineManager.Prognosing.Algorythms
             var timer = new Stopwatch();
 
             var windowsCount = traces.First().Series.Count() - Params.MinTraceWindow + 1;
-            var inputList = new GenericVector(R, traces.Select(ConvertToRList));
+            var splitedTraces = traces.GroupBy(t => t.Series.Count(v => v > 0) >= 2).ToDictionary(p => p.Key ? 1 : 0, p => p.ToArray());
+
+            var zeroResult = Enumerable.Range(0, windowsCount).Select(i => new ForecastResult(i, Enumerable.Repeat<float>(0, Params.PrognoseDepth).ToArray()));
+            var zeroSeriesResult = splitedTraces[0]
+                .Select(s => new VmResourceForecast(s.VmId, s.Resource, new Dictionary<string, IEnumerable<ForecastResult>>()
+                {
+                        { "ARIMA", zeroResult},
+                        { "SES", zeroResult},
+                        { "CROST", zeroResult},
+                        { "HOLT", zeroResult},
+                        { "DHOLT", zeroResult}
+                }));
+
+            var inputList = new GenericVector(R, splitedTraces[1].Select(ConvertToRList));
             R.SetSymbol(InputListName, inputList);
+
             timer.Start();
+
             var result = R.Evaluate($"foreach(i = {InputListName}) %dopar% {ProccessTraceFunction}(i, {Params.MinTraceWindow}, {windowsCount})");
 
             timer.Stop();
             Debug.WriteLine($"{traces.Count()} with {windowsCount} windows evaluated in {timer.ElapsedMilliseconds}ms");
 
-            return result.AsList().Select(r => ReadRList(r.AsList()));
+            return result.AsList().Select(r => ReadRList(r.AsList())).Concat(zeroSeriesResult);
         }
 
         private void InitRScript()
@@ -41,17 +57,36 @@ namespace VirtualMachineManager.Prognosing.Algorythms
             R.Evaluate($"horizon = {Params.PrognoseDepth}");
             R.Evaluate(
                 ProccessTraceFunction + @"<- function(trace, windowSize, windows) {
-                    #arimaResult = foreach(i=1:windows) %do% {
-                    #    arimaFit = auto.arima(window(trace$series, i, windowSize - 1 + i), lambda=0, biasadj=TRUE)
-                    #    list(offset=i, result=forecast(arimaFit, h = horizon, level = 95)$mean)
-                    #}
+                    arimaResult = foreach(i=1:windows) %do% {
+                        ar = tryCatch({
+                            forecast(auto.arima(window(trace$series, i, windowSize - 1 + i), lambda=0, biasadj=TRUE), h = horizon, level = 95)$mean
+                        },
+                        error=function(cond) {
+                            return(NA)
+                        })
+                        list(offset=i-1, result=NA)
+                    }
                     sesResult = foreach(i=1:windows) %do%
-                        list(offset=i, result=ses(window(trace$series, i, windowSize - 1 + i), h=horizon)$mean)
+                        list(offset=i-1, result=ses(window(trace$series, i, windowSize - 1 + i), h=horizon)$mean)
+
+                    crostResult = foreach(i=1:windows) %do% {
+                        cr = tryCatch({
+                            crost(window(trace$series, i, windowSize - 1 + i), h=horizon)$frc.out
+                        },
+                        error=function(cond) {
+                            return(NA)
+                        })
+                        list(offset=i-1, result=cr)
+                    }
+                        
 
                     holtResult = foreach(i=1:windows) %do%
-                        list(offset=i, result=holt(window(trace$series, i, windowSize - 1 + i), h=horizon)$mean)
+                        list(offset=i-1, result=holt(window(trace$series, i, windowSize - 1 + i), h=horizon)$mean)
 
-                    list(vmId = trace$vmId, resourceId = trace$resourceId, ses = sesResult, holt = holtResult)
+                    dholtResult = foreach(i=1:windows) %do%
+                        list(offset=i-1, result=holt(window(trace$series, i, windowSize - 1 + i), damped=TRUE, phi = 0.9, h=horizon)$mean)
+
+                    list(vmId = trace$vmId, resourceId = trace$resourceId, ses = sesResult, arima=arimaResult, crost = crostResult, holt = holtResult, dholt = dholtResult)
                 }"
             );
         }
@@ -62,28 +97,30 @@ namespace VirtualMachineManager.Prognosing.Algorythms
             list.SetNames("vmId", "resourceId", "series");
             list["vmId"] = new IntegerVector(R, new int[] { trace.VmId });
             list["resourceId"] = new IntegerVector(R, new int[] { (int)trace.Resource });
-            list["series"] = new NumericVector(R, trace.Series.Select(f => (double)(f + 1)));
+            list["series"] = new NumericVector(R, trace.Series.Select(f => (double)(f)));
             return list;
         }
 
         private VmResourceForecast ReadRList(GenericVector row)
         {
+            var forecasts = new[] { "arima", "ses", "crost", "holt", "dholt" }
+                .ToDictionary(x => x, method => ParseForecastResult(row[method].AsList()))
+                .Where(p => p.Value.Any())
+                .ToDictionary(p => p.Key.ToUpper(), p => p.Value);
+
             return new VmResourceForecast(
                 row["vmId"].AsInteger()[0],
                 (Resource)row["resourceId"].AsInteger()[0],
-                new Dictionary<string, IEnumerable<ForecastResult>>
-                    {
-                        // { "ARIMA", ParseForecastResult(row["arima"].AsList())},
-                        { "SES", ParseForecastResult(row["ses"].AsList())},
-                        { "HOLT", ParseForecastResult(row["holt"].AsList())}
-                    }
-                );
+                forecasts);
         }
 
         private IEnumerable<ForecastResult> ParseForecastResult(GenericVector list) =>
             list.Select(exp => exp.AsList())
-                .Select(r => new ForecastResult(
-                    r["offset"].AsInteger()[0],
-                    r["result"].AsNumeric().Select(f => (float)(f - 1)).ToArray()));
+                .Select(r => {
+                    var offset = r["offset"].AsInteger()[0];
+                    var r_reslult = r["result"].AsNumeric();
+                    float[] result = double.IsNaN(r_reslult[0]) ? null : r_reslult.Select(f => (float)f).ToArray();
+                    return new ForecastResult(offset, result);
+                }).Where(x => x.Result != null);
     }
 }

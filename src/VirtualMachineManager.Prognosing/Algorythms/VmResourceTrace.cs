@@ -1,15 +1,8 @@
 ﻿using System.Collections.Generic;
+using VirtualMachineManager.Core.Models;
 
 namespace VirtualMachineManager.Prognosing.Algorythms
 {
-    public enum Resource
-    {
-        Cpu = 1,
-        Memory = 2,
-        Network = 3,
-        Iops = 4
-    }
-
     public class VmResourceTrace
     {
         public int VmId { get; private set; }

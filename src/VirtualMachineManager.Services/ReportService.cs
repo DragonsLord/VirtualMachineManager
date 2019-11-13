@@ -15,6 +15,8 @@ namespace VirtualMachineManager.Services
         private string _outputFilename;
         private ExcelPackage _excelPackage;
 
+        private string[] _methods;
+
         private int _currentStep = 0;
 
         public ReportService(string outputFilename, int prognoseDepth)
@@ -58,6 +60,62 @@ namespace VirtualMachineManager.Services
             }
         }
 
+        public void InitVmPrognoseSheets(int vmId, params string[] methods)
+        {
+            _methods = methods;
+            var steps = _prognoseDepth * methods.Length + 1;
+            var ws = _excelPackage.Workbook.Worksheets.Add($"vm{vmId}");
+
+            ws.Cells.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            ws.Cells[1, 1].Value = "Step";
+            MergeAndSetValue(ws.Cells[1, 2, 1, steps + 1], "CPU");
+            MergeAndSetValue(ws.Cells[1, 1 * steps + 2, 1, 2 * steps + 1], "Memmory");
+            MergeAndSetValue(ws.Cells[1, 2 * steps + 2, 1, 3 * steps + 1], "Network");
+            MergeAndSetValue(ws.Cells[1, 3 * steps + 2, 1, 4 * steps + 1], "IOPS");
+
+            ws.Cells[2, 0 * steps + 2].Value = $"|actual|";
+            ws.Cells[2, 1 * steps + 2].Value = $"|actual|";
+            ws.Cells[2, 2 * steps + 2].Value = $"|actual|";
+            ws.Cells[2, 3 * steps + 2].Value = $"|actual|";
+
+            for (int i = 0; i < methods.Length; i++)
+            {
+                for (int j = 1; j <= _prognoseDepth; j++)
+                {
+                    ws.Cells[2, 0 * steps + 2 + i * _prognoseDepth + j].Value = $"|{methods[i]}+{j}|";
+                    ws.Cells[2, 1 * steps + 2 + i * _prognoseDepth + j].Value = $"|{methods[i]}+{j}|";
+                    ws.Cells[2, 2 * steps + 2 + i * _prognoseDepth + j].Value = $"|{methods[i]}+{j}|";
+                    ws.Cells[2, 3 * steps + 2 + i * _prognoseDepth + j].Value = $"|{methods[i]}+{j}|";
+                }
+            }
+        }
+
+        public void WriteVmPrognoseStatistics(int step, VM vm, Dictionary<Resource, Dictionary<string, float[]>> stat)
+        {
+            var steps = _prognoseDepth * _methods.Length + 1;
+            var ws = _excelPackage.Workbook.Worksheets[$"vm{vm.Id}"];
+
+            ws.Cells[2 + step, 0 * steps + 2].Value = vm.Resources.CPU;
+            ws.Cells[2 + step, 1 * steps + 2].Value = vm.Resources.Memmory;
+            ws.Cells[2 + step, 2 * steps + 2].Value = vm.Resources.Network;
+            ws.Cells[2 + step, 3 * steps + 2].Value = vm.Resources.IOPS;
+
+            if (!stat[Resource.Cpu].Any()) return;
+
+            for (int i = 0; i < _methods.Length; i++)
+            {
+                for (int j = 1; j <= _prognoseDepth; j++)
+                {
+                    ws.Cells[2 + step, 0 * steps + 2 + i * _prognoseDepth + j].Value = stat[Resource.Cpu][_methods[i]][j-1];
+                    ws.Cells[2 + step, 1 * steps + 2 + i * _prognoseDepth + j].Value = stat[Resource.Memory][_methods[i]][j-1];
+                    ws.Cells[2 + step, 2 * steps + 2 + i * _prognoseDepth + j].Value = stat[Resource.Cpu][_methods[i]][j-1];
+                    ws.Cells[2 + step, 3 * steps + 2 + i * _prognoseDepth + j].Value = stat[Resource.Iops][_methods[i]][j-1];
+                }
+            }
+
+            _currentStep = step;
+        }
+
         public void WriteServerStatistics(int step, Server server, IEnumerable<Resources> prognosed)  // TODO: Create ServerStatistic Model
         {
             var depth = _prognoseDepth;
@@ -86,9 +144,10 @@ namespace VirtualMachineManager.Services
 
         public void DrawCharts()
         {
-            foreach (var sheet in _excelPackage.Workbook.Worksheets)
+            ExcelLineChart chart;
+            foreach (var sheet in _excelPackage.Workbook.Worksheets.Where(w => !w.Name.Contains("vm")))
             {
-                var chart = CreatePredictionChart(sheet, "CPU", 0);
+                chart = CreatePredictionChart(sheet, "CPU", 0);
                 chart.SetSize(1000, 800);
                 chart.SetPosition(0, 0);
                 chart = CreatePredictionChart(sheet, "Memory", 1);
@@ -106,6 +165,26 @@ namespace VirtualMachineManager.Services
                 chart = CreateMigrationsChart(sheet);
                 chart.SetSize(1000, 400);
                 chart.SetPosition(3600, 0);
+            }
+        }
+
+        public void DrawVmForecastCharts()
+        {
+            var steps = _prognoseDepth * _methods.Length + 1;
+            foreach (var sheet in _excelPackage.Workbook.Worksheets.Where(w => w.Name.Contains("vm")))
+            {
+                var chart = CreateVmPredictionChart(sheet, "CPU", 0 * steps + 2);
+                chart.SetSize(1000, 800);
+                chart.SetPosition(0, 0);
+                chart = CreateVmPredictionChart(sheet, "Memory", 1 * steps + 2);
+                chart.SetSize(1000, 800);
+                chart.SetPosition(800, 0);
+                chart = CreateVmPredictionChart(sheet, "Network", 2 * steps + 2);
+                chart.SetSize(1000, 800);
+                chart.SetPosition(1600, 0);
+                chart = CreateVmPredictionChart(sheet, "IOPS", 3 * steps + 2);
+                chart.SetSize(1000, 800);
+                chart.SetPosition(2400, 0);
             }
         }
 
@@ -129,6 +208,25 @@ namespace VirtualMachineManager.Services
             chart.Series
                 .Add(GetValuesCellRange(sheet, 4 * depth + 10 + columnOffset, 0), GetValuesCellRange(sheet, 1, 0))
                 .Header = "capacity";
+            return chart;
+        }
+
+        private ExcelLineChart CreateVmPredictionChart(ExcelWorksheet sheet, string title, int column)
+        {
+            var chart = sheet.Drawings.AddChart(title, eChartType.Line) as ExcelLineChart;
+            chart.Title.Text = title;
+            for (int m = 0; m < _methods.Length; m++)
+            {
+                for (int i = 1; i <= _prognoseDepth; i++)
+                {
+                    chart.Series
+                        .Add(GetValuesCellRange(sheet, column + m*_prognoseDepth + i, -i), GetValuesCellRange(sheet, 1, i))
+                        .Header = $"{_methods[m]}+{i}";
+                }
+            }
+            chart.Series
+                .Add(GetValuesCellRange(sheet, column, 0), GetValuesCellRange(sheet, 1, 0))
+                .Header = "actual";
             return chart;
         }
 
