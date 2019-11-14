@@ -31,6 +31,7 @@ namespace VirtualMachineManager.Prognosing
         private readonly RForecast rForecast;
         private long traceWindowTime = 0;
 
+        // TODO: respect prognosing depth
         private Dictionary<ForecastCompositeKey, IEnumerable<ForecastResult>> lastForecasts
             = new Dictionary<ForecastCompositeKey, IEnumerable<ForecastResult>>();
 
@@ -127,6 +128,11 @@ namespace VirtualMachineManager.Prognosing
                 foreach (var fr in lastForecasts[key].Where(r => pair.Value.Any(x => x.WindowOffset == r.WindowOffset)))
                 {
                     // TODO: MAPE ?
+                    /***
+                     * MAPE will not work for 0 values.
+                     * In our context we can continue using MAE as we basically camparing result for same series
+                     * and we do not need to worry about value scaling and normalization
+                     * ***/
                     currErr = Math.Abs(fr.Result[0] - realValue);
                     if (currErr < minErr)
                     {
