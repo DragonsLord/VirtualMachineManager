@@ -64,7 +64,7 @@ namespace VirtualMachineManager.Prognosing.Algorythms
                         error=function(cond) {
                             return(NA)
                         })
-                        list(offset=i-1, result=NA)
+                        list(offset=i-1, result=ar)
                     }
                     sesResult = foreach(i=1:windows) %do%
                         list(offset=i-1, result=ses(window(trace$series, i, windowSize - 1 + i), h=horizon)$mean)
