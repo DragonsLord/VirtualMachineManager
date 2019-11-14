@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.0</TargetFramework>
@@ -10,8 +10,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\src\VirtualMachineManager.Core\VirtualMachineManager.Core.csproj" />
-    <ProjectReference Include="..\src\VirtualMachineManager.Prognosing\VirtualMachineManager.Prognosing.csproj" />
+    <ProjectReference Include="..\VirtualMachineManager.Core\VirtualMachineManager.Core.csproj" />
+    <ProjectReference Include="..\VirtualMachineManager.Prognosing\VirtualMachineManager.Prognosing.csproj" />
   </ItemGroup>
 
 </Project>

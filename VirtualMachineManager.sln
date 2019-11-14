@@ -21,7 +21,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VirtualMachineManager.App",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VirtualMachineManager.DataAccess", "src\VirtualMachineManager.DataAccess\VirtualMachineManager.DataAccess.csproj", "{7DA7AE7C-E4F7-4500-B1A0-770A2D9A2CA6}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VirtualMachineManager.TimeSeriesStorage", "VirtualMachineManager.TimeSeriesStorage\VirtualMachineManager.TimeSeriesStorage.csproj", "{97CF45CC-5584-4C10-8EE4-208445C4359A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VirtualMachineManager.TimeSeriesStorage", "src\VirtualMachineManager.TimeSeriesStorage\VirtualMachineManager.TimeSeriesStorage.csproj", "{97CF45CC-5584-4C10-8EE4-208445C4359A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VirtualMachineManager.PrognosingStatistics", "src\VirtualMachineManager.PrognosingStatistics\VirtualMachineManager.PrognosingStatistics.csproj", "{4CE18C7A-8D41-4BC3-AB30-33892A11613D}"
 EndProject
